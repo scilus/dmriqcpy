@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<title>{{ title }}</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" type="text/css" href="libs/css/w3.css">
+<link rel="stylesheet" type="text/css" href="libs/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="libs/css/jquery.dataTables.min.css">
+<link rel="stylesheet" type="text/css" href="libs/css/select2.min.css">
+<link rel="stylesheet" type="text/css" href="libs/css/ekko-lightbox.css">
+<link rel="stylesheet" type="text/css" href="libs/css/style.css">
+<link rel="stylesheet" type="text/css" href="libs/fontawesome-free-5.11.2-web/css/all.css">
+
+<script type="text/javascript" src="libs/js/jquery.min.js"></script>
+<script type="text/javascript" src="libs/js/jquery-3.3.1.js"></script> 
+<script type="text/javascript" src="libs/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="libs/js/ekko-lightbox.js"></script>
+<script type="text/javascript" src="libs/js/ekko-lightbox.min.js"></script>
+<script type="text/javascript" src="libs/js/select2.min.js"></script>
+<script type="text/javascript" src="libs/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="libs/js/StreamSaver.min.js"></script>
+<script type="text/javascript" src="libs/js/FileSaver.js"></script>
+<script type="text/javascript" src="libs/js/scripts.js"></script>
+
+<body class="w3-white">
+
+<!-- Top container -->
+<div class="w3-bar w3-top w3-large" style="background-color: #337ab7;">
+    <span class="w3-bar-item w3-left" style="color: white;">SCIL Quality Check</span>
+    <ul id="navigation" class="nav nav-tabs">
+            <li class="active"><a style="background-color: #19568b; color: white" data-toggle="tab" href="#Dashboard">Dashboard</a></li>
+            {% for metric_name in metrics_dict|sort() %}
+            <li><a style="background-color: #19568b; color: white" data-toggle="tab" href="#{{ metric_name|replace(" ", "_") }}">{{metric_name}}</a></li>
+            {% endfor %}
+    </ul>
+    <span class="w3-bar-item w3-left" style="color: white; margin: 2px">Tools: </span>
+    <label class="w3-bar-item w3-left" style="margin: 2px">
+        <input id="zoom-button" onclick="zoom()" class="w3-center" type="checkbox" name="zoom" style="color: white">
+        Zoom
+    </label>
+    <input class="load_save_file" accept=".json" type="file" name="file" id="load_file" onchange="load_qc()"/>
+    <label class="btn w3-light-grey" style="margin: 6px" for="load_file">
+        <span>Load QC</span>
+    </label>
+    <input class="load_save_file" accept=".json" onclick="save_qc()" id="save_file"/>
+    <label class="btn w3-light-grey" style="margin: 6px" for="save_file">
+        <span>Save QC</span>
+    </label>
+    <span class="w3-bar-item w3-right" style="color: white" id="curr_subj"></span>
+</div>
+
+<!-- !PAGE CONTENT! -->
+<div id="main" class="tab-content">
+        <div id="Dashboard" class="tab-pane fade active in" style="padding-top:75px">
+            <h3><b> <i class="fa fa-dashboard"></i> Dashboard</b></h3>
+            <div class="tab w3-row-padding w3-padding-large" id="dash">
+                {% block subjects_block scoped %}{% endblock subjects_block %}
+                <div class="w3-row w3-padding-16">
+                {% if warning_list %}
+                    {% for metric_name, metric_warning in warning_list.items() %}
+                        {% block warning_block scoped %}{% endblock warning_block %}
+                    {% endfor %}
+                {% endif %}
+                </div>
+                {% if graph_summ %}
+                    <div data-toggle="collapse" class="w3-container w3-row w3-padding-16" data-target="#diagrams">
+                        <h3><div class="fa fa-chevron-down"></div> Diagrams</h3>
+                        <div id="diagrams" class="collapse">
+                            {% for graph in graph_summ %}
+                                {{ graph }}
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+                {% if summary_dict %}
+                    <div data-toggle="collapse" class="w3-container w3-row w3-padding-16" data-target="#statistics">
+                        <h3><div class="fa fa-chevron-down"></div> Statistics</h3>
+                        <div id="statistics" class="collapse">
+                            {% for metric_name, metric_summ in summary_dict.items() %}
+                                <ul><li><h3>{{ metric_name }}</h3></li></ul>
+                                {{ metric_summ }}
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        {% for metric_name, metric_values in metrics_dict.items()|sort() %}
+            <div id="{{ metric_name|replace(" ", "_") }}" class="tab-pane fade" style="padding-top:75px">
+                <div class="w3-padding-16 w3-bar-item w3-right">
+                        <button id="prevBtn" onclick="nextPrev(-1)" class="fa fa-arrow-left"></button>
+                        <select id="subjects_{{ metric_name|replace(" ", "_") }}" class="js-dropdown">
+                        {% for subject in metric_values|sort() %}
+                            <option value="{{subject}}">{{subject}}</option>
+                        {% endfor %}
+                        </select>
+                        <button id="nextBtn" onclick="nextPrev(1)" class="fa fa-arrow-right"></button>
+                </div>
+                {% for subject_name, subject_values in metric_values.items()|sort() %}
+                    <div class="tab" id="{{ subject_name }}">
+                        <h1><b>Current subject: {{ subject_name }}</b></h1>
+                        {% block comment_block scoped %}{% endblock comment_block %}
+                        <div class="w3-container w3-padding-32 w3-light-grey" style="border-radius: 8px">
+                            {{subject_values.stats}}
+                            {% block screenshot_block scoped %}{% endblock screenshot_block %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
+
+<!-- Footer -->
+<footer class="w3-container w3-padding-16 w3-center" style="background-color: #337ab7">
+    <a href="http://scil.usherbrooke.ca/?lang=en" title="SCIL" target="_blank" style="color: black">SCIL</a>
+</footer>
+
+<!-- End page content -->
+</div>
+<script>
+    $(document).ready(function() {
+    $('.js-dropdown').select2({
+    matcher: matchCustom});
+
+    $('.table_sort').DataTable( {
+        "pagingType": "full_numbers"
+    });
+} );
+</script>
+</body>
+</html>
