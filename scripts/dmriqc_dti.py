@@ -20,7 +20,7 @@ from dmriqcpy.io.utils import add_overwrite_arg, assert_inputs_exist,\
 
 DESCRIPTION = """
 Compute the DTI report in HTML format.
- """
+"""
 
 
 def _build_arg_parser():
