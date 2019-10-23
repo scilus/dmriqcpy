@@ -64,3 +64,72 @@ def graph_mean_median(title, column_names, summary):
     div = off.plot(fig, show_link=False, output_type='div')
     div = div.replace("<div>", "<div style=\"display:inline-block\">")
     return div
+
+
+def graph_mean_in_tissues(title, column_names, summary):
+    """
+    Compute plotly graph with mean value in tissue masks
+
+    Parameters
+    ----------
+    title : string
+        Title of the graph.
+    column_names : array of strings
+        Name of the columns in the summary DataFrame.
+    summary : DataFrame
+        DataFrame containing the mean stats.
+
+    Returns
+    -------
+    div : html div (string)
+        Graph as a HTML div.
+    """
+    means_wm = []
+    means_gm = []
+    means_csf = []
+    np.random.seed(1)
+    metric = summary.index
+    means_wm = np.array(summary[column_names[0]])
+    means_gm = np.array(summary[column_names[1]])
+    means_csf = np.array(summary[column_names[2]])
+    wm = Box(
+        name="WM",
+        y=means_wm,
+        boxpoints='all',
+        jitter=0.3,
+        text=metric,
+        pointpos=-1.8,
+        hoverinfo="y+text"
+    )
+
+    gm = Box(
+        name="GM",
+        y=means_gm,
+        boxpoints='all',
+        jitter=0.3,
+        text=metric,
+        pointpos=-1.8,
+        hoverinfo="y+text"
+    )
+
+    csf = Box(
+        name="CSF",
+        y=means_csf,
+        boxpoints='all',
+        jitter=0.3,
+        text=metric,
+        pointpos=-1.8,
+        hoverinfo="y+text",
+    )
+    data = [wm, gm, csf]
+
+    fig = Figure(data=data)
+
+    range_yaxis = [0, np.max(means_wm) + 2 * np.max(means_wm)]
+
+    fig['layout']['yaxis'].update(range=range_yaxis)
+    fig['layout'].update(title=title)
+    fig['layout'].update(width=500, height=500)
+    div = off.plot(fig, show_link=False, output_type='div')
+    div = div.replace("<div>", "<div style=\"display:inline-block\">")
+    return div

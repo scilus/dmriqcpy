@@ -47,6 +47,7 @@ def _build_arg_parser():
 
     return p
 
+
 def _subj_parralel(images_no_bet, images_bet_mask, name, skip, summary):
     subjects_dict = {}
     for subj_metric, mask in zip(images_no_bet, images_bet_mask):
@@ -61,6 +62,7 @@ def _subj_parralel(images_no_bet, images_bet_mask, name, skip, summary):
         subjects_dict[subj_metric]['screenshot'] = screenshot_path
         subjects_dict[subj_metric]['stats'] = summary_html
     return subjects_dict
+
 
 def main():
     parser = _build_arg_parser()
@@ -103,7 +105,7 @@ def main():
     summary_dict[name] = stats_html
 
     pool = Pool(args.nb_threads)
-    subjects_dict_pool = pool.starmap(_subj_parralel,\
+    subjects_dict_pool = pool.starmap(_subj_parralel,
         zip(np.array_split(np.array(args.images_no_bet), args.nb_threads),
             np.array_split(np.array(args.images_bet_mask), args.nb_threads),
             itertools.repeat(name), itertools.repeat(args.skip),

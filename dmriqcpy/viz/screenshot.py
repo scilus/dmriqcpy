@@ -2,6 +2,7 @@
 
 import os
 
+from fury import window, actor
 from matplotlib.cm import get_cmap
 import nibabel as nib
 import numpy as np
@@ -187,10 +188,6 @@ def screenshot_mosaic(data, skip, pad, nb_columns, axis, cmap):
                curr_shape[1] * corner + corner * pad:
                corner * curr_shape[1] + curr_shape[1] + corner * pad] = curr_img
 
-    if cmap is not None:
-        colormap = get_cmap(cmap)
-        mosaic = colormap(mosaic/255.0) * 255
-
     if axis and not is_4d:
         mosaic = np.pad(mosaic, ((50, 50), (50, 50)), 'constant')
         img = Image.fromarray(mosaic)
@@ -205,6 +202,10 @@ def screenshot_mosaic(data, skip, pad, nb_columns, axis, cmap):
                   font=fnt)
         mosaic = np.array(img)
 
+    if cmap is not None:
+        colormap = get_cmap(cmap)
+        mosaic = colormap(mosaic/255.0) * 255
+
     if is_4d and mosaic.shape[2] > 3:
         gif = []
         for i in range(mosaic.shape[2]):
@@ -217,3 +218,84 @@ def screenshot_mosaic(data, skip, pad, nb_columns, axis, cmap):
         imgs_comb = Image.fromarray(img)
         imgs_comb = imgs_comb.convert("RGB")
         return imgs_comb
+
+
+def screenshot_fa_peaks(fa, peaks, directory='.'):
+    """
+    Compute 3 view screenshot with peaks on FA.
+
+    Parameters
+    ----------
+    fa : string
+        FA filename.
+    peaks : string
+        Peak filename.
+    directory : string
+        Directory to save the mosaic.
+
+    Returns
+    -------
+    name : string
+        Path of the mosaic
+    """
+    slice_name = ['sagittal', 'coronal', 'axial']
+    data = nib.load(fa).get_data()
+    evecs_data = nib.load(peaks).get_data()
+
+    evecs = np.zeros(data.shape + (1, 3))
+    evecs[:, :, :, 0, :] = evecs_data[...]
+
+    middle = [data.shape[0] // 2 + 4, data.shape[1] // 2,
+              data.shape[2] // 2]
+
+    slice_display = [(middle[0], None, None), (None, middle[1], None),
+                     (None, None, middle[2])]
+
+    concat = []
+    for j, slice_name in enumerate(slice_name):
+        image_name = os.path.basename(str(peaks)).split(".")[0]
+        name = os.path.join(directory, image_name + '.png')
+        slice_actor = actor.slicer(data, interpolation='nearest', opacity=0.3)
+        peak_actor = actor.peak_slicer(evecs, colors=None)
+
+        peak_actor.GetProperty().SetLineWidth(2.5)
+
+        slice_actor.display(slice_display[j][0], slice_display[j][1],
+                            slice_display[j][2])
+        peak_actor.display(slice_display[j][0], slice_display[j][1],
+                           slice_display[j][2])
+
+        renderer = window.ren()
+
+        renderer.add(slice_actor)
+        renderer.add(peak_actor)
+
+        center = slice_actor.GetCenter()
+        pos = None
+        viewup = None
+        if slice_name == "sagittal":
+            pos = (center[0] - 350, center[1], center[2])
+            viewup = (0, 0, -1)
+        elif slice_name == "coronal":
+            pos = (center[0], center[1] + 350, center[2])
+            viewup = (0, 0, -1)
+        elif slice_name == "axial":
+            pos = (center[0], center[1], center[2] + 350)
+            viewup = (0, -1, 1)
+
+        camera = renderer.GetActiveCamera()
+        camera.SetViewUp(viewup)
+
+        camera.SetPosition(pos)
+        camera.SetFocalPoint(center)
+
+        img = window.snapshot(renderer, size=(1080, 1080), offscreen=True)
+        if len(concat) == 0:
+            concat = img
+        else:
+            concat = np.hstack((concat, img))
+
+    imgs_comb = Image.fromarray(concat)
+    imgs_comb.save(name)
+
+    return name
