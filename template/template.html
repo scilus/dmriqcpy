@@ -1,8 +1,8 @@
 {% extends "index.html" %}
 
 {% block screenshot_block %}
-<div scroll="no" class="magnify" style='height: 80%; width: 80%; object-fit: contain'><div class="large" style="background: url('{{subject_values.screenshot}}') no-repeat;"></div>
-    <img class="small" src="{{subject_values.screenshot}}" style='height: 100%; width: 100%; object-fit: contain'>
+<div scroll="no" class="magnify" style='max-height: 720px; width: 80%; object-fit: contain'><div class="large" style="background: url('{{subject_values.screenshot}}') no-repeat;"></div>
+    <img class="small" src="{{subject_values.screenshot}}" style='max-height: 720px; height: 100%; width: 100%; object-fit: contain'>
 </div>
 {% endblock %}
 

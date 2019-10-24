@@ -19,7 +19,7 @@ def add_overwrite_arg(parser):
         help='Force overwriting of the output files.')
 
 
-def assert_inputs_exist(parser, required, optional=None):
+def assert_inputs_exist(parser, required, optional=None, are_directories=False):
     """
     Assert that all inputs exist. If not, print parser's usage and exit.
 
@@ -29,10 +29,13 @@ def assert_inputs_exist(parser, required, optional=None):
     required: string or list of paths
     optional: string or list of paths.
         Each element will be ignored if None
+    are_directories: bool
     """
-    def check(path):
-        if not os.path.isfile(path):
+    def check(path, are_directories):
+        if not os.path.isfile(path) and not are_directories:
             parser.error('Input file {} does not exist'.format(path))
+        elif are_directories and not os.path.isdir(path):
+            parser.error('Input directory {} does not exist'.format(path))
 
     if isinstance(required, str):
         required = [required]
@@ -41,10 +44,10 @@ def assert_inputs_exist(parser, required, optional=None):
         optional = [optional]
 
     for required_file in required:
-        check(required_file)
+        check(required_file, are_directories)
     for optional_file in optional or []:
         if optional_file is not None:
-            check(optional_file)
+            check(optional_file, are_directories)
 
 
 def assert_outputs_exist(parser, args, required, optional=None):
