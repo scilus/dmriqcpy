@@ -10,7 +10,7 @@ from dmriqcpy.io.utils import add_overwrite_arg, assert_inputs_exist,\
                               assert_outputs_exist
 
 DESCRIPTION = """
-Compute the report with mean and median stats
+Compute the screenshot report in HTML format.
 """
 
 
