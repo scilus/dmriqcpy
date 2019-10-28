@@ -227,6 +227,28 @@ for (let child of document.getElementById("navigation").children){
     dict_metrics[child.innerText.replace(/ /g,"_")] = 0;
 }
 
+for (let mag of document.getElementsByClassName('magnify')){
+    image_object = new Image;
+    image_object.src = mag.children[0].src;
+    max_h = parseInt(mag.children[0].style.maxHeight.replace("px", ''));
+    max_w = parseInt(mag.children[0].style.maxWidth.replace("px", ''));
+    height_diff = max_h - image_object.height;
+    width_diff = max_w - image_object.width;
+    ratio_height = height_diff / mag.children[0].height;
+    ratio_width = width_diff / mag.children[0].width;
+    if (mag.children[0].width + ratio_height * mag.children[0].width <= max_w && mag.children[0].height + ratio_height * mag.children[0].height <= max_h){
+        mag.children[0].width = mag.children[0].width + ratio_height * mag.children[0].width;
+        mag.children[0].height = mag.children[0].height + ratio_height * mag.children[0].height;
+    }
+    else if(mag.children[0].width + ratio_width * mag.children[0].width <= max_w && mag.children[0].height + ratio_width * mag.children[0].height <= max_h){
+        mag.children[0].width = mag.children[0].width + ratio_width * mag.children[0].width;
+        mag.children[0].height = mag.children[0].height + ratio_width * mag.children[0].height;
+    }
+    else{
+        console.log("ERROR");
+    }
+}
+
 showTab(dict_metrics[currentMetric]);
 function update(mx, my) {
     var rx = Math.round(mx - $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".large").width()/(2*zoom))*-1;
