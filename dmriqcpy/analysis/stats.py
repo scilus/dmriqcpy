@@ -22,8 +22,8 @@ def stats_mean_median(column_names, filenames):
     stats_per_subjects : DataFrame
         DataFrame containing mean and medians for each subject.
     stats_across_subjects : DataFrame
-        DataFrame containing mean, std, min and max of mean and medians.
-        across subjects
+        DataFrame containing mean, std, min and max of mean and medians
+        across subjects.
     """
     values = []
     for filename in filenames:
@@ -71,8 +71,7 @@ def stats_mean_in_tissues(column_names, images, wm_images, gm_images,
     stats_per_subjects : DataFrame
         DataFrame containing mean for each subject.
     stats_across_subjects : DataFrame
-        DataFrame containing mean, std, min and max of mean.
-        across subjects
+        DataFrame containing mean, std, min and max of mean across subjects.
     """
     values = []
     for i in range(len(images)):
@@ -90,6 +89,43 @@ def stats_mean_in_tissues(column_names, images, wm_images, gm_images,
             [data_wm, data_gm, data_csf, data_max])
 
     stats_per_subjects = pd.DataFrame(values, index=[images],
+                                      columns=column_names)
+
+    stats_across_subjects = pd.DataFrame([stats_per_subjects.mean(),
+                                          stats_per_subjects.std(),
+                                          stats_per_subjects.min(),
+                                          stats_per_subjects.max()],
+                                         index=['mean', 'std', 'min', 'max'],
+                                         columns=column_names)
+
+    return stats_per_subjects, stats_across_subjects
+
+
+def stats_frf(column_names, filenames):
+    """
+    Compute mean fiber response function.
+
+    Parameters
+    ----------
+    column_names : array of strings
+        Name of the columns.
+    filenames : array of strings
+        Array of filenames in txt format.
+
+    Returns
+    -------
+    stats_per_subjects : DataFrame
+        DataFrame containing mean for each subject.
+    stats_across_subjects : DataFrame
+        DataFrame containing mean, std, min and max of mean across subjects.
+    """
+    values = []
+    for filename in filenames:
+        frf = np.loadtxt(filename)
+
+        values.append([frf[0], frf[1], frf[3]])
+
+    stats_per_subjects = pd.DataFrame(values, index=[filenames],
                                       columns=column_names)
 
     stats_across_subjects = pd.DataFrame([stats_per_subjects.mean(),
