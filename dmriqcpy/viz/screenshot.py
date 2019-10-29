@@ -63,9 +63,9 @@ def screenshot_mosaic_wrapper(filename, output_prefix="", directory=".", skip=1,
         return imgs_comb
 
 
-def screenshot_mosaic_blend(image, mask, output_prefix="", directory=".",
+def screenshot_mosaic_blend(image, image_blend, output_prefix="", directory=".",
                             blend_val=0.5, skip=1, pad=20, nb_columns=15,
-                            cmap=None):
+                            cmap=None, is_mask=False):
     """
     Compute a blend mosaic from an image and a mask
 
@@ -73,8 +73,8 @@ def screenshot_mosaic_blend(image, mask, output_prefix="", directory=".",
     ----------
     image : string
         Image filename.
-    mask : string
-        Mask filename.
+    image_blend : string
+        Image blend filename.
     output_prefix : string
         Image_prefix.
     directory : string
@@ -89,6 +89,8 @@ def screenshot_mosaic_blend(image, mask, output_prefix="", directory=".",
         Number of columns.
     cmap : string
         Colormap name in matplotlib format.
+    is_mask : bool
+        Image blend is a mask.
 
 
     Returns
@@ -101,25 +103,26 @@ def screenshot_mosaic_blend(image, mask, output_prefix="", directory=".",
                                              axis=False,
                                              cmap=cmap,
                                              return_path=False)
-    mask_mosaic = screenshot_mosaic_wrapper(mask, skip=skip, pad=pad,
-                                            nb_columns=nb_columns,
-                                            axis=False, return_path=False)
+    image_mosaic = screenshot_mosaic_wrapper(image_blend, skip=skip, pad=pad,
+                                             nb_columns=nb_columns,
+                                             axis=False, return_path=False)
 
-    data = np.array(mask_mosaic)
-    data[(data == (255, 255, 255)).all(axis=-1)] = (255, 0, 0)
-    mask_mosaic = Image.fromarray(data, mode="RGB")
+    if is_mask:
+        data = np.array(image_mosaic)
+        data[(data == (255, 255, 255)).all(axis=-1)] = (255, 0, 0)
+        image_mosaic = Image.fromarray(data, mode="RGB")
 
     image_name = os.path.basename(str(image)).split(".")[0]
     if isinstance(mosaic_image, list):
         blend = []
         for _, mosaic in enumerate(mosaic_image):
-            blend.append(Image.blend(mosaic, mask_mosaic,
+            blend.append(Image.blend(mosaic, image_mosaic,
                                      alpha=blend_val))
         name = os.path.join(directory, output_prefix + image_name + '.gif')
         blend[0].save(name, save_all=True, append_images=blend[1:],
                       duration=100, loop=0)
     else:
-        blend = Image.blend(mosaic_image, mask_mosaic, alpha=blend_val)
+        blend = Image.blend(mosaic_image, image_mosaic, alpha=blend_val)
         name = os.path.join(directory, output_prefix + image_name + '.png')
         blend.save(name)
     return name
@@ -162,18 +165,22 @@ def screenshot_mosaic(data, skip, pad, nb_columns, axis, cmap):
              (data[:, :, 0].shape[0] + pad) * nb_columns + nb_columns * pad)
     padding = ((int(pad / 2), int(pad / 2)), (int(pad / 2), int(pad / 2)))
 
+    is_rgb = False
     if is_4d:
         time = data.shape[3]
+        if time == 3:
+            is_rgb = True
         shape += (time, )
         padding += ((0, 0), )
 
-    if len(unique) > 20:
-        data = np.float32(data - min_val) \
-            / np.float32(max_val - min_val) * 255.0
-    elif len(unique) > 2:
-        data = np.interp(data, xp=[data.min(), data.max()], fp=[0, 255])
-    else:
-        data *= 255
+    if not is_rgb:
+        if len(unique) > 20:
+            data = np.float32(data - min_val) \
+                / np.float32(max_val - min_val) * 255.0
+        elif len(unique) > 2:
+            data = np.interp(data, xp=[data.min(), data.max()], fp=[0, 255])
+        else:
+            data *= 255
 
     mosaic = np.zeros(shape)
     for i, idx in enumerate(range_row):
@@ -213,11 +220,10 @@ def screenshot_mosaic(data, skip, pad, nb_columns, axis, cmap):
             imgs_comb = Image.fromarray(img_t)
             gif.append(imgs_comb.convert("RGB"))
         return gif
-    else:
-        img = np.uint8(np.clip(mosaic, 0, 255))
-        imgs_comb = Image.fromarray(img)
-        imgs_comb = imgs_comb.convert("RGB")
-        return imgs_comb
+    img = np.uint8(np.clip(mosaic, 0, 255))
+    imgs_comb = Image.fromarray(img)
+    imgs_comb = imgs_comb.convert("RGB")
+    return imgs_comb
 
 
 def screenshot_fa_peaks(fa, peaks, directory='.'):
