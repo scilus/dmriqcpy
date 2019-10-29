@@ -28,7 +28,7 @@ def _build_arg_parser():
 
     p.add_argument('image_type',
                    help='Type of image (e.g. B0 resample)')
-    
+
     p.add_argument('output_report',
                    help='HTML report')
 
@@ -47,6 +47,9 @@ def _build_arg_parser():
     p.add_argument('--skip', default=2, type=int,
                    help='Number of images skipped to build the mosaic. [%(default)s]')
 
+    p.add_argument('--nb_columns', default=12, type=int,
+                   help='Number of columns for the mosaic. [%(default)s]')
+
     p.add_argument('--nb_threads', type=int, default=1,
                    help='Number of threads. [%(default)s]')
 
@@ -54,16 +57,16 @@ def _build_arg_parser():
 
     return p
 
-def _subj_parralel(subj_metric, summary, name, skip):
+def _subj_parralel(subj_metric, summary, name, skip, nb_columns):
     subjects_dict = {}
     screenshot_path = screenshot_mosaic_wrapper(subj_metric, output_prefix=name,
                                                 directory="data", skip=skip,
-                                                nb_columns=12)
+                                                nb_columns=nb_columns)
 
     summary_html = dataframe_to_html(summary.loc[subj_metric])
     subjects_dict[subj_metric] = {}
     subjects_dict[subj_metric]['screenshot'] = screenshot_path
-    subjects_dict[subj_metric]['stats'] = summary_html 
+    subjects_dict[subj_metric]['stats'] = summary_html
     return subjects_dict
 
 def main():
@@ -78,7 +81,7 @@ def main():
 
         with_tissues = True
         all_images = np.concatenate([args.images, args.wm, args.gm, args.csf])
-    
+
     assert_inputs_exist(parser, all_images)
     assert_outputs_exist(parser, args, [args.output_report, "data", "libs"])
 
@@ -90,17 +93,19 @@ def main():
         shutil.rmtree("libs")
 
     name = args.image_type
-    curr_metrics = ['Mean {} in WM'.format(name),
-                    'Mean {} in GM'.format(name),
-                    'Mean {} in CSF'.format(name),
-                    'Max {} in WM'.format(name)]
 
     if with_tissues:
+        curr_metrics = ['Mean {} in WM'.format(name),
+                        'Mean {} in GM'.format(name),
+                        'Mean {} in CSF'.format(name),
+                        'Max {} in WM'.format(name)]
         summary, stats = stats_mean_in_tissues(curr_metrics, args.images,
                                                args.wm, args.gm, args.csf)
         graph = graph_mean_in_tissues('Mean {}'.format(name), curr_metrics[:3],
                                       summary)
     else:
+        curr_metrics = ['Mean {}'.format(name),
+                        'Median {}'.format(name)]
         summary, stats = stats_mean_median(curr_metrics, args.images)
         graph = graph_mean_median('Mean {}'.format(name), curr_metrics, summary)
 
@@ -110,7 +115,7 @@ def main():
     warning_dict[name]['nb_warnings'] = len(np.unique(warning_list))
 
     graphs = []
-    graph.append(graph)
+    graphs.append(graph)
 
     stats_html = dataframe_to_html(stats)
     summary_dict = {}
@@ -120,12 +125,13 @@ def main():
                                       zip(args.images,
                                           itertools.repeat(summary),
                                           itertools.repeat(name),
-                                          itertools.repeat(args.skip)))
+                                          itertools.repeat(args.skip),
+                                          itertools.repeat(args.nb_columns)))
     pool.close()
     pool.join()
 
     metrics_dict = {}
-    subjects_dict={}
+    subjects_dict = {}
     for dict_sub in subjects_dict_pool:
         for key in dict_sub:
             subjects_dict[key] = dict_sub[key]
