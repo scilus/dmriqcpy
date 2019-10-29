@@ -54,6 +54,7 @@ def _build_arg_parser():
 
     return p
 
+
 def _subj_parralel(t1_metric, rgb_metric, summary, name, skip):
     subjects_dict = {}
     screenshot_path = screenshot_mosaic_blend(t1_metric, rgb_metric,
