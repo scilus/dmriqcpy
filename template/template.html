@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block subjects_block %}
-<div class="w3-container w3-green w3-padding-16 w3-quarter">
+<div class="w3-container w3-light-blue w3-padding-16 w3-quarter">
 <div class="w3-left"><i class="fa fa-users w3-xxxlarge"></i></div>
 <div class="w3-right">
 <h3>{{nb_subjects}}</h3>
@@ -19,13 +19,23 @@
 {% endblock %}
 
 {% block warning_block %}
-<div data-toggle="collapse" class="w3-container w3-orange w3-padding-16 w3-quarter" style="display:inline-block" data-target="#{{ metric_name|replace(" ", "_") }}_warning">
+{% if metric_warning.nb_warnings == 0 %}
+    <div data-toggle="collapse" class="w3-container w3-light-green w3-padding-16 w3-quarter" style="display:inline-block" data-target="#{{ metric_name|replace(" ", "_") }}_warning">
+{% else %}
+    <div data-toggle="collapse" class="w3-container w3-orange w3-padding-16 w3-quarter" style="display:inline-block" data-target="#{{ metric_name|replace(" ", "_") }}_warning">
+{% endif %}
 <div class="w3-left"><i class="fa fa-exclamation-triangle w3-xxxlarge"></i> {{metric_name}}</div>
 <div class="w3-right ">
 <h3>{{metric_warning.nb_warnings}}</h3>
 </div>
 <div class="w3-clear"></div>
-<h4><div class="fa fa-chevron-down"></div> Number of warnings</h4>
+<h4>
+    {% if metric_warning.nb_warnings > 0 %}
+    <div class="fa fa-chevron-down"></div>
+    {% endif %}
+    Number of warnings
+</h4>
+{% if metric_warning.nb_warnings > 0 %}
 <div id="{{ metric_name|replace(" ", "_") }}_warning" class="collapse">
 <div class="w3-row-padding">
     {% for name, warning_list in metric_warning.items() %}
@@ -39,6 +49,7 @@
     {% endfor %}
 </div>
 </div>
+{% endif %}
 </div>
 {% endblock %}
 
