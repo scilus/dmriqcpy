@@ -45,8 +45,8 @@ def _build_arg_parser():
     p.add_argument('--residual', nargs='+', required=True,
                    help='Residual images in Nifti format')
 
-    p.add_argument('--evecs', nargs='+', required=True,
-                   help='Evecs images in Nifti format')
+    p.add_argument('--evecs_v1', nargs='+', required=True,
+                   help='Evecs v1 images in Nifti format')
 
     p.add_argument('--wm', nargs='+', required=True,
                    help='WM mask in Nifti format')
@@ -89,12 +89,12 @@ def main():
     args = parser.parse_args()
 
     if not len(args.fa) == len(args.md) == len(args.rd) == len(args.ad) ==\
-        len(args.residual) == len(args.evecs) == len(args.wm) ==\
+        len(args.residual) == len(args.evecs_v1) == len(args.wm) ==\
         len(args.gm) == len(args.csf):
         parser.error("Not the same number of images in input.")
 
     all_images = np.concatenate([args.fa, args.md, args.rd, args.ad,
-                                 args.residual, args.evecs, args.wm,
+                                 args.residual, args.evecs_v1, args.wm,
                                  args.gm, args.csf])
     assert_inputs_exist(parser, all_images)
     assert_outputs_exist(parser, args, [args.output_report, "data", "libs"])
@@ -149,7 +149,7 @@ def main():
 
     subjects_dict = {}
     name = "Peaks"
-    for fa, evecs in zip(args.fa, args.evecs):
+    for fa, evecs in zip(args.fa, args.evecs_v1):
         screenshot_path = screenshot_fa_peaks(fa, evecs, "data")
 
         subjects_dict[evecs] = {}
