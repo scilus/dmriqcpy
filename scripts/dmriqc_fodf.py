@@ -30,7 +30,7 @@ def _build_arg_parser():
                    help='HTML report')
 
     p.add_argument('--afd_max', nargs='+', required=True,
-                   help='AFD max Nifti image')
+                   help='AFD max images in Nifti format')
 
     p.add_argument('--afd_sum', nargs='+', required=True,
                    help='AFD sum images in Nifti format')
@@ -39,7 +39,7 @@ def _build_arg_parser():
                    help='AFD total images in Nifti format')
 
     p.add_argument('--nufo', nargs='+', required=True,
-                   help='NUFO images in Nifti format')
+                   help='NUFO max images in Nifti format')
 
     p.add_argument('--wm', nargs='+', required=True,
                    help='WM mask in Nifti format')

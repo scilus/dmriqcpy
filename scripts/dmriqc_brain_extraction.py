@@ -55,7 +55,8 @@ def _subj_parralel(images_no_bet, images_bet_mask, name, skip, summary):
                                                   output_prefix=name,
                                                   directory="data",
                                                   blend_val=0.3,
-                                                  skip=skip, nb_columns=12)
+                                                  skip=skip, nb_columns=12,
+                                                  is_mask=True)
 
         summary_html = dataframe_to_html(summary.loc[subj_metric])
         subjects_dict[subj_metric] = {}
