@@ -39,7 +39,7 @@ def _build_arg_parser():
                    help='AFD total images in Nifti format')
 
     p.add_argument('--nufo', nargs='+', required=True,
-                   help='NUFO max images in Nifti forma')
+                   help='NUFO max images in Nifti format')
 
     p.add_argument('--wm', nargs='+', required=True,
                    help='WM mask in Nifti format')
