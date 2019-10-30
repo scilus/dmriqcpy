@@ -50,7 +50,6 @@ def screenshot_mosaic_wrapper(filename, output_prefix="", directory=".", skip=1,
     data = np.nan_to_num(data)
 
     imgs_comb = screenshot_mosaic(data, skip, pad, nb_columns, axis, cmap)
-    print(type(imgs_comb))
     if return_path:
         image_name = os.path.basename(str(filename)).split(".")[0]
         if isinstance(imgs_comb, list):
