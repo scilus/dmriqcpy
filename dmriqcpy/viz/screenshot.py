@@ -50,7 +50,7 @@ def screenshot_mosaic_wrapper(filename, output_prefix="", directory=".", skip=1,
     data = np.nan_to_num(data)
 
     imgs_comb = screenshot_mosaic(data, skip, pad, nb_columns, axis, cmap)
-
+    print(type(imgs_comb))
     if return_path:
         image_name = os.path.basename(str(filename)).split(".")[0]
         if isinstance(imgs_comb, list):
@@ -215,7 +215,7 @@ def screenshot_mosaic(data, skip, pad, nb_columns, axis, cmap):
         colormap = get_cmap(cmap)
         mosaic = colormap(mosaic/255.0) * 255
 
-    if is_4d and mosaic.shape[2] > 3:
+    if is_4d and mosaic.shape[2] != 3:
         gif = []
         for i in range(mosaic.shape[2]):
             img_t = np.uint8(np.clip(mosaic[:, :, i], 0, 255))
