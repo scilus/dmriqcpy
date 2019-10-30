@@ -136,3 +136,41 @@ def stats_frf(column_names, filenames):
                                          columns=column_names)
 
     return stats_per_subjects, stats_across_subjects
+
+
+def stats_tractogram(column_names, tractograms):
+    """
+    Compute mean number of streamlines.
+
+    Parameters
+    ----------
+    column_names : array of strings
+        Name of the columns.
+    tractograms : array of strings
+        Array of tractogram files.
+
+    Returns
+    -------
+    stats_per_subjects : DataFrame
+        DataFrame containing mean for each subject.
+    stats_across_subjects : DataFrame
+        DataFrame containing mean, std, min and max of mean across subjects.
+    """
+    values = []
+    for tractogram_file in tractograms:
+        tractogram = nib.streamlines.load(tractogram_file, lazy_load=True)
+
+        values.append(
+            [tractogram.header['nb_streamlines']])
+
+    stats_per_subjects = pd.DataFrame(values, index=[tractograms],
+                                      columns=column_names)
+
+    stats_across_subjects = pd.DataFrame([stats_per_subjects.mean(),
+                                          stats_per_subjects.std(),
+                                          stats_per_subjects.min(),
+                                          stats_per_subjects.max()],
+                                         index=['mean', 'std', 'min', 'max'],
+                                         columns=column_names)
+
+    return stats_per_subjects, stats_across_subjects

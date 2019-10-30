@@ -8,6 +8,8 @@ import nibabel as nib
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
+from dmriqcpy.viz.utils import renderer_to_arr
+
 
 def screenshot_mosaic_wrapper(filename, output_prefix="", directory=".", skip=1,
                               pad=20, nb_columns=15, axis=True, cmap=None,
@@ -302,6 +304,94 @@ def screenshot_fa_peaks(fa, peaks, directory='.'):
             concat = np.hstack((concat, img))
 
     imgs_comb = Image.fromarray(concat)
+    imgs_comb.save(name)
+
+    return name
+
+
+def screenshot_tracking(tracking, t1, directory="."):
+    """
+    Compute 3 view screenshot with streamlines on T1.
+
+    Parameters
+    ----------
+    tracking : string
+        tractogram filename.
+    t1 : string
+        t1 filename.
+    directory : string
+        Directory to save the mosaic.
+
+    Returns
+    -------
+    name : string
+        Path of the mosaic
+    """
+    tractogram = nib.streamlines.load(tracking, True).tractogram
+    t1 = nib.load(t1)
+    t1_data = t1.get_data()
+
+    slice_name = ['sagittal', 'coronal', 'axial']
+    img_center = [(int(t1_data.shape[0] / 2) + 5, None, None),
+                  (None, int(t1_data.shape[1] / 2), None),
+                  (None, None, int(t1_data.shape[2] / 2))]
+    center = [(330, 90, 60), (70, 330, 60), (70, 90, 400)]
+    viewup = [(0, 0, -1), (0, 0, -1), (0, -1, 0)]
+    size = (1920, 1080)
+
+    image = np.array([])
+    for i, _axis in enumerate(slice_name):
+        streamlines = []
+        it = 0
+        slice_idx = img_center[i][i]
+
+        for streamline in tractogram:
+            if it > 10000:
+                break
+            stream = streamline.streamline
+            if slice_idx in np.array(stream, dtype=int)[:, i]:
+                it += 1
+                idx = np.where(np.array(stream, dtype=int)[:, i] ==\
+                                        slice_idx)[0][0]
+                lower = idx - 2
+                if lower < 0:
+                    lower = 0
+                upper = idx + 2
+                if upper > len(stream) - 1:
+                    upper = len(stream) - 1
+                streamlines.append(stream[lower:upper])
+
+        ren = window.Renderer()
+
+        streamline_actor = actor.line(streamlines, linewidth=0.2)
+        ren.add(streamline_actor)
+
+        min_val = np.min(t1_data[t1_data > 0])
+        max_val = np.percentile(t1_data[t1_data > 0], 99)
+        t1_color = np.float32(t1_data - min_val) \
+                   / np.float32(max_val - min_val) * 255.0
+        slice_actor = actor.slicer(t1_color, opacity=0.8, value_range=(0, 255),
+                                   interpolation='nearest')
+        ren.add(slice_actor)
+        slice_actor.display(img_center[i][0], img_center[i][1],
+                            img_center[i][2])
+
+        camera = ren.GetActiveCamera()
+        camera.SetViewUp(viewup[i])
+        center_cam = streamline_actor.GetCenter()
+        camera.SetPosition(center[i])
+        camera.SetFocalPoint((center_cam))
+
+        img2 = renderer_to_arr(ren, size)
+        if image.size == 0:
+            image = img2
+        else:
+            image = np.hstack((image, img2))
+
+    imgs_comb = Image.fromarray(image)
+    imgs_comb = imgs_comb.resize((3*1920, 1080))
+    image_name = os.path.basename(str(tracking)).split(".")[0]
+    name = os.path.join(directory, image_name + '.png')
     imgs_comb.save(name)
 
     return name
