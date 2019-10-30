@@ -24,6 +24,9 @@ def _build_arg_parser():
     p.add_argument('data', nargs='+',
                    help='Screenshot folders')
 
+    p.add_argument('--not_same_nbr', action="store_true",
+                   help='Not the same number of subjects in the folders')
+
     add_overwrite_arg(p)
 
     return p
@@ -37,9 +40,14 @@ def main():
     assert_outputs_exist(parser, args, [args.output_report, "data", "libs"])
 
     nb_subjects = len(os.listdir(args.data[0]))
+    nb_total_subjects = nb_subjects
     for folder in args.data[1:]:
-        if nb_subjects != len(os.listdir(folder)):
+        nb_total_subjects += len(os.listdir(folder))
+        if not args.not_same_nbr and nb_subjects != len(os.listdir(folder)):
             parser.error("Not the same number of subjects in each folder.")
+    
+    if args.not_same_nbr:
+        nb_subjects = nb_total_subjects
 
     if os.path.exists("data"):
         shutil.rmtree("data")
