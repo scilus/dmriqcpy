@@ -231,3 +231,47 @@ def graph_tractogram(title, column_names, summary):
     div = off.plot(fig, show_link=False, output_type='div')
     div = div.replace("<div>", "<div style=\"display:inline-block\">")
     return div
+
+
+def graph_mask_volume(title, column_names, summary):
+    """
+    Compute plotly graph with mean mask volume
+
+    Parameters
+    ----------
+    title : string
+        Title of the graph.
+    column_names : array of strings
+        Name of the columns in the summary DataFrame.
+    summary : DataFrame
+        DataFrame containing the mean stats.
+
+    Returns
+    -------
+    div : html div (string)
+        Graph as a HTML div.
+    """
+    nb_streamlines = []
+    np.random.seed(1)
+    metric = summary.index
+    volume = np.array(summary[column_names[0]])
+
+    volume_graph = Box(
+        name="Volume",
+        y=volume,
+        boxpoints='all',
+        jitter=0.3,
+        text=metric,
+        pointpos=-1.8,
+        hoverinfo="y+text"
+    )
+
+    data = [volume_graph]
+
+    fig = Figure(data=data)
+
+    fig['layout'].update(title=title)
+    fig['layout'].update(width=500, height=500)
+    div = off.plot(fig, show_link=False, output_type='div')
+    div = div.replace("<div>", "<div style=\"display:inline-block\">")
+    return div

@@ -174,3 +174,44 @@ def stats_tractogram(column_names, tractograms):
                                          columns=column_names)
 
     return stats_per_subjects, stats_across_subjects
+
+
+def stats_mask_volume(column_names, images):
+    """
+    Compute mean volume in a mask.
+
+    Parameters
+    ----------
+    column_names : array of strings
+        Name of the columns.
+    images : array of strings
+        Array of filenames in Nifti format.
+
+    Returns
+    -------
+    stats_per_subjects : DataFrame
+        DataFrame containing mean for each subject.
+    stats_across_subjects : DataFrame
+        DataFrame containing mean, std, min and max of mean across subjects.
+    """
+    values = []
+    for image in images:
+        img = nib.load(image)
+        data = img.get_data()
+        voxel_volume = np.prod(img.header['pixdim'][1:4])
+        volume = np.count_nonzero(data) * voxel_volume
+
+        values.append(
+            [volume])
+
+    stats_per_subjects = pd.DataFrame(values, index=[images],
+                                      columns=column_names)
+
+    stats_across_subjects = pd.DataFrame([stats_per_subjects.mean(),
+                                          stats_per_subjects.std(),
+                                          stats_per_subjects.min(),
+                                          stats_per_subjects.max()],
+                                         index=['mean', 'std', 'min', 'max'],
+                                         columns=column_names)
+
+    return stats_per_subjects, stats_across_subjects
