@@ -201,8 +201,7 @@ def stats_mask_volume(column_names, images):
         voxel_volume = np.prod(img.header['pixdim'][1:4])
         volume = np.count_nonzero(data) * voxel_volume
 
-        values.append(
-            [volume])
+        values.append([volume])
 
     stats_per_subjects = pd.DataFrame(values, index=[images],
                                       columns=column_names)
