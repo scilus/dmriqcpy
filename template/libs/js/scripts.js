@@ -533,13 +533,9 @@ function load_qc(){
     reader.onload = function(event) { 
         let importedJSON = JSON.parse(event.target.result);
         for (let key in importedJSON){
-            if (key.includes("comments")){
-                document.getElementById(key).value = importedJSON[key];
-            }
-            else{
-                document.getElementById(key).innerText = importedJSON[key];
-                document.getElementById(key).style.backgroundColor = color_dict[importedJSON[key]];
-            }
+            document.getElementById(key + "_comments").value = importedJSON[key]["comments"];
+            document.getElementById(key + "_status").innerText = importedJSON[key]["status"];
+            document.getElementById(key + "_status").style.backgroundColor = color_dict[importedJSON[key]["status"]];
         }
         showTab(dict_metrics[currentMetric])
     };
@@ -551,8 +547,9 @@ function save_qc(){
     for (let metrics of document.getElementsByClassName("tab-pane")){
         for (let subject of metrics.getElementsByClassName("tab")){
             if (document.getElementById(subject.id + "_status")){
-                data[subject.id + "_status"] = document.getElementById(subject.id + "_status").innerText;
-                data[subject.id + "_comments"] = document.getElementById(subject.id + "_comments").value;
+                data[subject.id] = {}
+                data[subject.id]["status"] = document.getElementById(subject.id + "_status").innerText;
+                data[subject.id]["comments"] = document.getElementById(subject.id + "_comments").value;
             }
         }
     }
