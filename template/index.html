@@ -57,7 +57,7 @@
                 {% block subjects_block scoped %}{% endblock subjects_block %}
                 <div class="w3-row w3-padding-16">
                 {% if warning_list %}
-                    {% for metric_name, metric_warning in warning_list.items() %}
+                    {% for metric_name, metric_warning in warning_list.items()|sort() %}
                         {% block warning_block scoped %}{% endblock warning_block %}
                     {% endfor %}
                 {% endif %}
