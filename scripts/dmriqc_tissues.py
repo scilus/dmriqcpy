@@ -48,6 +48,7 @@ def _build_arg_parser():
 
     return p
 
+
 def _subj_parralel(subj_metric, summary, name, skip):
     subjects_dict = {}
     screenshot_path = screenshot_mosaic_wrapper(subj_metric, output_prefix=name,
