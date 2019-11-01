@@ -27,7 +27,7 @@ opts = dict(name=NAME,
             requires=REQUIRES,
             scripts=SCRIPTS,
             package_data={"dmriqcpy": ["template/*"],
-                          "dmriqcpy/template": ["libs"]})
+                          "dmriqcpy/template": ["libs/*"]})
 
 
 if __name__ == '__main__':
