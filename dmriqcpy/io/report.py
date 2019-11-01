@@ -21,7 +21,7 @@ class Report():
         """
         self.path = dirname(realpath(__file__))
         self.env = Environment(loader=FileSystemLoader(
-            join(self.path, "../../template")))
+            join(self.path, "../template")))
 
         self.report_name = report_name
         if ".html" not in self.report_name:

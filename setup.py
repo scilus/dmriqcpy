@@ -25,8 +25,7 @@ opts = dict(name=NAME,
             packages=PACKAGES,
             install_requires=REQUIRES,
             requires=REQUIRES,
-            scripts=SCRIPTS,
-            package_data={"": ["template"]})
+            scripts=SCRIPTS)
 
 
 if __name__ == '__main__':
