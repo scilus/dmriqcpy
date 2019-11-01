@@ -26,6 +26,7 @@ opts = dict(name=NAME,
             install_requires=REQUIRES,
             requires=REQUIRES,
             scripts=SCRIPTS,
+            include_package_data=True,
             package_data={"dmriqcpy": ["template/*"],
                           "dmriqcpy/template": ["libs/*"]})
 
