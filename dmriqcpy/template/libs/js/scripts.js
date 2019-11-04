@@ -227,28 +227,6 @@ for (let child of document.getElementById("navigation").children){
     dict_metrics[child.innerText.replace(/ /g,"_")] = 0;
 }
 
-for (let mag of document.getElementsByClassName('magnify')){
-    image_object = new Image;
-    image_object.src = mag.children[0].src;
-    max_h = parseInt(mag.children[0].style.maxHeight.replace("px", ''));
-    max_w = parseInt(mag.children[0].style.maxWidth.replace("px", ''));
-    height_diff = max_h - image_object.height;
-    width_diff = max_w - image_object.width;
-    ratio_height = height_diff / mag.children[0].height;
-    ratio_width = width_diff / mag.children[0].width;
-    if (mag.children[0].width + ratio_height * mag.children[0].width <= max_w && mag.children[0].height + ratio_height * mag.children[0].height <= max_h){
-        mag.children[0].width = mag.children[0].width + ratio_height * mag.children[0].width;
-        mag.children[0].height = mag.children[0].height + ratio_height * mag.children[0].height;
-    }
-    else if(mag.children[0].width + ratio_width * mag.children[0].width <= max_w && mag.children[0].height + ratio_width * mag.children[0].height <= max_h){
-        mag.children[0].width = mag.children[0].width + ratio_width * mag.children[0].width;
-        mag.children[0].height = mag.children[0].height + ratio_width * mag.children[0].height;
-    }
-    else{
-        console.log("ERROR");
-    }
-}
-
 showTab(dict_metrics[currentMetric]);
 function update(mx, my) {
     var rx = Math.round(mx - $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".large").width()/(2*zoom))*-1;
@@ -382,21 +360,21 @@ document.addEventListener("keydown", function(e){
     else if (e.which == 39){
         nextPrev(1);
     }
-    else if (e.which == 80)
+    else if (e.which == 80 || e.which == 49)
     {
         var tab = document.getElementById(currentMetric);
         var subj_id = tab.getElementsByClassName("tab")[dict_metrics[currentMetric]].id;
         update_status(document.getElementById(subj_id + "_pass"));
         qc_saved=false;
     }
-    else if (e.which == 87)
+    else if (e.which == 87 || e.which == 50)
     {
         var tab = document.getElementById(currentMetric);
         var subj_id = tab.getElementsByClassName("tab")[dict_metrics[currentMetric]].id;
         update_status(document.getElementById(subj_id + "_warning"));
         qc_saved=false;
     }
-    else if (e.which == 70)
+    else if (e.which == 70 || e.which == 51)
     {
         var tab = document.getElementById(currentMetric);
         var subj_id = tab.getElementsByClassName("tab")[dict_metrics[currentMetric]].id;
@@ -408,6 +386,7 @@ document.addEventListener("keydown", function(e){
 $(".js-dropdown").change(function(){
     var x = document.getElementById(currentMetric).getElementsByClassName("tab");
     x[dict_metrics[currentMetric]].style.display = "none";
+    x[dict_metrics[currentMetric]].getElementsByClassName("small")[0].removeAttribute("src");
     dict_metrics[currentMetric] = document.getElementById(currentMetric).getElementsByClassName('js-dropdown')[0].selectedIndex;
     showTab(dict_metrics[currentMetric])
 });
@@ -456,6 +435,31 @@ function showTab(n) {
     if (tab.getElementsByTagName("button").length > 0){
         curr_subj.innerText = "Current subject: " + x[n].id;
         document.getElementById("curr_subj").style.backgroundColor = document.getElementById(x[n].id + "_status").style.backgroundColor;
+
+        var img = x[n].getElementsByClassName("small")[0];
+
+        img.src = img.getAttribute('data-src');
+
+        img.onload = function(){
+            max_h = parseInt(img.style.maxHeight.replace("px", ''));
+            max_w = parseInt(img.style.maxWidth.replace("px", ''));
+            height_diff = max_h - this.height;
+            width_diff = max_w - this.width;
+            ratio_height = height_diff / this.height;
+            ratio_width = width_diff / this.width;
+            if (this.width + ratio_height * this.width <= max_w && this.height + ratio_height * this.height <= max_h){
+                this.width = this.width + ratio_height * this.width;
+                this.height = this.height + ratio_height * this.height;
+            }
+            else if(this.width + ratio_width * this.width <= max_w && this.height + ratio_width * this.height <= max_h){
+                this.width = this.width + ratio_width * this.width;
+                this.height = this.height + ratio_width * this.height;
+            }
+            else{
+                console.log("ERROR");
+            }
+        }
+
         if (n == 0) {
             tab.getElementsByTagName("button")[0].disabled = true;
         } else {
@@ -480,6 +484,7 @@ function nextPrev(n) {
     
     // Hide the current tab:
     x[dict_metrics[currentMetric]].style.display = "none";
+    x[dict_metrics[currentMetric]].getElementsByClassName("small")[0].removeAttribute("src");
     dict_metrics[currentMetric] = dict_metrics[currentMetric] + n;
     // if you have reached the end of the form...
     

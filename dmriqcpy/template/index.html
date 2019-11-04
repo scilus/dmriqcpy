@@ -100,7 +100,7 @@
                     <div class="tab" id="{{ subject_name }}">
                         <h1><b>Current subject: {{ subject_name }}</b></h1>
                         {% block comment_block scoped %}{% endblock comment_block %}
-                        <div class="w3-container w3-padding-32 w3-light-grey" style="border-radius: 8px">
+                        <div class="w3-container w3-padding-32 w3-light-grey" style="border-radius: 8px; min-height: 920px;">
                             {{subject_values.stats}}
                             {% block screenshot_block scoped %}{% endblock screenshot_block %}
                         </div>
