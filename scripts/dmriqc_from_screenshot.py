@@ -27,6 +27,9 @@ def _build_arg_parser():
     p.add_argument('--not_same_nbr', action="store_true",
                    help='Not the same number of subjects in the folders')
 
+    p.add_argument('--sym_link', action="store_true",
+                   help='Use symlink instead of copy')
+
     add_overwrite_arg(p)
 
     return p
@@ -63,8 +66,12 @@ def main():
         name = folder.replace("/", "")
         subjects_dict = {}
         for subj_screenshot in files:
-            shutil.copyfile(folder + "/" + subj_screenshot,
-                            "data/" + subj_screenshot)
+            if args.sym_link:
+                os.symlink(os.path.abspath(folder) + "/" + subj_screenshot,
+                           "data/" + subj_screenshot)
+            else:
+                shutil.copyfile(folder + "/" + subj_screenshot,
+                                "data/" + subj_screenshot)
             subjects_dict[subj_screenshot] = {}
             subjects_dict[subj_screenshot]['screenshot'] =\
                 "data/" + subj_screenshot
