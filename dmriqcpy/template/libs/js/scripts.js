@@ -331,7 +331,7 @@ $(".magnify").mousemove(function(e){
     loadLocker = true;
 });
 
-document.addEventListener("keydown", function(e){
+function shortcut(e){
     if (e.ctrlKey && e.which == 37){
         idx = nodes.indexOf(document.getElementById("navigation").getElementsByClassName("active")[0]);
         if (idx - 1 >= 0){
@@ -381,12 +381,16 @@ document.addEventListener("keydown", function(e){
         update_status(document.getElementById(subj_id + "_fail"));
         qc_saved=false;
     }
-});
+}
+
+document.addEventListener("keydown", shortcut);
 
 $(".js-dropdown").change(function(){
     var x = document.getElementById(currentMetric).getElementsByClassName("tab");
     x[dict_metrics[currentMetric]].style.display = "none";
-    x[dict_metrics[currentMetric]].getElementsByClassName("small")[0].removeAttribute("src");
+    if (x[dict_metrics[currentMetric]].getElementsByClassName("small").length > 0){
+        x[dict_metrics[currentMetric]].getElementsByClassName("small")[0].removeAttribute("src");
+    }
     dict_metrics[currentMetric] = document.getElementById(currentMetric).getElementsByClassName('js-dropdown')[0].selectedIndex;
     showTab(dict_metrics[currentMetric])
 });
@@ -394,6 +398,14 @@ $(".js-dropdown").change(function(){
 $(document).on('click', '[data-toggle="lightbox"]', function(event) {
     event.preventDefault();
     $(this).ekkoLightbox();
+});
+
+$('select').on('select2:opening', function( event ) {
+    document.removeEventListener("keydown", shortcut);
+});
+
+$('select').on('select2:closing', function( event ) {
+    document.addEventListener("keydown", shortcut);
 });
 })
 
@@ -441,27 +453,29 @@ function showTab(n) {
         counter.style.backgroundColor = "#19568b";
         document.getElementById("curr_subj").style.backgroundColor = document.getElementById(x[n].id + "_status").style.backgroundColor;
 
-        var img = x[n].getElementsByClassName("small")[0];
+        if (x[n].getElementsByClassName("small").length > 0){
+            var img = x[n].getElementsByClassName("small")[0];
 
-        img.src = img.getAttribute('data-src');
+            img.src = img.getAttribute('data-src');
 
-        img.onload = function(){
-            max_h = parseInt(img.style.maxHeight.replace("px", ''));
-            max_w = parseInt(img.style.maxWidth.replace("px", ''));
-            height_diff = max_h - this.height;
-            width_diff = max_w - this.width;
-            ratio_height = height_diff / this.height;
-            ratio_width = width_diff / this.width;
-            if (this.width + ratio_height * this.width <= max_w && this.height + ratio_height * this.height <= max_h){
-                this.width = this.width + ratio_height * this.width;
-                this.height = this.height + ratio_height * this.height;
-            }
-            else if(this.width + ratio_width * this.width <= max_w && this.height + ratio_width * this.height <= max_h){
-                this.width = this.width + ratio_width * this.width;
-                this.height = this.height + ratio_width * this.height;
-            }
-            else{
-                console.log("ERROR");
+            img.onload = function(){
+                max_h = parseInt(img.style.maxHeight.replace("px", ''));
+                max_w = parseInt(img.style.maxWidth.replace("px", ''));
+                height_diff = max_h - this.height;
+                width_diff = max_w - this.width;
+                ratio_height = height_diff / this.height;
+                ratio_width = width_diff / this.width;
+                if (this.width + ratio_height * this.width <= max_w && this.height + ratio_height * this.height <= max_h){
+                    this.width = this.width + ratio_height * this.width;
+                    this.height = this.height + ratio_height * this.height;
+                }
+                else if(this.width + ratio_width * this.width <= max_w && this.height + ratio_width * this.height <= max_h){
+                    this.width = this.width + ratio_width * this.width;
+                    this.height = this.height + ratio_width * this.height;
+                }
+                else{
+                    console.log("ERROR");
+                }
             }
         }
 
@@ -489,7 +503,9 @@ function nextPrev(n) {
     
     // Hide the current tab:
     x[dict_metrics[currentMetric]].style.display = "none";
-    x[dict_metrics[currentMetric]].getElementsByClassName("small")[0].removeAttribute("src");
+    if (x[dict_metrics[currentMetric]].getElementsByClassName("small").length > 0){
+        x[dict_metrics[currentMetric]].getElementsByClassName("small")[0].removeAttribute("src");
+    }
     dict_metrics[currentMetric] = dict_metrics[currentMetric] + n;
     // if you have reached the end of the form...
     
