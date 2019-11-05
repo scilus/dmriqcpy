@@ -430,10 +430,15 @@ function showTab(n) {
     x[n].style.display = "block";
     curr_subj = document.getElementById("curr_subj");
     curr_subj.innerText = "";
+    counter = document.getElementById("counter");
+    counter.innerText = "";
+    counter.style.backgroundColor = "";
     document.getElementById("curr_subj").style.backgroundColor = "";
     //... and fix the Previous/Next buttons:
     if (tab.getElementsByTagName("button").length > 0){
         curr_subj.innerText = "Current subject: " + x[n].id;
+        counter.innerText = (n + 1) + "/" + x.length;
+        counter.style.backgroundColor = "#19568b";
         document.getElementById("curr_subj").style.backgroundColor = document.getElementById(x[n].id + "_status").style.backgroundColor;
 
         var img = x[n].getElementsByClassName("small")[0];
