@@ -407,6 +407,14 @@ $('select').on('select2:opening', function( event ) {
 $('select').on('select2:closing', function( event ) {
     document.addEventListener("keydown", shortcut);
 });
+
+$('textarea').on('focus', function( event ) {
+    document.removeEventListener("keydown", shortcut);
+});
+
+$('textarea').on('blur', function( event ) {
+    document.addEventListener("keydown", shortcut);
+});
 })
 
 function matchCustom(params, data) {
