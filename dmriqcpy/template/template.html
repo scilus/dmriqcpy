@@ -54,15 +54,19 @@
 {% endblock %}
 
 {% block comment_block %}
-<div class="w3-padding-16">
-    <div class="w3-container w3-grey w3-padding-16" style="width: 40%; border-radius: 8px">
-        <h2><span>Quality report: </span><span class="status" id="{{ subject_name }}_status"></span></h2>
+<button id="{{ subject_name }}_comment" class="open-button" onclick="openForm(this)">Quality report</button>
+
+<div class="chat-popup" id="{{ subject_name }}_comment_box">
+    <div class="form-container">
+        <h2>Quality report</h2>
         <button class="button" id="{{ subject_name }}_pass" name="{{ subject_name }}" style="background-color: green" onclick="update_status(this)">Pass</button>
         <button class="button" id="{{ subject_name }}_warning" name="{{ subject_name }}" style="background-color: orange" onclick="update_status(this)">Warning</button>
         <button class="button" id="{{ subject_name }}_fail" name="{{ subject_name }}" style="background-color: red" onclick="update_status(this)">Fail</button>
+        <button class="button" id="{{ subject_name }}_pending" name="{{ subject_name }}" style="background-color: grey" onclick="update_status(this)">Pending</button>
         <div class="form-group">
             <textarea oninput="comment_update()" rows="5" id="{{ subject_name }}_comments" style="resize: none; width: 100%" placeholder="Your comments here..."></textarea>
         </div>
+        <button type="button" class="btn cancel" onclick="closeForm(this)">Close</button>
     </div>
 </div>
 {% endblock %}

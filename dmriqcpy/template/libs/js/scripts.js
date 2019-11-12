@@ -381,6 +381,21 @@ function shortcut(e){
         update_status(document.getElementById(subj_id + "_fail"));
         qc_saved=false;
     }
+    else if (e.which == 52)
+    {
+        var tab = document.getElementById(currentMetric);
+        var subj_id = tab.getElementsByClassName("tab")[dict_metrics[currentMetric]].id;
+        update_status(document.getElementById(subj_id + "_pending"));
+        qc_saved=false;
+    }
+    else if(e.which == 67)
+    {
+        e.preventDefault();
+        var tab = document.getElementById(currentMetric);
+        var subj_id = tab.getElementsByClassName("tab")[dict_metrics[currentMetric]].id;
+        openForm(document.getElementById(subj_id + "_comment"));
+        document.getElementById(subj_id + "_comments").focus();
+    }
 }
 
 document.addEventListener("keydown", shortcut);
@@ -416,6 +431,14 @@ $('textarea').on('blur', function( event ) {
     document.addEventListener("keydown", shortcut);
 });
 })
+
+function openForm(event) {
+    document.getElementById(event.id + "_box").style.display = "block";
+}
+
+function closeForm(event) {
+    document.getElementById(event.offsetParent.id).style.display = "none";
+}
 
 function matchCustom(params, data) {
     // If there are no search terms, return all of the data
@@ -459,7 +482,12 @@ function showTab(n) {
         curr_subj.innerText = "Current subject: " + x[n].id;
         counter.innerText = (n + 1) + "/" + x.length;
         counter.style.backgroundColor = "#19568b";
-        document.getElementById("curr_subj").style.backgroundColor = document.getElementById(x[n].id + "_status").style.backgroundColor;
+        if (document.getElementById(x[n].id + "_status").innerText != "Pending"){
+            document.getElementById("curr_subj").style.backgroundColor = document.getElementById(x[n].id + "_status").style.backgroundColor;
+        }
+        else{
+            document.getElementById("curr_subj").style.backgroundColor = "";
+        }
 
         if (x[n].getElementsByClassName("small").length > 0){
             var img = x[n].getElementsByClassName("small")[0];
@@ -556,22 +584,32 @@ function zoom()
 function update_status(object) {
     document.getElementById(object.name+"_status").innerText = object.innerText;
     document.getElementById(object.name+"_status").style.backgroundColor = object.style.backgroundColor;
-    document.getElementById("curr_subj").style.backgroundColor = object.style.backgroundColor;
+    if (object.innerText != "Pending"){
+        document.getElementById("curr_subj").style.backgroundColor = object.style.backgroundColor;
+    }
+    else{
+        document.getElementById("curr_subj").style.backgroundColor = "";
+    }
     qc_saved=false;
 }
 
 function load_qc(){
-    color_dict = {"Pass": "green", "Warning": "orange", "Fail": "red"};
+    color_dict = {"Pass": "green", "Warning": "orange", "Fail": "red", "Pending": "grey"};
     var selectedFile = document.getElementById('load_file').files[0];
     var reader = new FileReader();
+    var x = document.getElementById(currentMetric).getElementsByClassName("tab");
+    x[dict_metrics[currentMetric]].style.display = "none";
     reader.onload = function(event) { 
         let importedJSON = JSON.parse(event.target.result);
-        for (let key in importedJSON){
-            document.getElementById(key + "_comments").value = importedJSON[key]["comments"];
-            document.getElementById(key + "_status").innerText = importedJSON[key]["status"];
-            document.getElementById(key + "_status").style.backgroundColor = color_dict[importedJSON[key]["status"]];
+        for (let metric in importedJSON){
+            dict_metrics[metric] = importedJSON[metric]["curr_subject"];
+            for (let key in importedJSON[metric]["subjects"]){
+                document.getElementById(key + "_comments").value = importedJSON[metric]["subjects"][key]["comments"];
+                document.getElementById(key + "_status").innerText = importedJSON[metric]["subjects"][key]["status"];
+                document.getElementById(key + "_status").style.backgroundColor = color_dict[importedJSON[metric]["subjects"][key]["status"]];
+            }
         }
-        showTab(dict_metrics[currentMetric])
+        showTab(dict_metrics[currentMetric]);
     };
     reader.readAsText(selectedFile);
 }
@@ -579,11 +617,16 @@ function load_qc(){
 function save_qc(){
     data = {};
     for (let metrics of document.getElementsByClassName("tab-pane")){
-        for (let subject of metrics.getElementsByClassName("tab")){
-            if (document.getElementById(subject.id + "_status")){
-                data[subject.id] = {}
-                data[subject.id]["status"] = document.getElementById(subject.id + "_status").innerText;
-                data[subject.id]["comments"] = document.getElementById(subject.id + "_comments").value;
+        if (metrics.id != "Dashboard"){
+            data[metrics.id] = {};
+            data[metrics.id]["subjects"] = {};
+            data[metrics.id]["curr_subject"] = dict_metrics[metrics.id];
+            for (let subject of metrics.getElementsByClassName("tab")){
+                if (document.getElementById(subject.id + "_status")){
+                    data[metrics.id]["subjects"][subject.id] = {}
+                    data[metrics.id]["subjects"][subject.id]["status"] = document.getElementById(subject.id + "_status").innerText;
+                    data[metrics.id]["subjects"][subject.id]["comments"] = document.getElementById(subject.id + "_comments").value;
+                }
             }
         }
     }
