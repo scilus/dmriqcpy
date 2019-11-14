@@ -395,10 +395,22 @@ function shortcut(e){
         var subj_id = tab.getElementsByClassName("tab")[dict_metrics[currentMetric]].id;
         openForm(document.getElementById(subj_id + "_comment"));
         document.getElementById(subj_id + "_comments").focus();
+        document.removeEventListener("keydown", shortcut);
+    }
+}
+
+function close_comment(e){
+    if(e.which == 27)
+    {
+        var tab = document.getElementById(currentMetric);
+        var subj_id = tab.getElementsByClassName("tab")[dict_metrics[currentMetric]].id;
+        closeForm(document.getElementById(subj_id + "_comment_box").getElementsByClassName("btn")[0]);
+        document.addEventListener("keydown", shortcut);
     }
 }
 
 document.addEventListener("keydown", shortcut);
+document.addEventListener("keydown", close_comment);
 
 $(".js-dropdown").change(function(){
     var x = document.getElementById(currentMetric).getElementsByClassName("tab");
