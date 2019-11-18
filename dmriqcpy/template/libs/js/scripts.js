@@ -219,6 +219,7 @@ var native_height = 0;
 var loadLocker = true;
 var image_object = null;
 var zoom = 2;
+zoom_activated = false;
 qc_saved = true;
 nodes = Array.prototype.slice.call(document.getElementById('navigation').children);
 currentMetric = document.getElementById("navigation").children[0].innerText.replace(/ /g,"_");
@@ -260,7 +261,7 @@ $('.large').on('mousewheel', function(event) {
 
 //Now the mousemove function
 $(".magnify").mousemove(function(e){
-    if ($("#zoom-button").is(":checked")){
+    if (zoom_activated){
         //When the user hovers on the image, the script will first calculate
     //the native dimensions if they don't exist. Only after the native dimensions
     //are available, the script will show the zoomed version.
@@ -331,6 +332,21 @@ $(".magnify").mousemove(function(e){
     loadLocker = true;
 });
 
+
+
+function zoom_f(zoom_activated)
+{
+    if (zoom_activated)
+    {
+        $(".magnify").mousewheel(doMouseWheel);
+    }
+    else
+    {
+        $(".magnify").unmousewheel(doMouseWheel);
+        $(".magnify").children(".large").fadeOut(100);
+    }
+}
+
 function shortcut(e){
     if (e.ctrlKey && e.which == 37){
         idx = nodes.indexOf(document.getElementById("navigation").getElementsByClassName("active")[0]);
@@ -397,6 +413,11 @@ function shortcut(e){
         document.getElementById(subj_id + "_comments").focus();
         document.removeEventListener("keydown", shortcut);
     }
+    else if(e.which == 90)
+    {
+        zoom_activated = !zoom_activated;
+        zoom_f(zoom_activated);
+    }
 }
 
 function close_comment(e){
@@ -406,6 +427,7 @@ function close_comment(e){
         var subj_id = tab.getElementsByClassName("tab")[dict_metrics[currentMetric]].id;
         closeForm(document.getElementById(subj_id + "_comment_box").getElementsByClassName("btn")[0]);
         document.addEventListener("keydown", shortcut);
+        document.getElementById(subj_id + "_comments_summ").innerText = document.getElementById(subj_id + "_comments").value;
     }
 }
 
@@ -440,6 +462,7 @@ $('textarea').on('focus', function( event ) {
 });
 
 $('textarea').on('blur', function( event ) {
+    document.getElementById(event.currentTarget.id + "_summ").innerText = document.getElementById(event.currentTarget.id).value;
     document.addEventListener("keydown", shortcut);
 });
 })
@@ -489,8 +512,8 @@ function showTab(n) {
     counter.innerText = "";
     counter.style.backgroundColor = "";
     document.getElementById("curr_subj").style.backgroundColor = "";
-    //... and fix the Previous/Next buttons:
-    if (tab.getElementsByTagName("button").length > 0){
+
+    if (tab.id != "Summary" && tab.id != "Dashboard"){
         curr_subj.innerText = "Current subject: " + x[n].id;
         counter.innerText = (n + 1) + "/" + x.length;
         counter.style.backgroundColor = "#19568b";
@@ -579,23 +602,11 @@ function doMouseWheel(event) {
     event.preventDefault();
 }
 
-function zoom()
-{
-    var check = document.getElementById("zoom-button").checked;
-    if (check)
-    {
-        $(".magnify").mousewheel(doMouseWheel);
-    }
-    else
-    {
-        $(".magnify").unmousewheel(doMouseWheel);
-        $(".magnify").children(".large").fadeOut(100);
-    }
-}
-
 function update_status(object) {
     document.getElementById(object.name+"_status").innerText = object.innerText;
     document.getElementById(object.name+"_status").style.backgroundColor = object.style.backgroundColor;
+    document.getElementById(object.name+"_status_summ").innerText = object.innerText;
+    document.getElementById(object.name+"_status_summ").style.backgroundColor = object.style.backgroundColor;
     if (object.innerText != "Pending"){
         document.getElementById("curr_subj").style.backgroundColor = object.style.backgroundColor;
     }
@@ -607,18 +618,34 @@ function update_status(object) {
 
 function load_qc(){
     color_dict = {"Pass": "green", "Warning": "orange", "Fail": "red", "Pending": "grey"};
+    var table = $('#table_sort').DataTable();
     var selectedFile = document.getElementById('load_file').files[0];
     var reader = new FileReader();
     var x = document.getElementById(currentMetric).getElementsByClassName("tab");
     x[dict_metrics[currentMetric]].style.display = "none";
     reader.onload = function(event) { 
         let importedJSON = JSON.parse(event.target.result);
-        for (let metric in importedJSON){
-            dict_metrics[metric] = importedJSON[metric]["curr_subject"];
-            for (let key in importedJSON[metric]["subjects"]){
-                document.getElementById(key + "_comments").value = importedJSON[metric]["subjects"][key]["comments"];
-                document.getElementById(key + "_status").innerText = importedJSON[metric]["subjects"][key]["status"];
-                document.getElementById(key + "_status").style.backgroundColor = color_dict[importedJSON[metric]["subjects"][key]["status"]];
+        for (let dict_idx in importedJSON){
+            if (importedJSON[dict_idx]["type"] == "report"){
+                for (let data_idx in importedJSON[dict_idx]["data"]){
+                    filename = importedJSON[dict_idx]["data"][data_idx]["filename"];
+                    status = importedJSON[dict_idx]["data"][data_idx]["status"];
+                    comments = importedJSON[dict_idx]["data"][data_idx]["comments"];
+                    document.getElementById(filename + "_comments").value = comments;
+                    document.getElementById(filename + "_comments_summ").innerText = comments;
+                    document.getElementById(filename + "_status").innerText = status;
+                    document.getElementById(filename + "_status").style.backgroundColor = color_dict[status];
+                    document.getElementById(filename + "_status_summ").innerText = status;
+                    document.getElementById(filename + "_status_summ").style.backgroundColor = color_dict[status];
+                }
+            }
+            else if (importedJSON[dict_idx]["type"] == "settings")
+            {
+                for (let data_idx in importedJSON[dict_idx]["data"]){
+                    name = importedJSON[dict_idx]["data"][data_idx]["tab_name"];
+                    idx = importedJSON[dict_idx]["data"][data_idx]["tab_index"];
+                    dict_metrics[name] = idx;
+                }
             }
         }
         showTab(dict_metrics[currentMetric]);
@@ -627,21 +654,30 @@ function load_qc(){
 }
 
 function save_qc(){
-    data = {};
+    data = [];
+    settings = {"type": "settings", "data": []};
+    report = {"type": "report", "data": []};
     for (let metrics of document.getElementsByClassName("tab-pane")){
         if (metrics.id != "Dashboard"){
-            data[metrics.id] = {};
-            data[metrics.id]["subjects"] = {};
-            data[metrics.id]["curr_subject"] = dict_metrics[metrics.id];
+            curr_tab = {};
+            curr_tab["tab_name"] = metrics.id;
+            curr_tab["tab_index"] = dict_metrics[metrics.id];
+            settings["data"].push(curr_tab);
             for (let subject of metrics.getElementsByClassName("tab")){
                 if (document.getElementById(subject.id + "_status")){
-                    data[metrics.id]["subjects"][subject.id] = {}
-                    data[metrics.id]["subjects"][subject.id]["status"] = document.getElementById(subject.id + "_status").innerText;
-                    data[metrics.id]["subjects"][subject.id]["comments"] = document.getElementById(subject.id + "_comments").value;
+                    curr_subj = {};
+                    curr_subj["qc"] = metrics.id;
+                    curr_subj["status"] = document.getElementById(subject.id + "_status").innerText;
+                    curr_subj["comments"] = document.getElementById(subject.id + "_comments").value;
+                    curr_subj["filename"] = subject.id;
+                    report["data"].push(curr_subj);
                 }
             }
         }
     }
+
+    data.push(settings);
+    data.push(report);
     var jsons = JSON.stringify(data);
     var blob = new Blob([jsons], {type: "application/json"});
     saveAs(blob, "data.json");
