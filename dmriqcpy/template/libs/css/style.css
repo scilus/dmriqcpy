@@ -312,3 +312,19 @@ bottom: .5em;
   0% { opacity:0; }
   100% { opacity:100%; }
 }
+
+.alert {
+  padding: 20px;
+  color: white;
+  opacity: 1;
+  transition: opacity 0.6s;
+  bottom: 60px;
+  position: fixed;
+  z-index: 9;
+  display: none;
+  right: 28px;
+  width: 280px;
+  text-align: center;
+}
+
+.alert.info {background-color: #2196F3;}

@@ -494,6 +494,11 @@ function openForm(event) {
 
 function closeForm(event) {
     document.getElementById(event.offsetParent.id).style.display = "none";
+    var div = document.getElementsByClassName("info")[0];
+    div.style.display = "block";
+    div.style.opacity = 1;
+    setTimeout(function(){ div.style.display = "none";}, 3000);
+    setTimeout(function(){ div.style.opacity = "0";}, 2000);
 }
 
 function matchCustom(params, data) {
