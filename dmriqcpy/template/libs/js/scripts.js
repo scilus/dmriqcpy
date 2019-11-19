@@ -220,6 +220,7 @@ var loadLocker = true;
 var image_object = null;
 var zoom = 2;
 zoom_activated = false;
+help_displayed = false;
 qc_saved = true;
 nodes = Array.prototype.slice.call(document.getElementById('navigation').children);
 currentMetric = document.getElementById("navigation").children[0].innerText.replace(/ /g,"_");
@@ -418,7 +419,27 @@ function shortcut(e){
         zoom_activated = !zoom_activated;
         zoom_f(zoom_activated);
     }
+    else if(e.which == 72)
+    {
+        help_displayed = !help_displayed;
+        if (help_displayed){
+            document.getElementById("help").style.display = "block";
+        }
+        else{
+            document.getElementById("help").style.display = "none";
+        }
+    }
 }
+
+document.getElementById("help-div").addEventListener("mouseenter", function(){
+    help_displayed = true;
+    document.getElementById("help").style.display = "block";
+});
+
+document.getElementById("help-div").addEventListener("mouseleave", function(){
+    help_displayed = false;
+    document.getElementById("help").style.display = "none";
+});
 
 function close_comment(e){
     if(e.which == 27)
@@ -427,7 +448,7 @@ function close_comment(e){
         var subj_id = tab.getElementsByClassName("tab")[dict_metrics[currentMetric]].id;
         closeForm(document.getElementById(subj_id + "_comment_box").getElementsByClassName("btn")[0]);
         document.addEventListener("keydown", shortcut);
-        document.getElementById(subj_id + "_comments_summ").innerText = document.getElementById(subj_id + "_comments").value;
+        update_summ(subj_id + "_comments_summ", document.getElementById(subj_id + "_comments").value);
     }
 }
 
@@ -462,7 +483,7 @@ $('textarea').on('focus', function( event ) {
 });
 
 $('textarea').on('blur', function( event ) {
-    document.getElementById(event.currentTarget.id + "_summ").innerText = document.getElementById(event.currentTarget.id).value;
+    update_summ(event.currentTarget.id + "_summ", document.getElementById(event.currentTarget.id).value);
     document.addEventListener("keydown", shortcut);
 });
 })
@@ -605,8 +626,6 @@ function doMouseWheel(event) {
 function update_status(object) {
     document.getElementById(object.name+"_status").innerText = object.innerText;
     document.getElementById(object.name+"_status").style.backgroundColor = object.style.backgroundColor;
-    document.getElementById(object.name+"_status_summ").innerText = object.innerText;
-    document.getElementById(object.name+"_status_summ").style.backgroundColor = object.style.backgroundColor;
     if (object.innerText != "Pending"){
         document.getElementById("curr_subj").style.backgroundColor = object.style.backgroundColor;
     }
@@ -614,6 +633,9 @@ function update_status(object) {
         document.getElementById("curr_subj").style.backgroundColor = "";
     }
     qc_saved=false;
+    copy = document.getElementById(object.name+"_status").cloneNode(true);
+    copy.removeAttribute("id");
+    update_summ(object.name+'_status_summ', copy.outerHTML);
 }
 
 function load_qc(){
@@ -632,11 +654,10 @@ function load_qc(){
                     status = importedJSON[dict_idx]["data"][data_idx]["status"];
                     comments = importedJSON[dict_idx]["data"][data_idx]["comments"];
                     document.getElementById(filename + "_comments").value = comments;
-                    document.getElementById(filename + "_comments_summ").innerText = comments;
+                    update_summ(filename+'_comments_summ', document.getElementById(filename + "_comments").value);
                     document.getElementById(filename + "_status").innerText = status;
                     document.getElementById(filename + "_status").style.backgroundColor = color_dict[status];
-                    document.getElementById(filename + "_status_summ").innerText = status;
-                    document.getElementById(filename + "_status_summ").style.backgroundColor = color_dict[status];
+                    update_summ(filename+'_status_summ', document.getElementById(filename+"_status").outerHTML);
                 }
             }
             else if (importedJSON[dict_idx]["type"] == "settings")

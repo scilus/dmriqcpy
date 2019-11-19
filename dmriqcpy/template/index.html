@@ -42,9 +42,6 @@
             <li><a style="background-color: #19568b; color: white" data-toggle="tab" href="#{{ metric_name|replace(" ", "_") }}">{{metric_name}}</a></li>
             {% endfor %}
     </ul>
-    <div class="tooltip"><i class="fa fa-info-circle"></i>
-        <span class="tooltiptext">Tooltip text</span>
-    </div>
     <input class="load_save_file" accept=".json" type="file" name="file" id="load_file" onchange="load_qc()"/>
     <label class="btn w3-light-grey" style="margin: 6px" for="load_file">
         <span>Load QC</span>
@@ -59,6 +56,21 @@
 
 <!-- !PAGE CONTENT! -->
 <div id="main" class="tab-content">
+    <div class="help-tip" id="help-div">
+        <p id="help">
+            Shortcuts:<br>
+            Ctrl + left or right arrow -> Change tab.<br>
+            left or right arrow -> Change subject.<br>
+            <br>
+            1 -> Pass.<br>
+            2 -> Warning.<br>
+            3 -> Fail.<br>
+            4 -> Pending.<br>
+            c -> display comment box.<br>
+            Esc -> Close comment box.<br>
+            h -> Display this help.<br>
+        </p>
+    </div>
     <div id="Dashboard" class="tab-pane fade active in" style="padding-top:75px">
         <h3><b> <i class="fa fa-dashboard"></i> Dashboard</b></h3>
         <div class="tab w3-row-padding w3-padding-large" id="dash">
@@ -96,6 +108,40 @@
     <div id="Summary" class="tab-pane fade" style="padding-top:75px">
         <h3><b>Summary</b></h3>
         <div class="tab w3-row-padding w3-padding-large" id="summ">
+            <div class="w3-container w3-padding-16">
+                <div class="w3-container w3-green w3-padding-16 w3-quarter">
+                    <div class="w3-left"><i class="fa fa-check-square w3-xxxlarge"></i></div>
+                    <div class="w3-right">
+                    <h3 id="Pass">0</h3>
+                    </div>
+                    <div class="w3-clear"></div>
+                    <h4>Number of pass</h4>
+                </div>
+                <div class="w3-container w3-orange w3-padding-16 w3-quarter">
+                    <div class="w3-left"><i class="fa fa-exclamation-triangle w3-xxxlarge"></i></div>
+                    <div class="w3-right">
+                    <h3 id="Warning">0</h3>
+                    </div>
+                    <div class="w3-clear"></div>
+                    <h4>Number of warning</h4>
+                </div>
+                <div class="w3-container w3-red w3-padding-16 w3-quarter">
+                    <div class="w3-left"><i class="fa fa-times-circle w3-xxxlarge"></i></div>
+                    <div class="w3-right">
+                    <h3 id="Fail">0</h3>
+                    </div>
+                    <div class="w3-clear"></div>
+                    <h4>Number of fail</h4>
+                </div>
+                <div class="w3-container w3-grey w3-padding-16 w3-quarter">
+                    <div class="w3-left"><i class="fa fa-question-circle w3-xxxlarge"></i></div>
+                    <div class="w3-right">
+                    <h3 id="Pending">0</h3>
+                    </div>
+                    <div class="w3-clear"></div>
+                    <h4>Number of pending</h4>
+                </div>
+            </div>
             <table id="table_sort" class="display" cellspacing="0" width="100%">
             <thead>
                 <tr>
@@ -115,8 +161,8 @@
                     <tr>
                     <td>{{ metric_name }}</td>
                     <td>{{ subject_name }}</td>
-                    <td><span class="status" style="background-color: grey;" id="{{ subject_name }}_status_summ">Pending</span></td>
-                    <td id="{{ subject_name }}_comments_summ"></td>
+                    <td id="{{ subject_name|replace("/", "_")|replace(".", "_")}}_status_summ"><span class="status" style="background-color: grey;">Pending</span></td>
+                    <td id="{{ subject_name|replace("/", "_")|replace(".", "_")}}_comments_summ"></td>
                     </tr>
                 {% endfor %}
             {% endfor %}
@@ -165,11 +211,8 @@
     $('.js-dropdown').select2({
     matcher: matchCustom});
 
-    $('#table_sort').DataTable({
-        scrollY: '50px',
-        scrollCollapse: true,
-        paging: false,
-        dom: 'Bf',
+    table = $('#table_sort').DataTable({
+        dom: 'Bflrtip',
         buttons: [
         {
             extend: 'csv',
@@ -179,9 +222,28 @@
             extend: 'pdf',
             text: 'Export to .pdf'
         }],
-        "ordering": false,
     });
+    update_summ_status();
 });
+
+function update_summ(id, data){
+    id_html = '#'+id.replace("/", "_").replace(".", "_").replace(".", "_")
+    if (!id_html.includes('comments')){
+        curr_status = $(table.cell(id_html).data())[0].innerText;
+    }
+    table.cell(id_html).data(data).draw();
+    if (!id_html.includes('comments')){
+        document.getElementById(curr_status).innerText = parseInt(document.getElementById(curr_status).innerText) - 1;
+        document.getElementById($(data)[0].innerText).innerText = parseInt(document.getElementById($(data)[0].innerText).innerText) + 1;
+    }
+}
+
+function update_summ_status(){
+    table.column(2).data().each( function ( value, index ) {
+        document.getElementById($(value)[0].innerText).innerText = parseInt(document.getElementById($(value)[0].innerText).innerText) + 1;
+    });
+}
+
 </script>
 </body>
 </html>
