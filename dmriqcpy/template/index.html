@@ -35,11 +35,11 @@
 <!-- Top container -->
 <div class="w3-bar w3-top w3-large" style="background-color: #337ab7;">
     <span class="w3-bar-item w3-left" style="color: white;">dMRI Quality Check</span>
-    <ul id="navigation" class="nav nav-tabs">
-            <li class="active"><a style="background-color: #19568b; color: white" data-toggle="tab" href="#Dashboard">Dashboard</a></li>
-            <li><a style="background-color: #19568b; color: white" data-toggle="tab" href="#Summary">Summary</a></li>
+    <ul id="navigation" class="nav nav-tabs" style="border-bottom: 5px solid #ddd">
+            <li class="active"><a style="background-color: #19568b; color: white; border-bottom: 2px solid white" data-toggle="tab" href="#Dashboard">Dashboard</a></li>
+            <li><a style="background-color: #19568b; color: white ; border-bottom: 2px solid white" data-toggle="tab" href="#Summary">Summary</a></li>
             {% for metric_name in metrics_dict|sort() %}
-            <li><a style="background-color: #19568b; color: white" data-toggle="tab" href="#{{ metric_name|replace(" ", "_") }}">{{metric_name}}</a></li>
+            <li><a style="background-color: #19568b; color: white ; border-bottom: 2px solid white" data-toggle="tab" href="#{{ metric_name|replace(" ", "_") }}">{{metric_name}}</a></li>
             {% endfor %}
     </ul>
     <input class="load_save_file" accept=".json" type="file" name="file" id="load_file" onchange="load_qc()"/>
@@ -66,8 +66,9 @@
             2 -> Warning.<br>
             3 -> Fail.<br>
             4 -> Pending.<br>
-            c -> display comment box.<br>
+            c -> Display comment box.<br>
             Esc -> Close comment box.<br>
+            z -> Zoom<br>
             h -> Display this help.<br>
         </p>
     </div>
