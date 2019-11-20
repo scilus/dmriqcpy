@@ -377,21 +377,21 @@ function shortcut(e){
     else if (e.which == 39){
         nextPrev(1);
     }
-    else if (e.which == 80 || e.which == 49)
+    else if (e.which == 49)
     {
         var tab = document.getElementById(currentMetric);
         var subj_id = tab.getElementsByClassName("tab")[dict_metrics[currentMetric]].id;
         update_status(document.getElementById(subj_id + "_pass"));
         qc_saved=false;
     }
-    else if (e.which == 87 || e.which == 50)
+    else if (e.which == 50)
     {
         var tab = document.getElementById(currentMetric);
         var subj_id = tab.getElementsByClassName("tab")[dict_metrics[currentMetric]].id;
         update_status(document.getElementById(subj_id + "_warning"));
         qc_saved=false;
     }
-    else if (e.which == 70 || e.which == 51)
+    else if (e.which == 51)
     {
         var tab = document.getElementById(currentMetric);
         var subj_id = tab.getElementsByClassName("tab")[dict_metrics[currentMetric]].id;
@@ -472,19 +472,33 @@ $(document).on('click', '[data-toggle="lightbox"]', function(event) {
 
 $('select').on('select2:opening', function( event ) {
     document.removeEventListener("keydown", shortcut);
+    document.removeEventListener("keydown", close_comment);
 });
 
 $('select').on('select2:closing', function( event ) {
     document.addEventListener("keydown", shortcut);
+    document.addEventListener("keydown", close_comment);
 });
 
 $('textarea').on('focus', function( event ) {
     document.removeEventListener("keydown", shortcut);
+    document.removeEventListener("keydown", close_comment);
 });
 
 $('textarea').on('blur', function( event ) {
     update_summ(event.currentTarget.id + "_summ", document.getElementById(event.currentTarget.id).value);
     document.addEventListener("keydown", shortcut);
+    document.addEventListener("keydown", close_comment);
+});
+
+$('input').on('focus', function( event ) {
+    document.removeEventListener("keydown", shortcut);
+    document.removeEventListener("keydown", close_comment);
+});
+
+$('input').on('blur', function( event ) {
+    document.addEventListener("keydown", shortcut);
+    document.addEventListener("keydown", close_comment);
 });
 })
 
