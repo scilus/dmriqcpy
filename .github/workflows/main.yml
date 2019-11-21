@@ -14,14 +14,15 @@ jobs:
         ref: master
     - name: Install singularity
       run: |
-          date "+%Y%m%d"
+          curr_date=$(date "+%Y%m%d")
+          echo ${curr_date}
           sudo wget -O- http://neuro.debian.net/lists/xenial.us-ca.full | sudo tee /etc/apt/sources.list.d/neurodebian.sources.list
           sudo apt-key adv --recv-keys --keyserver pool.sks-keyservers.net 2649A5A9 || { sudo wget -q -O- http://neuro.debian.net/_static/neuro.debian.net.asc | sudo apt-key add -; }
           sudo apt-get update
           sudo apt-get install -y singularity-container
           mkdir singularity_dmriqc_build
           curr_date=$(date "+%Y%m%d")
-          sudo singularity build singularity_dmriqc_build/singularity_tractoflow_$curr_date_$GITHUB_SHA.img /home/runner/work/dmriqcpy/singularity-dmriqc/singularity_dmriqcpy.def
+          sudo singularity build singularity_dmriqc_build/singularity_tractoflow_${curr_date}_${GITHUB_SHA}.img /home/runner/work/dmriqcpy/singularity-dmriqc/singularity_dmriqcpy.def
 
     - uses: actions/upload-artifact@v1
       with:
