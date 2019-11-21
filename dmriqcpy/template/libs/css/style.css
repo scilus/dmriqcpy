@@ -230,7 +230,7 @@ bottom: .5em;
 }
 
 .help-tip{
-  position: absolute;
+  position: fixed;
   top: 10px;
   right: 18px;
   text-align: center;
@@ -350,6 +350,8 @@ bottom: .5em;
   position: absolute;
   top: 50%;
   left: 50%;
+  margin-top: -60px;
+  margin-left: -60px;
   z-index: 9999999;
 }
 

@@ -28,7 +28,14 @@
 <script type="text/javascript" src="libs/js/pdfmake.min.js"></script>
 <script type="text/javascript" src="libs/js/vfs_fonts.js"></script>
 
+<script>
+    function hideLoader() {
+    $('.loader').hide();
+    $('.overlay').hide();
+}
 
+$(window).ready(hideLoader);
+</script>
 
 <body class="w3-white">
 <div class="overlay">
@@ -214,15 +221,6 @@
 </div>
 
 <script>
-    function hideLoader() {
-        $('.loader').hide();
-        $('.overlay').hide();
-    }
-    $(window).ready(hideLoader);
-
-    // Hide loader after 20 seconds, even if the page hasn't finished loading
-    setTimeout(hideLoader, 20 * 1000);
-
     $('.js-dropdown').select2({
     matcher: matchCustom});
 

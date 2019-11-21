@@ -472,34 +472,38 @@ $(document).on('click', '[data-toggle="lightbox"]', function(event) {
 
 $('select').on('select2:opening', function( event ) {
     document.removeEventListener("keydown", shortcut);
-    document.removeEventListener("keydown", close_comment);
 });
 
 $('select').on('select2:closing', function( event ) {
     document.addEventListener("keydown", shortcut);
-    document.addEventListener("keydown", close_comment);
 });
 
 $('textarea').on('focus', function( event ) {
     document.removeEventListener("keydown", shortcut);
-    document.removeEventListener("keydown", close_comment);
 });
 
 $('textarea').on('blur', function( event ) {
     update_summ(event.currentTarget.id + "_summ", document.getElementById(event.currentTarget.id).value);
     document.addEventListener("keydown", shortcut);
-    document.addEventListener("keydown", close_comment);
 });
 
 $('input').on('focus', function( event ) {
     document.removeEventListener("keydown", shortcut);
-    document.removeEventListener("keydown", close_comment);
 });
 
 $('input').on('blur', function( event ) {
     document.addEventListener("keydown", shortcut);
-    document.addEventListener("keydown", close_comment);
 });
+
+$(".nav-tabs a").click(function(){
+    $(this).tab('show');
+  });
+
+$('#navigation li a').click(function() {
+    currentMetric = this.innerText.replace(/ /g,"_");
+    showTab(dict_metrics[currentMetric]);
+});
+
 })
 
 function openForm(event) {
@@ -727,16 +731,6 @@ function save_qc(){
 function comment_update(){
     qc_saved=false;
 }
-
-$(document).ready(function(){
-    $(".nav-tabs a").click(function(){
-      $(this).tab('show');
-    });
-    $('#navigation li a').click(function() {
-        currentMetric = this.innerText.replace(/ /g,"_");
-        showTab(dict_metrics[currentMetric]);
-    });
-});
 
 window.onbeforeunload = function (e) {
     e = e || window.event;
