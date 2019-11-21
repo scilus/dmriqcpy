@@ -21,7 +21,7 @@ jobs:
           sudo apt-get install -y singularity-container
           mkdir singularity_dmriqc_build
           curr_date=$(date "+%Y%m%d")
-          singularity build singularity_dmriqc_build/singularity_tractoflow_$curr_date_$GITHUB_SHA.img singularity_dmriqcpy.def
+          singularity build singularity_dmriqc_build/singularity_tractoflow_$curr_date_$GITHUB_SHA.img /home/runner/work/dmriqcpy/singularity-dmriqc/singularity_dmriqcpy.def
 
     - uses: actions/upload-artifact@v1
       with:
