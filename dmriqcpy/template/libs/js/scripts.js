@@ -605,6 +605,23 @@ function showTab(n) {
             tab.getElementsByTagName("button")[1].disabled = false;
         }
     }
+    else if (tab.id == "Summary")
+    {
+        data = []
+        report = {"type": "report", "data": []};
+        for (let metrics of document.getElementsByClassName("tab-pane")){
+            if (metrics.id != "Dashboard"){
+                for (let subject of metrics.getElementsByClassName("tab")){
+                    if (document.getElementById(subject.id + "_status")){
+                        data.push([metrics.id, subject.id, document.getElementById(subject.id + "_status").innerText, document.getElementById(subject.id + "_comments").value])
+                    }
+                }
+            }
+        }
+
+        load_summ(data);
+        update_summ_table();
+    }
 }
 
 function nextPrev(n) {
@@ -658,7 +675,7 @@ function update_status(object) {
     qc_saved=false;
     copy = document.getElementById(object.name+"_status").cloneNode(true);
     copy.removeAttribute("id");
-    update_summ(object.name+'_status_summ', copy.outerHTML);
+    // update_summ(object.name+'_status_summ', copy.innerText);
 }
 
 function load_qc(){
@@ -668,6 +685,7 @@ function load_qc(){
     var reader = new FileReader();
     var x = document.getElementById(currentMetric).getElementsByClassName("tab");
     x[dict_metrics[currentMetric]].style.display = "none";
+    test = []
     reader.onload = function(event) { 
         let importedJSON = JSON.parse(event.target.result);
         for (let dict_idx in importedJSON){
@@ -677,10 +695,12 @@ function load_qc(){
                     status = importedJSON[dict_idx]["data"][data_idx]["status"];
                     comments = importedJSON[dict_idx]["data"][data_idx]["comments"];
                     document.getElementById(filename + "_comments").value = comments;
-                    update_summ(filename+'_comments_summ', document.getElementById(filename + "_comments").value);
+                    curr = importedJSON[dict_idx]["data"][data_idx];
+                    test.push([curr["qc"], curr["filename"], curr["status"], curr["comments"]])
+                    // update_summ(filename+'_comments_summ', document.getElementById(filename + "_comments").value);
                     document.getElementById(filename + "_status").innerText = status;
                     document.getElementById(filename + "_status").style.backgroundColor = color_dict[status];
-                    update_summ(filename+'_status_summ', document.getElementById(filename+"_status").outerHTML);
+                    // update_summ(filename+'_status_summ', document.getElementById(filename+"_status").outerHTML);
                 }
             }
             else if (importedJSON[dict_idx]["type"] == "settings")
@@ -693,6 +713,8 @@ function load_qc(){
             }
         }
         showTab(dict_metrics[currentMetric]);
+        load_summ(test);
+        update_summ_table();
     };
     reader.readAsText(selectedFile);
 }
