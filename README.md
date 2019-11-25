@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/GuillaumeTh/dmriqcpy/workflows/Singularity Build/badge.svg)](https://github.com/GuillaumeTh/dmriqcpy/actions)
+[![Actions Status](https://github.com/GuillaumeTh/dmriqcpy/workflows/Singularity%20Build/badge.svg)](https://github.com/GuillaumeTh/dmriqcpy/actions)
 
 # dmriqcpy
 Diffusion MRI Quality Check in python
