@@ -27,7 +27,7 @@ def graph_mean_median(title, column_names, summary):
     means = []
     medians = []
     np.random.seed(1)
-    image = summary.index
+    image = np.concatenate(summary.index)
     means = np.array(summary[column_names[0]])
     medians = np.array(summary[column_names[1]])
 
@@ -88,7 +88,7 @@ def graph_mean_in_tissues(title, column_names, summary):
     means_gm = []
     means_csf = []
     np.random.seed(1)
-    metric = summary.index
+    metric = np.concatenate(summary.index)
     means_wm = np.array(summary[column_names[0]])
     means_gm = np.array(summary[column_names[1]])
     means_csf = np.array(summary[column_names[2]])
@@ -154,7 +154,7 @@ def graph_frf(title, column_names, summary):
         Graph as a HTML div.
     """
     np.random.seed(1)
-    metric = summary.index
+    metric = np.concatenate(summary.index)
     e1 = np.array(summary[column_names[0]])
     e2 = np.array(summary[column_names[1]])
 
@@ -209,7 +209,7 @@ def graph_tractogram(title, column_names, summary):
     """
     nb_streamlines = []
     np.random.seed(1)
-    metric = summary.index
+    metric = np.concatenate(summary.index)
     nb_streamlines = np.array(summary[column_names[0]])
 
     nb_streamlines_graph = Box(
@@ -251,9 +251,8 @@ def graph_mask_volume(title, column_names, summary):
     div : html div (string)
         Graph as a HTML div.
     """
-    nb_streamlines = []
     np.random.seed(1)
-    metric = summary.index
+    metric = np.concatenate(summary.index)
     volume = np.array(summary[column_names[0]])
 
     volume_graph = Box(
