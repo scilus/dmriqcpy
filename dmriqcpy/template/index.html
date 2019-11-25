@@ -7,7 +7,6 @@
 <link rel="stylesheet" type="text/css" href="libs/css/bootstrap.min.css">
 <link rel="stylesheet" type="text/css" href="libs/css/select2.min.css">
 <link rel="stylesheet" type="text/css" href="libs/css/ekko-lightbox.css">
-<link rel="stylesheet" type="text/css" href="libs/css/style.css">
 <link rel="stylesheet" type="text/css" href="libs/fontawesome-free-5.11.2-web/css/all.css">
 <link rel="stylesheet" type="text/css" href="libs/DataTables/datatables.min.css"/>
 <link rel="stylesheet" type="text/css" href="libs/DataTables/Buttons-1.6.1/css/buttons.dataTables.css"/>
@@ -37,7 +36,7 @@
 $(window).ready(hideLoader);
 </script>
 
-<body class="w3-white">
+<body class="bg-white">
 <div class="overlay">
     <div class="loader"></div>
 </div>
@@ -81,6 +80,11 @@ $(window).ready(hideLoader);
             z -> Zoom<br>
             h -> Display this help.<br>
         </p>
+    </div>
+    <div class="material-switch pull-right">
+        Dark Mode
+        <input type="checkbox" class="custom-control-input" id="darkSwitch" />
+        <label class="custom-control-label" for="darkSwitch"></label>
     </div>
     <div class="alert info">
         <strong>Saved!</strong>
@@ -245,5 +249,7 @@ $(window).ready(hideLoader);
     }
 
 </script>
+<script type="text/javascript" src="libs/js/dark-mode-switch.js"></script>
+<link rel="stylesheet" type="text/css" href="libs/css/style.css">
 </body>
 </html>
