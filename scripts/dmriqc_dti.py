@@ -60,6 +60,9 @@ def _build_arg_parser():
     p.add_argument('--skip', default=2, type=int,
                    help='Number of images skipped to build the mosaic. [%(default)s]')
 
+    p.add_argument('--nb_columns', default=12, type=int,
+                   help='Number of columns for the mosaic. [%(default)s]')
+
     p.add_argument('--nb_threads', type=int, default=1,
                    help='Number of threads. [%(default)s]')
 
@@ -68,14 +71,14 @@ def _build_arg_parser():
     return p
 
 
-def _subj_parralel(subj_metric, summary, name, skip):
+def _subj_parralel(subj_metric, summary, name, skip, nb_columns):
     subjects_dict = {}
     cmap = None
     if name == "Residual":
         cmap = "hot"
     screenshot_path = screenshot_mosaic_wrapper(subj_metric, output_prefix=name,
                                                 directory="data", skip=skip,
-                                                nb_columns=12, cmap=cmap)
+                                                nb_columns=nb_columns, cmap=cmap)
 
     summary_html = dataframe_to_html(summary.loc[subj_metric])
     subjects_dict[subj_metric] = {}
@@ -137,7 +140,8 @@ def main():
                                           zip(metrics,
                                               itertools.repeat(summary),
                                               itertools.repeat(name),
-                                              itertools.repeat(args.skip)))
+                                              itertools.repeat(args.skip),
+                                              itertools.repeat(args.nb_columns)))
 
         pool.close()
         pool.join()

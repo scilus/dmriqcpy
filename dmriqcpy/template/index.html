@@ -183,8 +183,8 @@ $(window).ready(hideLoader);
             <div class="w3-padding-16 w3-bar-item w3-right">
                     <button id="prevBtn" onclick="nextPrev(-1)" class="fa fa-arrow-left"></button>
                     <select id="subjects_{{ metric_name|replace(" ", "_") }}" class="js-dropdown">
-                    {% for subject in metric_values|sort() %}
-                        <option value="{{subject}}">{{subject}}</option>
+                    {% for subject_name, subject_values in metric_values.items()|sort() %}
+                        <option value="{{subject_name}}">{{subject_name}}</option>
                     {% endfor %}
                     </select>
                     <button id="nextBtn" onclick="nextPrev(1)" class="fa fa-arrow-right"></button>

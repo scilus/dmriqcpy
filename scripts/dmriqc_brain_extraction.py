@@ -40,6 +40,9 @@ def _build_arg_parser():
     p.add_argument('--skip', default=2, type=int,
                    help='Number of images skipped to build the mosaic. [%(default)s]')
 
+    p.add_argument('--nb_columns', default=12, type=int,
+                   help='Number of columns for the mosaic. [%(default)s]')
+
     p.add_argument('--nb_threads', type=int, default=1,
                    help='Number of threads. [%(default)s]')
 
@@ -48,14 +51,14 @@ def _build_arg_parser():
     return p
 
 
-def _subj_parralel(images_no_bet, images_bet_mask, name, skip, summary):
+def _subj_parralel(images_no_bet, images_bet_mask, name, skip, summary, nb_columns):
     subjects_dict = {}
     for subj_metric, mask in zip(images_no_bet, images_bet_mask):
         screenshot_path = screenshot_mosaic_blend(subj_metric, mask,
                                                   output_prefix=name,
                                                   directory="data",
                                                   blend_val=0.3,
-                                                  skip=skip, nb_columns=12,
+                                                  skip=skip, nb_columns=nb_columns,
                                                   is_mask=True)
 
         summary_html = dataframe_to_html(summary.loc[subj_metric])
@@ -110,7 +113,7 @@ def main():
         zip(np.array_split(np.array(args.images_no_bet), args.nb_threads),
             np.array_split(np.array(args.images_bet_mask), args.nb_threads),
             itertools.repeat(name), itertools.repeat(args.skip),
-            itertools.repeat(summary)))
+            itertools.repeat(summary), itertools.repeat(args.nb_columns)))
 
     pool.close()
     pool.join()
