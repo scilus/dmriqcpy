@@ -42,13 +42,13 @@ $(window).ready(hideLoader);
 </div>
 
 <!-- Top container -->
-<div class="w3-bar w3-top w3-large" style="background-color: #337ab7;">
-    <span class="w3-bar-item w3-left" style="color: white;">dMRI Quality Check</span>
+<div class="w3-bar w3-top w3-large nav_color">
+    <span class="w3-bar-item w3-left nav_color_text">dMRI Quality Check</span>
     <ul id="navigation" class="nav nav-tabs" style="border-bottom: 5px solid #ddd">
-            <li class="active"><a style="background-color: #19568b; color: white; border-bottom: 2px solid white" data-toggle="tab" href="#Dashboard">Dashboard</a></li>
-            <li><a style="background-color: #19568b; color: white ; border-bottom: 2px solid white" data-toggle="tab" href="#Summary">Summary</a></li>
+            <li class="active"><a class="nav_tab_color" data-toggle="tab" href="#Dashboard">Dashboard</a></li>
+            <li><a class="nav_tab_color" data-toggle="tab" href="#Summary">Summary</a></li>
             {% for metric_name in metrics_dict|sort() %}
-            <li><a style="background-color: #19568b; color: white ; border-bottom: 2px solid white" data-toggle="tab" href="#{{ metric_name|replace(" ", "_") }}">{{metric_name}}</a></li>
+            <li><a class="nav_tab_color" data-toggle="tab" href="#{{ metric_name|replace(" ", "_") }}">{{metric_name}}</a></li>
             {% endfor %}
     </ul>
     <input class="load_save_file" accept=".json" type="file" name="file" id="load_file" onchange="load_qc()"/>
@@ -59,8 +59,8 @@ $(window).ready(hideLoader);
     <label class="btn w3-light-grey" style="margin: 6px" for="save_file">
         <span>Save QC</span>
     </label>
-    <b><span class="w3-bar-item w3-right" style="padding: 12px; color: white;" id="counter"></span></b>
-    <b><span class="w3-bar-item w3-right" style="padding: 12px; color: white" id="curr_subj"></span></b>
+    <b><span class="w3-bar-item w3-right nav_color_text" style="padding: 12px;" id="counter"></span></b>
+    <b><span class="w3-bar-item w3-right nav_color_text" style="padding: 12px;" id="curr_subj"></span></b>
 </div>
 
 <!-- !PAGE CONTENT! -->
@@ -127,7 +127,7 @@ $(window).ready(hideLoader);
         <h3><b>Summary</b></h3>
         <div class="tab w3-row-padding w3-padding-large" id="summ">
             <div class="w3-container w3-padding-16">
-                <div class="w3-container w3-green w3-padding-16 w3-quarter">
+                <div class="w3-container pass w3-padding-16 w3-quarter">
                     <div class="w3-left"><i class="fa fa-check-square w3-xxxlarge"></i></div>
                     <div class="w3-right">
                     <h3 id="Pass">0</h3>
@@ -135,7 +135,7 @@ $(window).ready(hideLoader);
                     <div class="w3-clear"></div>
                     <h4>Number of pass</h4>
                 </div>
-                <div class="w3-container w3-orange w3-padding-16 w3-quarter">
+                <div class="w3-container warning w3-padding-16 w3-quarter">
                     <div class="w3-left"><i class="fa fa-exclamation-triangle w3-xxxlarge"></i></div>
                     <div class="w3-right">
                     <h3 id="Warning">0</h3>
@@ -143,7 +143,7 @@ $(window).ready(hideLoader);
                     <div class="w3-clear"></div>
                     <h4>Number of warning</h4>
                 </div>
-                <div class="w3-container w3-red w3-padding-16 w3-quarter">
+                <div class="w3-container fail w3-padding-16 w3-quarter">
                     <div class="w3-left"><i class="fa fa-times-circle w3-xxxlarge"></i></div>
                     <div class="w3-right">
                     <h3 id="Fail">0</h3>
@@ -151,7 +151,7 @@ $(window).ready(hideLoader);
                     <div class="w3-clear"></div>
                     <h4>Number of fail</h4>
                 </div>
-                <div class="w3-container w3-grey w3-padding-16 w3-quarter">
+                <div class="w3-container pending w3-padding-16 w3-quarter">
                     <div class="w3-left"><i class="fa fa-question-circle w3-xxxlarge"></i></div>
                     <div class="w3-right">
                     <h3 id="Pending">0</h3>
@@ -192,7 +192,7 @@ $(window).ready(hideLoader);
             {% for subject_name, subject_values in metric_values.items()|sort() %}
                 <div class="tab" id="{{ subject_name }}">
                     <h1><b>Current subject: {{ subject_name }}</b></h1>
-                    <h2>Status: <span class="status" style="background-color: grey;" id="{{ subject_name }}_status">Pending</span></h2>
+                    <h2>Status: <span class="status pending" id="{{ subject_name }}_status">Pending</span></h2>
                     {% block comment_block scoped %}{% endblock comment_block %}
                     {{subject_values.stats}}
                     {% if subject_values.screenshot %}
@@ -207,8 +207,8 @@ $(window).ready(hideLoader);
 </div>
 
 <!-- Footer -->
-<footer class="w3-container w3-padding-16 w3-center" style="background-color: #337ab7">
-    <a href="http://scil.usherbrooke.ca/?lang=en" title="SCIL" target="_blank" style="color: black">SCIL</a>
+<footer class="w3-container w3-padding-16 w3-center footer_color">
+    <a href="http://scil.usherbrooke.ca/?lang=en" title="SCIL" target="_blank">SCIL</a>
 </footer>
 
 <!-- End page content -->

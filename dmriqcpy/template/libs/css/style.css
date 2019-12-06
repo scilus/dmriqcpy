@@ -1,3 +1,95 @@
+:root {
+  --nav_tab_color_bg: #19568b;
+  --nav_tab_color_text_color: white;
+  
+  --nav_color_bg: #337ab7;
+  --nav_color_border: 5px solid #ddd;
+
+  --nav_color_text: white;
+
+  --footer_bg_color: #337ab7;
+  --footer_color: #000;
+
+  --pending_bg_color: #000;
+  --pending_text_color: #9e9e9e;
+
+  --pass_bg_color: #fff;
+  --pass_text_color: #4CAF50;
+
+  --warning_bg_color: #000;
+  --warning_text_color: #ff9800;
+
+  --fail_bg_color: #fff;
+  --fail_text_color: #f44336;
+
+  --subject_bg_color: #000;
+  --subject_text_color: #87CEEB;
+
+  --statusbox_bg_color: red;
+
+  --popup_save_bg: #2196F3;
+
+  --help_bg: #BCDBEA;
+  --help_color: #fff;
+
+  --dark_mode_text_color: white;
+}
+
+.nav_tab_color{ 
+  background-color: var(--nav_tab_color_bg);
+  color: var(--nav_tab_color_text_color);
+  border-bottom: 2px solid white
+}
+
+.nav_color{
+  background-color: var(--nav_color_bg);
+  border-bottom: var(--nav_color_border);
+}
+
+.nav_color_text{
+  color: var(--nav_color_text);
+}
+
+.footer_color{
+  background-color: var(--footer_bg_color);
+  color: var(--footer_color);
+}
+
+.pending{
+  color:var(--pending_bg_color)!important;
+  background-color: var(--pending_text_color)!important;
+}
+
+.pass{
+  color:var(--pass_bg_color)!important;
+  background-color: var(--pass_text_color)!important;
+}
+
+.warning{
+  color:var(--warning_bg_color)!important;
+  background-color: var(--warning_text_color)!important;
+}
+
+.fail{
+  color:var(--fail_bg_color)!important;
+  background-color: var(--fail_text_color)!important;
+}
+
+.subject{
+  color:var(--subject_bg_color)!important;
+  background-color: var(--subject_text_color)!important;
+}
+
+.nav-tabs>li.active>a,
+.nav-tabs>li.active>a:focus,
+.nav-tabs>li.active>a:hover {
+ color:var(--nav_tab_color_text_color);
+ cursor:default;
+ background-color:var(--nav_tab_color_bg);
+ border:3px solid #ddd;
+ border-bottom-color:transparent
+}
+
 .magnify { margin: 50px auto; position: relative;}
 /*Lets create the magnifying glass*/
 .large {
@@ -29,6 +121,7 @@
 .small { display: block; }
 
 html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
+
 .tab {
   display: none;
 }
@@ -207,8 +300,8 @@ iframe {
 }
 
 /* Add a red background color to the cancel button */
-.form-container .cancel {
-  background-color: red;
+.form-container .close_box_btn {
+  background-color: var(--statusbox_bg_color);
 }
 
 /* Add some hover effects to buttons */
@@ -234,7 +327,7 @@ bottom: .5em;
   top: 10px;
   right: 18px;
   text-align: center;
-  background-color: #BCDBEA;
+  background-color: var(--help_bg);
   border-radius: 50%;
   width: 24px;
   height: 24px;
@@ -246,7 +339,7 @@ bottom: .5em;
 .help-tip:before{
   content:'?';
   font-weight: bold;
-  color:#fff;
+  color: var(--help_color);
 }
 
 .help-tip:hover p{
@@ -326,17 +419,7 @@ bottom: .5em;
   text-align: center;
 }
 
-.alert.info {background-color: #2196F3;}
-
-.nav-tabs>li.active>a,
-.nav-tabs>li.active>a:focus,
-.nav-tabs>li.active>a:hover {
- color:#555;
- cursor:default;
- background-color:#fff;
- border:3px solid #ddd;
- border-bottom-color:transparent
-}
+.alert.info {background-color: var(--popup_save_bg);}
 
 .loader {
   border: 16px solid #f3f3f3;
@@ -379,14 +462,6 @@ bottom: .5em;
 [data-theme="dark"] {
   background-color: #111 !important;
   color: #eee;
-}
-
-[data-theme="dark"] .bg-white {
-  background-color: #000 !important;
-}
-
-[data-theme="dark"] .bg-black {
-  background-color: #eee !important;
 }
 
 [data-theme="dark"] .fa-arrow-left{
@@ -542,5 +617,5 @@ table.dataTable.display tbody tr.even > .sorting_1, table.dataTable.order-column
   right: 60px;
   z-index: 9;
   font-size: 18px;
-  color: white;
+  color: var(--dark_mode_text_color);
 }

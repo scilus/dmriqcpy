@@ -664,18 +664,21 @@ function doMouseWheel(event) {
 }
 
 function update_status(object) {
+    curr_status = document.getElementById(object.name+"_status").classList[1];
+    new_status = object.classList[1];
     document.getElementById(object.name+"_status").innerText = object.innerText;
-    document.getElementById(object.name+"_status").style.backgroundColor = object.style.backgroundColor;
+    document.getElementById(object.name+"_status").classList.remove(curr_status);
+    document.getElementById(object.name+"_status").classList.add(new_status);
     if (object.innerText != "Pending"){
-        document.getElementById("curr_subj").style.backgroundColor = object.style.backgroundColor;
+        document.getElementById("curr_subj").classList.remove(curr_status);
+        document.getElementById("curr_subj").classList.add(new_status);
     }
     else{
-        document.getElementById("curr_subj").style.backgroundColor = "";
+        document.getElementById("curr_subj").classList.remove(curr_status);
     }
     qc_saved=false;
     copy = document.getElementById(object.name+"_status").cloneNode(true);
     copy.removeAttribute("id");
-    // update_summ(object.name+'_status_summ', copy.innerText);
 }
 
 function load_qc(){
