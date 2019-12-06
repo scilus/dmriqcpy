@@ -44,7 +44,7 @@ $(window).ready(hideLoader);
 <!-- Top container -->
 <div class="w3-bar w3-top w3-large nav_color">
     <span class="w3-bar-item w3-left nav_color_text">dMRI Quality Check</span>
-    <ul id="navigation" class="nav nav-tabs" style="border-bottom: 5px solid #ddd">
+    <ul id="navigation" class="nav nav-tabs nav_color">
             <li class="active"><a class="nav_tab_color" data-toggle="tab" href="#Dashboard">Dashboard</a></li>
             <li><a class="nav_tab_color" data-toggle="tab" href="#Summary">Summary</a></li>
             {% for metric_name in metrics_dict|sort() %}

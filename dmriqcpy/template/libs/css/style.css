@@ -4,6 +4,7 @@
 
   --nav_tab_color_bg: #19568b;
   --nav_tab_color_text_color: white;
+  --nav_tab_color_border: 3px solid #ddd;
   
   --nav_color_bg: #337ab7;
   --nav_color_border: 5px solid #ddd;
@@ -41,9 +42,13 @@
   --dm_bg_color: #111;
   --dm_text_color: #eee;
 
-  --row_even_bg_color: #272727;
-  --row_odd_bg_color: #202020;
+  --row_even_bg_color_selected: #272727;
+  --row_odd_bg_color_selected: #202020;
 
+  --row_even_bg_color: #343434;
+  --row_odd_bg_color: #272727;
+
+  --table_text_color: white;
 }
 
 body {
@@ -54,7 +59,6 @@ body {
 .nav_tab_color{ 
   background-color: var(--nav_tab_color_bg);
   color: var(--nav_tab_color_text_color);
-  border-bottom: 2px solid white
 }
 
 .nav_color{
@@ -102,7 +106,7 @@ body {
  color:var(--nav_tab_color_text_color);
  cursor:default;
  background-color:var(--nav_tab_color_bg);
- border:3px solid #ddd;
+ border:var(--nav_tab_color_border);
  border-bottom-color:transparent
 }
 
@@ -526,21 +530,21 @@ bottom: .5em;
   }
 
   [data-theme="dark"] .table-striped > tbody > tr:nth-of-type(2n+1){
-    background-color: #272727;
+    background-color: var(--row_odd_bg_color);
   }
 
   [data-theme="dark"] .table-striped > tbody > tr:nth-of-type(2n){
-    background-color: #202020;
+    background-color: var(--row_even_bg_color);
   }
   
 
 
 [data-theme="dark"] .dataTables_wrapper .dataTables_length{
-  color: white;
+  color: var(--table_text_color);
 }
 
 [data-theme="dark"] .dataTables_wrapper .dataTables_filter{
-  color: white;
+  color: var(--table_text_color);
 }
 
 [data-theme="dark"] .dataTables_wrapper input{
@@ -548,11 +552,11 @@ bottom: .5em;
 }
 
 [data-theme="dark"] .dataTables_wrapper .dataTables_info{
-  color: white;
+  color: var(--table_text_color);
 }
 
 [data-theme="dark"] .dataTables_wrapper .dataTables_processing{
-  color: white;
+  color: var(--table_text_color);
 }
 
 .current{
@@ -562,26 +566,26 @@ bottom: .5em;
 
 [data-theme="dark"] 
 .dataTable {
-  color: white;
+  color: var(--table_text_color);
 }
 
 [data-theme="dark"] 
 table.dataTable.display tbody tr.odd {
-  background-color: #272727;
+  background-color: var(--row_odd_bg_color);
 }
 
 [data-theme="dark"] 
 table.dataTable.display tbody tr.odd > .sorting_1, table.dataTable.order-column.stripe tbody tr.odd > .sorting_1 {
-  background-color: var(--row_od_bg_color);
+  background-color: var(--row_odd_bg_color_selected);
 }
 
 [data-theme="dark"] 
 table.dataTable.display tbody tr.even {
-  background-color: #343434;
+  background-color: var(--row_even_bg_color);
 }
 [data-theme="dark"] 
 table.dataTable.display tbody tr.even > .sorting_1, table.dataTable.order-column.stripe tbody tr.even > .sorting_1 {
-  background-color: var(--row_even_bg_color);
+  background-color: var(--row_even_bg_color_selected);
 }
 
 .material-switch > input[type="checkbox"] {
