@@ -1,4 +1,7 @@
 :root {
+  --bg_color: white;
+  --text_color: black;
+
   --nav_tab_color_bg: #19568b;
   --nav_tab_color_text_color: white;
   
@@ -32,7 +35,20 @@
   --help_bg: #BCDBEA;
   --help_color: #fff;
 
+  /*Dark mode section*/
   --dark_mode_text_color: white;
+
+  --dm_bg_color: #111;
+  --dm_text_color: #eee;
+
+  --row_even_bg_color: #272727;
+  --row_odd_bg_color: #202020;
+
+}
+
+body {
+  background-color: var(--bg_color);
+  color: var(--text_color);
 }
 
 .nav_tab_color{ 
@@ -460,8 +476,8 @@ bottom: .5em;
 }
 
 [data-theme="dark"] {
-  background-color: #111 !important;
-  color: #eee;
+  background-color: var(--dm_bg_color) !important;
+  color: var(--dm_text_color);
 }
 
 [data-theme="dark"] .fa-arrow-left{
@@ -556,7 +572,7 @@ table.dataTable.display tbody tr.odd {
 
 [data-theme="dark"] 
 table.dataTable.display tbody tr.odd > .sorting_1, table.dataTable.order-column.stripe tbody tr.odd > .sorting_1 {
-  background-color: #202020;
+  background-color: var(--row_od_bg_color);
 }
 
 [data-theme="dark"] 
@@ -565,7 +581,7 @@ table.dataTable.display tbody tr.even {
 }
 [data-theme="dark"] 
 table.dataTable.display tbody tr.even > .sorting_1, table.dataTable.order-column.stripe tbody tr.even > .sorting_1 {
-  background-color: #272727;
+  background-color: var(--row_even_bg_color);
 }
 
 .material-switch > input[type="checkbox"] {
