@@ -239,9 +239,9 @@ function update(mx, my) {
     var px = mx - $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".large").width()/2;
     var py = my - $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".large").height()/2;
     //Now the glass moves with the mouse
-    //The logic is to deduct half of the glass's width and height from the 
+    //The logic is to deduct half of the glass's width and height from the
     //mouse coordinates to place it with its center at the mouse coordinates
-    
+
     //If you hover on the image now, you should see the magnifying glass in action
     $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".large").css({left: px, top: py, backgroundPosition: bgp, backgroundSize: bgs});
 }
@@ -269,7 +269,7 @@ $(".magnify").mousemove(function(e){
     if(!native_width && !native_height)
     {
     //This will create a new image object with the same image as that in .small
-    //We cannot directly get the dimensions from .small because of the 
+    //We cannot directly get the dimensions from .small because of the
     //width specified to 200px in the html. To get the actual dimensions we have
     //created this image object.
     if (loadLocker) {
@@ -278,9 +278,9 @@ $(".magnify").mousemove(function(e){
         image_object.src = $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".small").attr("src");
     }
     //This code is wrapped in the .load function which is important.
-    //width and height of the object would return 0 if accessed before 
+    //width and height of the object would return 0 if accessed before
     //the image gets loaded.
-    
+
     native_width = image_object.width;
     native_height = image_object.height;
     }
@@ -290,11 +290,11 @@ $(".magnify").mousemove(function(e){
     //This is the position of .magnify with respect to the document.
     var magnify_offset = $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).offset();
     //We will deduct the positions of .magnify from the mouse positions with
-    //respect to the document to get the mouse positions with respect to the 
+    //respect to the document to get the mouse positions with respect to the
     //container(.magnify)
     var mx = e.pageX - magnify_offset.left;
     var my = e.pageY - magnify_offset.top;
-    
+
     //Finally the code to fade out the glass if the mouse is outside the container
     if(mx < $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).width() && my < $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).height() && mx > 0 && my > 0)
     {
@@ -308,20 +308,20 @@ $(".magnify").mousemove(function(e){
     {
         //The background position of .large will be changed according to the position
         //of the mouse over the .small image. So we will get the ratio of the pixel
-        //under the mouse pointer with respect to the image and use that to position the 
+        //under the mouse pointer with respect to the image and use that to position the
         //large image inside the magnifying glass
         var rx = Math.round(mx - $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".large").width()/(2*zoom))*-1;
         var ry = Math.round(my - $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".large").height()/(2*zoom))*-1;
         var bgp = rx * zoom + "px " + ry * zoom + "px";
         var bgs = ($(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".small").width() * zoom) + "px " + ($(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".small").height() * zoom) + "px";
-        
+
         //Time to move the magnifying glass with the mouse
         var px = mx - $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".large").width()/2;
         var py = my - $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".large").height()/2;
         //Now the glass moves with the mouse
-        //The logic is to deduct half of the glass's width and height from the 
+        //The logic is to deduct half of the glass's width and height from the
         //mouse coordinates to place it with its center at the mouse coordinates
-        
+
         //If you hover on the image now, you should see the magnifying glass in action
         $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".large").css({left: px, top: py, backgroundPosition: bgp, backgroundSize: bgs});
     }
@@ -352,6 +352,9 @@ function shortcut(e){
     if (e.ctrlKey && e.which == 37){
         idx = nodes.indexOf(document.getElementById("navigation").getElementsByClassName("active")[0]);
         if (idx - 1 >= 0){
+            curr_scroll = $(document.getElementById("navigation"))[0].scrollLeft
+            if ($(document.getElementById("navigation").children[idx - 1]).position().left - $(document.getElementById("navigation").children[0]).position().left < curr_scroll)
+                $(document.getElementById("navigation")).scrollLeft($(document.getElementById("navigation").children[idx - 1]).position().left - $(document.getElementById("navigation").children[0]).position().left)
             currentMetric = document.getElementById("navigation").children[idx - 1].innerText.replace(/ /g,"_");
             showTab(dict_metrics[currentMetric]);
             document.getElementById("navigation").children[idx - 1].classList.add("active");
@@ -363,6 +366,9 @@ function shortcut(e){
     else if (e.ctrlKey && e.which == 39){
         idx = nodes.indexOf(document.getElementById("navigation").getElementsByClassName("active")[0]);
         if (idx + 1 < document.getElementById("navigation").children.length){
+            curr_scroll = $(document.getElementById("navigation"))[0].scrollLeft
+            if (document.getElementById("navigation").children[idx + 1].clientWidth + $(document.getElementById("navigation").children[idx + 1]).position().left - $(document.getElementById("navigation").children[0]).position().left > document.getElementById("navigation").clientWidth + curr_scroll)
+                $(document.getElementById("navigation")).scrollLeft($(document.getElementById("navigation").children[idx + 1]).position().left - $(document.getElementById("navigation").children[0]).position().left)
             currentMetric = document.getElementById("navigation").children[idx + 1].innerText.replace(/ /g,"_");
             showTab(dict_metrics[currentMetric]);
             document.getElementById("navigation").children[idx + 1].classList.add("active");
@@ -632,7 +638,7 @@ function nextPrev(n) {
     // ... the form gets submitted:
     return false;
     }
-    
+
     // Hide the current tab:
     x[dict_metrics[currentMetric]].style.display = "none";
     if (x[dict_metrics[currentMetric]].getElementsByClassName("small").length > 0){
@@ -640,7 +646,7 @@ function nextPrev(n) {
     }
     dict_metrics[currentMetric] = dict_metrics[currentMetric] + n;
     // if you have reached the end of the form...
-    
+
     // Otherwise, display the correct tab:
     showTab(dict_metrics[currentMetric]);
     document.getElementById(currentMetric).getElementsByClassName('js-dropdown')[0].selectedIndex = dict_metrics[currentMetric];
@@ -686,7 +692,7 @@ function load_qc(){
     var x = document.getElementById(currentMetric).getElementsByClassName("tab");
     x[dict_metrics[currentMetric]].style.display = "none";
     test = []
-    reader.onload = function(event) { 
+    reader.onload = function(event) {
         let importedJSON = JSON.parse(event.target.result);
         for (let dict_idx in importedJSON){
             if (importedJSON[dict_idx]["type"] == "report"){

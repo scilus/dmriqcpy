@@ -12,14 +12,14 @@
 <link rel="stylesheet" type="text/css" href="libs/DataTables/Buttons-1.6.1/css/buttons.dataTables.css"/>
 
 <script type="text/javascript" src="libs/js/jquery.min.js"></script>
-<script type="text/javascript" src="libs/js/jquery-3.3.1.js"></script> 
+<script type="text/javascript" src="libs/js/jquery-3.3.1.js"></script>
 <script type="text/javascript" src="libs/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="libs/js/ekko-lightbox.js"></script>
 <script type="text/javascript" src="libs/js/ekko-lightbox.min.js"></script>
 <script type="text/javascript" src="libs/js/select2.min.js"></script>
 <script type="text/javascript" src="libs/js/StreamSaver.min.js"></script>
 <script type="text/javascript" src="libs/js/FileSaver.js"></script>
-<script type="text/javascript" src="libs/js/scripts.js"></script> 
+<script type="text/javascript" src="libs/js/scripts.js"></script>
 <script type="text/javascript" src="libs/DataTables/datatables.min.js"></script>
 <script type="text/javascript" src="libs/DataTables/Buttons-1.6.1/js/dataTables.buttons.js"></script>
 <script type="text/javascript" src="libs/DataTables/Buttons-1.6.1/js/buttons.print.min.js"></script>
@@ -42,29 +42,22 @@ $(window).ready(hideLoader);
 </div>
 
 <!-- Top container -->
-<div class="w3-bar w3-top w3-large" style="background-color: #337ab7;">
-    <span class="w3-bar-item w3-left" style="color: white;">dMRI Quality Check</span>
-    <ul id="navigation" class="nav nav-tabs" style="border-bottom: 5px solid #ddd">
+<div class="top-wrapper">
+<div class="w3-bar top-div w3-large">
+    <div class="w3-bar-item w3-left" style="width:100%;display: inline-flex;color: white; border-bottom: 5px solid #ddd">
+    <span style="width:11%;display: inline-flex; align-items: center; margin-right: 5px;">dMRI Quality Check</span>
+    <ul id="navigation" class="nav nav-tabs" style="width:-moz-available;overflow-y:hidden;display: inline-flex; scrollbar-color: rgb(25, 86, 139) #337ab7; scrollbar-width: thin;">
             <li class="active"><a style="background-color: #19568b; color: white; border-bottom: 2px solid white" data-toggle="tab" href="#Dashboard">Dashboard</a></li>
             <li><a style="background-color: #19568b; color: white ; border-bottom: 2px solid white" data-toggle="tab" href="#Summary">Summary</a></li>
-            {% for metric_name in metrics_dict|sort() %}
+            {% for metric_name, _ in metrics_dict.items()|sort() %}
             <li><a style="background-color: #19568b; color: white ; border-bottom: 2px solid white" data-toggle="tab" href="#{{ metric_name|replace(" ", "_") }}">{{metric_name}}</a></li>
             {% endfor %}
     </ul>
-    <input class="load_save_file" accept=".json" type="file" name="file" id="load_file" onchange="load_qc()"/>
-    <label class="btn w3-light-grey" style="margin: 6px" for="load_file">
-        <span>Load QC</span>
-    </label>
-    <input class="load_save_file" accept=".json" onclick="save_qc()" id="save_file"/>
-    <label class="btn w3-light-grey" style="margin: 6px" for="save_file">
-        <span>Save QC</span>
-    </label>
-    <b><span class="w3-bar-item w3-right" style="padding: 12px; color: white;" id="counter"></span></b>
-    <b><span class="w3-bar-item w3-right" style="padding: 12px; color: white" id="curr_subj"></span></b>
-</div>
-
-<!-- !PAGE CONTENT! -->
-<div id="main" class="tab-content">
+    <div class="material-switch pull-right">
+        Dark Mode
+        <input type="checkbox" class="custom-control-input" id="darkSwitch" />
+        <label class="custom-control-label" for="darkSwitch"></label>
+    </div>
     <div class="help-tip" id="help-div">
         <p id="help">
             Shortcuts:<br>
@@ -81,15 +74,28 @@ $(window).ready(hideLoader);
             h -> Display this help.<br>
         </p>
     </div>
-    <div class="material-switch pull-right">
-        Dark Mode
-        <input type="checkbox" class="custom-control-input" id="darkSwitch" />
-        <label class="custom-control-label" for="darkSwitch"></label>
     </div>
+    <div class="w3-bar-item">
+    <input class="load_save_file" accept=".json" type="file" name="file" id="load_file" onchange="load_qc()"/>
+    <label class="btn w3-light-grey" style="margin: 6px" for="load_file">
+        <span>Load QC</span>
+    </label>
+    <input class="load_save_file" accept=".json" onclick="save_qc()" id="save_file"/>
+    <label class="btn w3-light-grey" style="margin: 6px" for="save_file">
+        <span>Save QC</span>
+    </label>
+    <b><span class="w3-bar-item w3-right" style="padding: 12px; color: white;" id="counter"></span></b>
+    <b><span class="w3-bar-item w3-right" style="padding: 12px; color: white" id="curr_subj"></span></b>
+    </div>
+</div>
+</div>
+
+<!-- !PAGE CONTENT! -->
+<div id="main" class="tab-content">
     <div class="alert info">
         <strong>Saved!</strong>
     </div>
-    <div id="Dashboard" class="tab-pane fade active in" style="padding-top:75px">
+    <div id="Dashboard" class="tab-pane fade active in">
         <h3><b> <i class="fa fa-dashboard"></i> Dashboard</b></h3>
         <div class="tab w3-row-padding w3-padding-large" id="dash">
             {% block subjects_block scoped %}{% endblock subjects_block %}
@@ -123,7 +129,7 @@ $(window).ready(hideLoader);
             {% endif %}
         </div>
     </div>
-    <div id="Summary" class="tab-pane fade" style="padding-top:75px">
+    <div id="Summary" class="tab-pane fade">
         <h3><b>Summary</b></h3>
         <div class="tab w3-row-padding w3-padding-large" id="summ">
             <div class="w3-container w3-padding-16">
@@ -179,8 +185,8 @@ $(window).ready(hideLoader);
         </div>
     </div>
     {% for metric_name, metric_values in metrics_dict.items()|sort() %}
-        <div id="{{ metric_name|replace(" ", "_") }}" class="tab-pane fade" style="padding-top:75px">
-            <div class="w3-padding-16 w3-bar-item w3-right">
+        <div id="{{ metric_name|replace(" ", "_") }}" class="tab-pane fade">
+            <div class="w3-bar-item w3-right">
                     <button id="prevBtn" onclick="nextPrev(-1)" class="fa fa-arrow-left"></button>
                     <select id="subjects_{{ metric_name|replace(" ", "_") }}" class="js-dropdown">
                     {% for subject_name, subject_values in metric_values.items()|sort() %}
