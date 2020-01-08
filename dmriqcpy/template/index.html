@@ -230,11 +230,16 @@ $(window).ready(hideLoader);
         buttons: [
         {
             extend: 'csv',
-            text: 'Export to .csv'
+            text: 'Export to .csv',
+            filename: "Quality Control data",
+            customize: function (csv) {
+                return csv.split("\"").join("");
+            }
         },
         {
             extend: 'pdf',
-            text: 'Export to .pdf'
+            text: 'Export to .pdf',
+            filename: "Quality Control data"
         }],
     });
     update_summ_table()
