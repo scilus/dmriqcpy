@@ -8,8 +8,8 @@
 <link rel="stylesheet" type="text/css" href="libs/css/select2.min.css">
 <link rel="stylesheet" type="text/css" href="libs/css/ekko-lightbox.css">
 <link rel="stylesheet" type="text/css" href="libs/fontawesome-free-5.11.2-web/css/all.css">
-<link rel="stylesheet" type="text/css" href="libs/DataTables/datatables.min.css"/>
-<link rel="stylesheet" type="text/css" href="libs/DataTables/Buttons-1.6.1/css/buttons.dataTables.css"/>
+<link rel="stylesheet" type="text/css" href="libs/DataTables/datatables.min.css">
+<link rel="stylesheet" type="text/css" href="libs/DataTables/Buttons-1.6.1/css/buttons.dataTables.css">
 
 <script type="text/javascript" src="libs/js/jquery.min.js"></script>
 <script type="text/javascript" src="libs/js/jquery-3.3.1.js"></script>
@@ -29,233 +29,253 @@
 
 <script>
     function hideLoader() {
-    $('.loader').hide();
-    $('.overlay').hide();
-}
+        $('.loader').hide();
+        $('.overlay').hide();
+    }
 
-$(window).ready(hideLoader);
+    $(window).ready(hideLoader);
 </script>
 
 <body class="bg-white">
-<div class="overlay">
-    <div class="loader"></div>
-</div>
+    <div class="overlay">
+        <div class="loader"></div>
+    </div>
 
-<!-- Top container -->
-<div class="top-wrapper">
-<div class="w3-bar top-div w3-large">
-    <div class="w3-bar-item w3-left" style="width:100%;display: inline-flex;color: white; border-bottom: 5px solid #ddd">
-    <span style="width:11%;display: inline-flex; align-items: center; margin-right: 5px;">dMRI Quality Check</span>
-    <ul id="navigation" class="nav nav-tabs" style="width:-moz-available;overflow-y:hidden;display: inline-flex; scrollbar-color: rgb(25, 86, 139) #337ab7; scrollbar-width: thin;">
-            <li class="active"><a style="background-color: #19568b; color: white; border-bottom: 2px solid white" data-toggle="tab" href="#Dashboard">Dashboard</a></li>
-            <li><a style="background-color: #19568b; color: white ; border-bottom: 2px solid white" data-toggle="tab" href="#Summary">Summary</a></li>
-            {% for metric_name, _ in metrics_dict.items()|sort() %}
-            <li><a style="background-color: #19568b; color: white ; border-bottom: 2px solid white" data-toggle="tab" href="#{{ metric_name|replace(" ", "_") }}">{{metric_name}}</a></li>
-            {% endfor %}
-    </ul>
-    <div class="material-switch pull-right">
-        Dark Mode
-        <input type="checkbox" class="custom-control-input" id="darkSwitch" />
-        <label class="custom-control-label" for="darkSwitch"></label>
-    </div>
-    <div class="help-tip" id="help-div">
-        <p id="help">
-            Shortcuts:<br>
-            Ctrl + left or right arrow -> Change tab.<br>
-            left or right arrow -> Change subject.<br>
-            <br>
-            1 -> Pass.<br>
-            2 -> Warning.<br>
-            3 -> Fail.<br>
-            4 -> Pending.<br>
-            c -> Display comment box.<br>
-            Esc -> Close comment box.<br>
-            z -> Zoom<br>
-            h -> Display this help.<br>
-        </p>
-    </div>
-    </div>
-    <div class="w3-bar-item">
-    <input class="load_save_file" accept=".json" type="file" name="file" id="load_file" onchange="load_qc()"/>
-    <label class="btn w3-light-grey" style="margin: 6px" for="load_file">
-        <span>Load QC</span>
-    </label>
-    <input class="load_save_file" accept=".json" onclick="save_qc()" id="save_file"/>
-    <label class="btn w3-light-grey" style="margin: 6px" for="save_file">
-        <span>Save QC</span>
-    </label>
-    <b><span class="w3-bar-item w3-right" style="padding: 12px; color: white;" id="counter"></span></b>
-    <b><span class="w3-bar-item w3-right" style="padding: 12px; color: white" id="curr_subj"></span></b>
-    </div>
-</div>
-</div>
-
-<!-- !PAGE CONTENT! -->
-<div id="main" class="tab-content">
-    <div class="alert info">
-        <strong>Saved!</strong>
-    </div>
-    <div id="Dashboard" class="tab-pane fade active in">
-        <h3><b> <i class="fa fa-dashboard"></i> Dashboard</b></h3>
-        <div class="tab w3-row-padding w3-padding-large" id="dash">
-            {% block subjects_block scoped %}{% endblock subjects_block %}
-            <div class="w3-row w3-padding-16">
-            {% if warning_list %}
-                {% for metric_name, metric_warning in warning_list.items()|sort() %}
-                    {% block warning_block scoped %}{% endblock warning_block %}
-                {% endfor %}
-            {% endif %}
+    <!-- Top container -->
+    <div class="top-wrapper">
+        <div class="w3-bar top-div w3-large">
+            <div class="w3-bar-item w3-left"
+                style="width:100%;display: inline-flex;color: white; border-bottom: 5px solid #ddd">
+                <span style="width:11%;display: inline-flex; align-items: center; margin-right: 5px;">dMRI Quality
+                    Check</span>
+                <ul id="navigation" class="nav nav-tabs"
+                    style="width:-moz-available;overflow-y:hidden;display: inline-flex; scrollbar-color: rgb(25, 86, 139) #337ab7; scrollbar-width: thin;">
+                    <li class="active"><a
+                            style="background-color: #19568b; color: white; border-bottom: 2px solid white"
+                            data-toggle="tab" href="#Dashboard">Dashboard</a></li>
+                    <li><a style="background-color: #19568b; color: white ; border-bottom: 2px solid white"
+                            data-toggle="tab" href="#Summary">Summary</a></li>
+                    {% for metric_name, _ in metrics_dict.items()|sort() %}
+                    <li><a style="background-color: #19568b; color: white ; border-bottom: 2px solid white"
+                            data-toggle="tab" href="#{{ metric_name|replace(" ", "_") }}">{{metric_name}}</a></li>
+                    {% endfor %}
+                </ul>
+                <div class="material-switch pull-right">
+                    Dark Mode
+                    <input type="checkbox" class="custom-control-input" id="darkSwitch" />
+                    <label class="custom-control-label" for="darkSwitch"></label>
+                </div>
+                <div class="help-tip" id="help-div">
+                    <p id="help">
+                        Shortcuts:<br>
+                        Ctrl + left or right arrow -> Change tab.<br>
+                        left or right arrow -> Change subject.<br>
+                        <br>
+                        1 -> Pass.<br>
+                        2 -> Warning.<br>
+                        3 -> Fail.<br>
+                        4 -> Pending.<br>
+                        c -> Display comment box.<br>
+                        Esc -> Close comment box.<br>
+                        z -> Zoom<br>
+                        h -> Display this help.<br>
+                    </p>
+                </div>
             </div>
-            {% if graph_summ %}
+            <div class="w3-bar-item">
+                <input class="load_save_file" accept=".json" type="file" name="file" id="load_file"
+                    onchange="load_qc()" />
+                <label class="btn w3-light-grey" style="margin: 6px" for="load_file">
+                    <span>Load QC</span>
+                </label>
+                <input class="load_save_file" accept=".json" onclick="save_qc()" id="save_file" />
+                <label class="btn w3-light-grey" style="margin: 6px" for="save_file">
+                    <span>Save QC</span>
+                </label>
+                <b><span class="w3-bar-item w3-right" style="padding: 12px; color: white;" id="counter"></span></b>
+                <b><span class="w3-bar-item w3-right" style="padding: 12px; color: white" id="curr_subj"></span></b>
+            </div>
+        </div>
+    </div>
+
+    <!-- !PAGE CONTENT! -->
+    <div id="main" class="tab-content">
+        <div class="alert info">
+            <strong>Saved!</strong>
+        </div>
+        <div id="Dashboard" class="tab-pane fade active in">
+            <h3><b> <i class="fa fa-dashboard"></i> Dashboard</b></h3>
+            <div class="tab w3-row-padding w3-padding-large" id="dash">
+                {% block subjects_block scoped %}{% endblock subjects_block %}
+                <div class="w3-row w3-padding-16">
+                    {% if warning_list %}
+                    {% for metric_name, metric_warning in warning_list.items()|sort() %}
+                    {% block warning_block scoped %}{% endblock warning_block %}
+                    {% endfor %}
+                    {% endif %}
+                </div>
+                {% if graph_summ %}
                 <div class="w3-container w3-row w3-padding-16">
                     <h3>Diagrams</h3>
                     <div id="diagrams">
                         {% for graph in graph_summ %}
-                            {{ graph }}
+                        {{ graph }}
                         {% endfor %}
                     </div>
                 </div>
-            {% endif %}
-            {% if summary_dict %}
+                {% endif %}
+                {% if summary_dict %}
                 <div class="w3-container w3-row w3-padding-16">
                     <h3>Statistics</h3>
                     <div id="statistics">
                         {% for metric_name, metric_summ in summary_dict.items() %}
-                            <ul><li><h3>{{ metric_name }}</h3></li></ul>
-                            {{ metric_summ }}
+                        <ul>
+                            <li>
+                                <h3>{{ metric_name }}</h3>
+                            </li>
+                        </ul>
+                        {{ metric_summ }}
                         {% endfor %}
                     </div>
                 </div>
-            {% endif %}
-        </div>
-    </div>
-    <div id="Summary" class="tab-pane fade">
-        <h3><b>Summary</b></h3>
-        <div class="tab w3-row-padding w3-padding-large" id="summ">
-            <div class="w3-container w3-padding-16">
-                <div class="w3-container w3-green w3-padding-16 w3-quarter">
-                    <div class="w3-left"><i class="fa fa-check-square w3-xxxlarge"></i></div>
-                    <div class="w3-right">
-                    <h3 id="Pass">0</h3>
-                    </div>
-                    <div class="w3-clear"></div>
-                    <h4>Number of pass</h4>
-                </div>
-                <div class="w3-container w3-orange w3-padding-16 w3-quarter">
-                    <div class="w3-left"><i class="fa fa-exclamation-triangle w3-xxxlarge"></i></div>
-                    <div class="w3-right">
-                    <h3 id="Warning">0</h3>
-                    </div>
-                    <div class="w3-clear"></div>
-                    <h4>Number of warning</h4>
-                </div>
-                <div class="w3-container w3-red w3-padding-16 w3-quarter">
-                    <div class="w3-left"><i class="fa fa-times-circle w3-xxxlarge"></i></div>
-                    <div class="w3-right">
-                    <h3 id="Fail">0</h3>
-                    </div>
-                    <div class="w3-clear"></div>
-                    <h4>Number of fail</h4>
-                </div>
-                <div class="w3-container w3-grey w3-padding-16 w3-quarter">
-                    <div class="w3-left"><i class="fa fa-question-circle w3-xxxlarge"></i></div>
-                    <div class="w3-right">
-                    <h3 id="Pending">0</h3>
-                    </div>
-                    <div class="w3-clear"></div>
-                    <h4>Number of pending</h4>
-                </div>
+                {% endif %}
             </div>
-            <table id="table_sort" class="display" cellspacing="0" width="100%">
-            <thead>
-                <tr>
-                <th class="th-sm">Metric
-                </th>
-                <th class="th-sm">Subject
-                </th>
-                <th class="th-sm">Status
-                </th>
-                <th class="th-sm">Comments
-                </th>
-                </tr>
-            </thead>
-            <tbody>
-            </tbody>
-            </table>
         </div>
-    </div>
-    {% for metric_name, metric_values in metrics_dict.items()|sort() %}
+        <div id="Summary" class="tab-pane fade">
+            <h3><b>Summary</b></h3>
+            <div class="tab w3-row-padding w3-padding-large" id="summ">
+                <div class="w3-container w3-padding-16">
+                    <div class="w3-container w3-green w3-padding-16 w3-quarter">
+                        <div class="w3-left"><i class="fa fa-check-square w3-xxxlarge"></i></div>
+                        <div class="w3-right">
+                            <h3 id="Pass">0</h3>
+                        </div>
+                        <div class="w3-clear"></div>
+                        <h4>Number of pass</h4>
+                    </div>
+                    <div class="w3-container w3-orange w3-padding-16 w3-quarter">
+                        <div class="w3-left"><i class="fa fa-exclamation-triangle w3-xxxlarge"></i></div>
+                        <div class="w3-right">
+                            <h3 id="Warning">0</h3>
+                        </div>
+                        <div class="w3-clear"></div>
+                        <h4>Number of warning</h4>
+                    </div>
+                    <div class="w3-container w3-red w3-padding-16 w3-quarter">
+                        <div class="w3-left"><i class="fa fa-times-circle w3-xxxlarge"></i></div>
+                        <div class="w3-right">
+                            <h3 id="Fail">0</h3>
+                        </div>
+                        <div class="w3-clear"></div>
+                        <h4>Number of fail</h4>
+                    </div>
+                    <div class="w3-container w3-grey w3-padding-16 w3-quarter">
+                        <div class="w3-left"><i class="fa fa-question-circle w3-xxxlarge"></i></div>
+                        <div class="w3-right">
+                            <h3 id="Pending">0</h3>
+                        </div>
+                        <div class="w3-clear"></div>
+                        <h4>Number of pending</h4>
+                    </div>
+                </div>
+                <table id="table_sort" class="display" cellspacing="0" width="100%">
+                    <thead>
+                        <tr>
+                            <th class="th-sm">Metric
+                            </th>
+                            <th class="th-sm">Subject
+                            </th>
+                            <th class="th-sm">Status
+                            </th>
+                            <th class="th-sm">Comments
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% for metric_name, metric_values in metrics_dict.items()|sort() %}
         <div id="{{ metric_name|replace(" ", "_") }}" class="tab-pane fade">
             <div class="w3-bar-item w3-right">
-                    <button id="prevBtn" onclick="nextPrev(-1)" class="fa fa-arrow-left"></button>
-                    <select id="subjects_{{ metric_name|replace(" ", "_") }}" class="js-dropdown">
+                <button id="prevBtn" onclick="nextPrev(-1)" class="fa fa-arrow-left"></button>
+                <select id="subjects_{{ metric_name|replace(" ", "_") }}" class="js-dropdown">
                     {% for subject_name, subject_values in metric_values.items()|sort() %}
-                        <option value="{{subject_name}}">{{subject_name}}</option>
+                    <option value="{{subject_name}}">{{subject_name}}</option>
                     {% endfor %}
-                    </select>
-                    <button id="nextBtn" onclick="nextPrev(1)" class="fa fa-arrow-right"></button>
+                </select>
+                <button id="nextBtn" onclick="nextPrev(1)" class="fa fa-arrow-right"></button>
             </div>
             {% for subject_name, subject_values in metric_values.items()|sort() %}
-                <div class="tab" id="{{ subject_name }}">
-                    <h1><b>Current subject: {{ subject_name }}</b></h1>
-                    <h2>Status: <span class="status" style="background-color: grey;" id="{{ subject_name }}_status">Pending</span></h2>
-                    {% block comment_block scoped %}{% endblock comment_block %}
-                    {{subject_values.stats}}
-                    {% if subject_values.screenshot %}
-                    <div class="w3-container w3-padding-32" style="border-radius: 8px; min-height: 820px;">
-                        {% block screenshot_block scoped %}{% endblock screenshot_block %}
-                    </div>
-                    {% endif %}
+            <div class="tab" id="{{ subject_name }}">
+                <h1><b>Current subject: {{ subject_name }}</b></h1>
+                <h2>Status: <span class="status" style="background-color: grey;"
+                        id="{{ subject_name }}_status">Pending</span></h2>
+                {% block comment_block scoped %}{% endblock comment_block %}
+                {{subject_values.stats}}
+                {% if subject_values.screenshot %}
+                <div class="w3-container w3-padding-32" style="border-radius: 8px; min-height: 820px;">
+                    {% block screenshot_block scoped %}{% endblock screenshot_block %}
                 </div>
+                {% endif %}
+            </div>
             {% endfor %}
         </div>
-    {% endfor %}
-</div>
+        {% endfor %}
+    </div>
 
-<!-- Footer -->
-<footer class="w3-container w3-padding-16 w3-center" style="background-color: #337ab7">
-    <a href="http://scil.usherbrooke.ca/?lang=en" title="SCIL" target="_blank" style="color: black">SCIL</a>
-</footer>
+    <!-- Footer -->
+    <footer class="w3-container w3-padding-16 w3-center" style="background-color: #337ab7">
+        <a href="http://scil.usherbrooke.ca/?lang=en" title="SCIL" target="_blank" style="color: black">SCIL</a>
+    </footer>
 
-<!-- End page content -->
-</div>
+    <!-- End page content -->
+    </div>
 
-<script>
-    $('.js-dropdown').select2({
-    matcher: matchCustom});
-
-    table = $('#table_sort').DataTable({
-        dom: 'Bflrtip',
-        deferRender: true,
-        buttons: [
-        {
-            extend: 'csv',
-            text: 'Export to .csv'
-        },
-        {
-            extend: 'pdf',
-            text: 'Export to .pdf'
-        }],
-    });
-    update_summ_table()
-    function update_summ_table(){
-        document.getElementById("Pass").innerText = 0
-        document.getElementById("Warning").innerText = 0
-        document.getElementById("Fail").innerText = 0
-        document.getElementById("Pending").innerText = 0
-        table.column(2).data().each( function ( value, index ) {
-            document.getElementById(value).innerText = parseInt(document.getElementById(value).innerText) + 1;
+    <script>
+        $('.js-dropdown').select2({
+            matcher: matchCustom
         });
-    }
 
-    function load_summ(data){
-        table.clear();
-        table.rows.add(data);
-        table.draw();
-    }
+        table = $('#table_sort').DataTable({
+            dom: 'Bflrtip',
+            deferRender: true,
+            buttons: [
+                {
+                    extend: 'csv',
+                    text: 'Export to .csv',
+                    filename: "Quality Control data",
+                    customize: function (csv) {
+                        return csv.split("\"").join("");
+                    }
+                },
+                {
+                    extend: 'pdf',
+                    text: 'Export to .pdf',
+                    filename: "Quality Control data"
+                }],
+        });
+        update_summ_table()
+        function update_summ_table() {
+            document.getElementById("Pass").innerText = 0
+            document.getElementById("Warning").innerText = 0
+            document.getElementById("Fail").innerText = 0
+            document.getElementById("Pending").innerText = 0
+            table.column(2).data().each(function (value, index) {
+                document.getElementById(value).innerText = parseInt(document.getElementById(value).innerText) + 1;
+            });
+        }
 
-</script>
-<script type="text/javascript" src="libs/js/dark-mode-switch.js"></script>
-<link rel="stylesheet" type="text/css" href="libs/css/style.css">
+        function load_summ(data) {
+            table.clear();
+            table.rows.add(data);
+            table.draw();
+        }
+
+    </script>
+    <script type="text/javascript" src="libs/js/dark-mode-switch.js"></script>
+    <link rel="stylesheet" type="text/css" href="libs/css/style.css">
 </body>
+
 </html>
