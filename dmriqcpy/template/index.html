@@ -239,6 +239,9 @@
         });
 
         table = $('#table_sort').DataTable({
+            search: {
+                regex: true
+            },
             dom: 'Bflrtip',
             deferRender: true,
             buttons: [
