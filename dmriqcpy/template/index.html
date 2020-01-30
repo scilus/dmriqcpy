@@ -249,18 +249,6 @@
                     extend: 'csv',
                     text: 'Export to .csv',
                     filename: "Quality Control data",
-                    customize: function (csv) {
-                        var csv = csv.split("\n");
-                        var header = csv[0].split("\"").join("");
-                        var data = csv.slice(1, -1).map(line => {
-                            var fields = line.split("\",\"");
-                            fields[0] = fields[0].replace("\"", "");
-                            last = fields.length - 1;
-                            fields[last] = "\"" + fields[last];
-                            return fields.join(",");
-                        })
-                        return [header].concat(data).join("\n");
-                    }
                 },
                 {
                     extend: 'pdf',
