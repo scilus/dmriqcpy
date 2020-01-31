@@ -352,9 +352,6 @@ function shortcut(e){
     if (e.ctrlKey && e.which == 37){
         idx = nodes.indexOf(document.getElementById("navigation").getElementsByClassName("active")[0]);
         if (idx - 1 >= 0){
-            curr_scroll = $(document.getElementById("navigation"))[0].scrollLeft
-            if ($(document.getElementById("navigation").children[idx - 1]).position().left - $(document.getElementById("navigation").children[0]).position().left < curr_scroll)
-                $(document.getElementById("navigation")).scrollLeft($(document.getElementById("navigation").children[idx - 1]).position().left - $(document.getElementById("navigation").children[0]).position().left)
             currentMetric = document.getElementById("navigation").children[idx - 1].innerText.replace(/ /g,"_");
             showTab(dict_metrics[currentMetric]);
             document.getElementById("navigation").children[idx - 1].classList.add("active");
@@ -366,9 +363,6 @@ function shortcut(e){
     else if (e.ctrlKey && e.which == 39){
         idx = nodes.indexOf(document.getElementById("navigation").getElementsByClassName("active")[0]);
         if (idx + 1 < document.getElementById("navigation").children.length){
-            curr_scroll = $(document.getElementById("navigation"))[0].scrollLeft
-            if (document.getElementById("navigation").children[idx + 1].clientWidth + $(document.getElementById("navigation").children[idx + 1]).position().left - $(document.getElementById("navigation").children[0]).position().left > document.getElementById("navigation").clientWidth + curr_scroll)
-                $(document.getElementById("navigation")).scrollLeft($(document.getElementById("navigation").children[idx + 1]).position().left - $(document.getElementById("navigation").children[0]).position().left)
             currentMetric = document.getElementById("navigation").children[idx + 1].innerText.replace(/ /g,"_");
             showTab(dict_metrics[currentMetric]);
             document.getElementById("navigation").children[idx + 1].classList.add("active");
@@ -566,12 +560,15 @@ function showTab(n) {
     if (tab.id != "Summary" && tab.id != "Dashboard"){
         curr_subj.innerText = "Current subject: " + x[n].id;
         counter.innerText = (n + 1) + "/" + x.length;
-        counter.style.backgroundColor = "#19568b";
+        elem = document.querySelector('.nav_tab_color');
+        style = getComputedStyle(elem);
+        console.log(style)
+        counter.style.backgroundColor = style.backgroundColor;
         if (document.getElementById(x[n].id + "_status").innerText != "Pending"){
-            document.getElementById("curr_subj").style.backgroundColor = document.getElementById(x[n].id + "_status").style.backgroundColor;
+            document.getElementById("curr_subj").classList.add(document.getElementById(x[n].id + "_status").classList[1]);
         }
         else{
-            document.getElementById("curr_subj").style.backgroundColor = "";
+            document.getElementById("curr_subj").classList.remove(document.getElementById(x[n].id + "_status").classList[1]);
         }
 
         if (x[n].getElementsByClassName("small").length > 0){
@@ -670,18 +667,21 @@ function doMouseWheel(event) {
 }
 
 function update_status(object) {
+    curr_status = document.getElementById(object.name+"_status").classList[1];
+    new_status = object.classList[1];
     document.getElementById(object.name+"_status").innerText = object.innerText;
-    document.getElementById(object.name+"_status").style.backgroundColor = object.style.backgroundColor;
+    document.getElementById(object.name+"_status").classList.remove(curr_status);
+    document.getElementById(object.name+"_status").classList.add(new_status);
     if (object.innerText != "Pending"){
-        document.getElementById("curr_subj").style.backgroundColor = object.style.backgroundColor;
+        document.getElementById("curr_subj").classList.remove(curr_status);
+        document.getElementById("curr_subj").classList.add(new_status);
     }
     else{
-        document.getElementById("curr_subj").style.backgroundColor = "";
+        document.getElementById("curr_subj").classList.remove(curr_status);
     }
     qc_saved=false;
     copy = document.getElementById(object.name+"_status").cloneNode(true);
     copy.removeAttribute("id");
-    // update_summ(object.name+'_status_summ', copy.innerText);
 }
 
 function load_qc(){

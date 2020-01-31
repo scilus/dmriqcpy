@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block subjects_block %}
-<div class="w3-container w3-light-blue w3-padding-16 w3-quarter">
+<div class="w3-container subject w3-padding-16 w3-quarter">
 <div class="w3-left"><i class="fa fa-users w3-xxxlarge"></i></div>
 <div class="w3-right">
 <h3>{{nb_subjects}}</h3>
@@ -20,9 +20,9 @@
 
 {% block warning_block %}
 {% if metric_warning.nb_warnings == 0 %}
-    <div data-toggle="collapse" class="w3-container w3-light-green w3-padding-16 w3-quarter" style="display:inline-block" data-target="#{{ metric_name|replace(" ", "_") }}_warning">
+    <div data-toggle="collapse" class="w3-container pass w3-padding-16 w3-quarter" style="display:inline-block" data-target="#{{ metric_name|replace(" ", "_") }}_warning">
 {% else %}
-    <div data-toggle="collapse" class="w3-container w3-orange w3-padding-16 w3-quarter" style="display:inline-block" data-target="#{{ metric_name|replace(" ", "_") }}_warning">
+    <div data-toggle="collapse" class="w3-container warning w3-padding-16 w3-quarter" style="display:inline-block" data-target="#{{ metric_name|replace(" ", "_") }}_warning">
 {% endif %}
 <div class="w3-left"><i class="fa fa-exclamation-triangle w3-xxxlarge"></i> {{metric_name}}</div>
 <div class="w3-right ">
@@ -59,14 +59,14 @@
 <div class="chat-popup" id="{{ subject_name }}_comment_box">
     <div class="form-container">
         <h2>Quality report</h2>
-        <button class="button" id="{{ subject_name }}_pass" name="{{ subject_name }}" style="background-color: green" onclick="update_status(this)">Pass</button>
-        <button class="button" id="{{ subject_name }}_warning" name="{{ subject_name }}" style="background-color: orange" onclick="update_status(this)">Warning</button>
-        <button class="button" id="{{ subject_name }}_fail" name="{{ subject_name }}" style="background-color: red" onclick="update_status(this)">Fail</button>
-        <button class="button" id="{{ subject_name }}_pending" name="{{ subject_name }}" style="background-color: grey" onclick="update_status(this)">Pending</button>
+        <button class="button pass" id="{{ subject_name }}_pass" name="{{ subject_name }}" onclick="update_status(this)">Pass</button>
+        <button class="button warning" id="{{ subject_name }}_warning" name="{{ subject_name }}" onclick="update_status(this)">Warning</button>
+        <button class="button fail" id="{{ subject_name }}_fail" name="{{ subject_name }}" onclick="update_status(this)">Fail</button>
+        <button class="button pending" id="{{ subject_name }}_pending" name="{{ subject_name }}" onclick="update_status(this)">Pending</button>
         <div class="form-group">
             <textarea oninput="comment_update()" rows="5" id="{{ subject_name }}_comments" style="resize: none; width: 100%" placeholder="Your comments here..."></textarea>
         </div>
-        <button type="button" class="btn cancel" onclick="closeForm(this)">Close</button>
+        <button type="button" class="btn close_box_btn" onclick="closeForm(this)">Close</button>
     </div>
 </div>
 {% endblock %}
