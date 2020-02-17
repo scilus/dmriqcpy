@@ -201,7 +201,7 @@ def screenshot_mosaic(data, skip, pad, nb_columns, axis, cmap):
         img = Image.fromarray(mosaic)
         draw = ImageDraw.Draw(img)
 
-        fnt = ImageFont.truetype('Pillow/Tests/fonts/FreeMono.ttf', 40)
+        fnt = ImageFont.truetype('/usr/share/fonts/truetype/freefont/FreeSans.ttf', 40)
         draw.text([mosaic.shape[1] / 2, 0], "A", fill=255, font=fnt)
         draw.text([mosaic.shape[1] / 2, mosaic.shape[0] - 40], "P", fill=255,
                   font=fnt)
@@ -219,6 +219,11 @@ def screenshot_mosaic(data, skip, pad, nb_columns, axis, cmap):
         for i in range(mosaic.shape[2]):
             img_t = np.uint8(np.clip(mosaic[:, :, i], 0, 255))
             imgs_comb = Image.fromarray(img_t)
+
+            draw = ImageDraw.Draw(imgs_comb)
+            fnt = ImageFont.truetype('/usr/share/fonts/truetype/freefont/FreeSans.ttf', 40)
+            draw.text([0, 0], str(i), fill=255, font=fnt)
+
             gif.append(imgs_comb.convert("RGB"))
         return gif
     img = np.uint8(np.clip(mosaic, 0, 255))
