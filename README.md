@@ -1,6 +1,6 @@
 [![Actions Status](https://github.com/GuillaumeTh/dmriqcpy/workflows/Singularity%20Build/badge.svg)](https://github.com/GuillaumeTh/dmriqcpy/actions)
 
-# dmriqcpy
+# dMRIqcpy
 Diffusion MRI Quality Check in python
 
 To install dmriqcpy, run the following command: 
