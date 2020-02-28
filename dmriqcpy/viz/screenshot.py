@@ -301,7 +301,7 @@ def screenshot_fa_peaks(fa, peaks, directory='.'):
         camera.SetPosition(pos)
         camera.SetFocalPoint(center)
 
-        img = window.snapshot(renderer, size=(1080, 1080), offscreen=True)
+        img = renderer_to_arr(renderer, (1080, 1080))
         if len(concat) == 0:
             concat = img
         else:
