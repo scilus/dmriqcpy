@@ -1,18 +1,19 @@
 :root {
-  --bg_color: white;
-  --text_color: black;
+  --bg_color: #ecf7f9;
+  --text_color: #0f1235;
 
-  --nav_tab_color_bg: #19568b;
-  --nav_tab_color_text_color: white;
-  --nav_tab_color_border: 3px solid #ddd;
+  --nav_tab_color_bg: #72afb8;
+  --nav_tab_color_text_color: #ecf7f9;
+  --nav_tab_color_border: 2px solid #0f1235;
 
-  --nav_color_bg: #337ab7;
-  --nav_color_border: 5px solid #ddd;
+  --nav_color_bg: #99d3de;
+  --nav_color_border: 5px solid #0f1235;
 
-  --nav_color_text: white;
+  --nav_color_text: #0f1235;
+  --nav_color_border_bottom: 5px solid #0f1235;
 
-  --footer_bg_color: #337ab7;
-  --footer_color: #000;
+  --qc_report_button_bg_color: #99d3de;
+  --qc_report_button_text_color: #0f1235;
 
   --pending_bg_color: #000;
   --pending_text_color: #9e9e9e;
@@ -29,12 +30,12 @@
   --subject_bg_color: #000;
   --subject_text_color: #87CEEB;
 
-  --statusbox_bg_color: red;
+  --closebox_bg_color: red;
 
-  --popup_save_bg: #2196F3;
+  --popup_save_bg: #396d8f;
 
-  --help_bg: #BCDBEA;
-  --help_color: #fff;
+  --help_bg: #72afb8;
+  --help_color: #ecf7f9;
 
   /*Dark mode section*/
   --dark_mode_text_color: white;
@@ -68,6 +69,7 @@ body {
 
 .nav_color_text{
   color: var(--nav_color_text);
+  border-bottom: var(--nav_color_border_bottom);
 }
 
 .footer_color{
@@ -329,7 +331,7 @@ iframe {
 
 /* Add a red background color to the cancel button */
 .form-container .close_box_btn {
-  background-color: var(--statusbox_bg_color);
+  background-color: var(--closebox_bg_color);
 }
 
 /* Add some hover effects to buttons */

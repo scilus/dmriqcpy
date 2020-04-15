@@ -448,7 +448,7 @@ function close_comment(e){
         var subj_id = tab.getElementsByClassName("tab")[dict_metrics[currentMetric]].id;
         closeForm(document.getElementById(subj_id + "_comment_box").getElementsByClassName("btn")[0]);
         document.addEventListener("keydown", shortcut);
-        update_summ(subj_id + "_comments_summ", document.getElementById(subj_id + "_comments").value);
+        update_summ_table();
     }
 }
 
@@ -483,7 +483,7 @@ $('textarea').on('focus', function( event ) {
 });
 
 $('textarea').on('blur', function( event ) {
-    update_summ(event.currentTarget.id + "_summ", document.getElementById(event.currentTarget.id).value);
+    update_summ_table();
     document.addEventListener("keydown", shortcut);
 });
 
@@ -555,14 +555,13 @@ function showTab(n) {
     counter = document.getElementById("counter");
     counter.innerText = "";
     counter.style.backgroundColor = "";
-    document.getElementById("curr_subj").style.backgroundColor = "";
+    curr_subj.classList.remove("pass", "warning", "fail", "pending");
 
     if (tab.id != "Summary" && tab.id != "Dashboard"){
         curr_subj.innerText = "Current subject: " + x[n].id;
         counter.innerText = (n + 1) + "/" + x.length;
         elem = document.querySelector('.nav_tab_color');
         style = getComputedStyle(elem);
-        console.log(style)
         counter.style.backgroundColor = style.backgroundColor;
         if (document.getElementById(x[n].id + "_status").innerText != "Pending"){
             document.getElementById("curr_subj").classList.add(document.getElementById(x[n].id + "_status").classList[1]);
@@ -672,6 +671,7 @@ function update_status(object) {
     document.getElementById(object.name+"_status").innerText = object.innerText;
     document.getElementById(object.name+"_status").classList.remove(curr_status);
     document.getElementById(object.name+"_status").classList.add(new_status);
+    console.log(curr_status)
     if (object.innerText != "Pending"){
         document.getElementById("curr_subj").classList.remove(curr_status);
         document.getElementById("curr_subj").classList.add(new_status);
