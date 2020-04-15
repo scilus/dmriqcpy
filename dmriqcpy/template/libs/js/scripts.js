@@ -454,7 +454,7 @@ function close_comment(e){
         var subj_id = tab.getElementsByClassName("tab")[dict_metrics[currentMetric]].id;
         closeForm(document.getElementById(subj_id + "_comment_box").getElementsByClassName("btn")[0]);
         document.addEventListener("keydown", shortcut);
-        update_summ(subj_id + "_comments_summ", document.getElementById(subj_id + "_comments").value);
+        update_summ_table();
     }
 }
 
@@ -489,7 +489,7 @@ $('textarea').on('focus', function( event ) {
 });
 
 $('textarea').on('blur', function( event ) {
-    update_summ(event.currentTarget.id + "_summ", document.getElementById(event.currentTarget.id).value);
+    update_summ_table();
     document.addEventListener("keydown", shortcut);
 });
 
