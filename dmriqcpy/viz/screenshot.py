@@ -155,69 +155,81 @@ def screenshot_mosaic(data, skip, pad, nb_columns, axis, cmap):
     imgs_comb : array 2D
         mosaic in array 2D
     """
-    range_row = range(0, data.shape[2], skip)
-    nb_rows = int(np.ceil(len(range_row) / nb_columns))
+    all_axis = [0, 1, 2]
+    final_mosaic = np.array([])
     is_4d = True if len(data.shape) == 4 else False
+    shapes = []
+    for axe in all_axis:
+        shapes.append(np.prod(np.take(data, 0, axis=axe).shape[0]))
+    max_size_col = shapes.index(max(shapes))
+    for axe in all_axis:
+        range_row = range(0, data.shape[max_size_col], skip)
+        nb_rows = int(np.ceil(len(range_row) / nb_columns))
 
-    unique = np.unique(data)
-    min_val = np.min(data[data > 0])
-    max_val = np.percentile(data[data > 0], 99)
-    shape = ((data[:, :, 0].shape[1] + pad) * nb_rows + pad * nb_rows,
-             (data[:, :, 0].shape[0] + pad) * nb_columns + nb_columns * pad)
-    padding = ((int(pad / 2), int(pad / 2)), (int(pad / 2), int(pad / 2)))
+        unique = np.unique(data)
+        min_val = np.min(data[data > 0])
+        max_val = np.percentile(data[data > 0], 99)
+        shape = ((np.take(data, 0, axis=axe).shape[1] + pad) * nb_rows + pad * nb_rows,
+                 (np.take(data, 0, axis=max_size_col).shape[0] + pad) * nb_columns + nb_columns * pad)
+        padding = ((int(pad / 2), int(pad / 2)), (int(pad / 2), int(pad / 2)))
 
-    is_rgb = False
-    if is_4d:
-        time = data.shape[3]
-        if time == 3:
-            is_rgb = True
-        shape += (time, )
-        padding += ((0, 0), )
+        is_rgb = False
+        if is_4d:
+            time = data.shape[3]
+            if time == 3:
+                is_rgb = True
+            shape += (time, )
+            padding += ((0, 0), )
 
-    if not is_rgb:
-        if len(unique) > 20:
-            data = np.float32(data - min_val) \
-                / np.float32(max_val - min_val) * 255.0
-        elif len(unique) > 2:
-            data = np.interp(data, xp=[data.min(), data.max()], fp=[0, 255])
+        if not is_rgb:
+            if len(unique) > 20:
+                data = np.float32(data - min_val) \
+                    / np.float32(max_val - min_val) * 255.0
+            elif len(unique) > 2:
+                data = np.interp(data, xp=[data.min(), data.max()], fp=[0, 255])
+            else:
+                data *= 255
+
+        mosaic = np.zeros(shape)
+        for i, idx in enumerate(range_row):
+            corner = i % nb_columns
+            row = int(i / nb_columns)
+            curr_img = np.rot90(np.take(data, idx, axis=axe))
+
+            curr_img = np.pad(curr_img, padding, 'constant')
+            curr_shape = curr_img.shape
+            mosaic[curr_shape[0] * row + row * pad:
+                   row * curr_shape[0] + curr_shape[0] + row * pad,
+                   curr_shape[1] * corner + corner * pad:
+                   corner * curr_shape[1] + curr_shape[1] + corner * pad] = curr_img
+
+        if axis and not is_4d:
+            mosaic = np.pad(mosaic, ((50, 50), (50, 50)), 'constant')
+            img = Image.fromarray(mosaic)
+            draw = ImageDraw.Draw(img)
+            fnt = ImageFont.truetype('/usr/share/fonts/truetype/freefont/FreeSans.ttf', 40)
+            if axe == 2:
+                draw.text([mosaic.shape[1] / 2, 0], "A", fill=255, font=fnt)
+                draw.text([mosaic.shape[1] / 2, mosaic.shape[0] - 40], "P", fill=255,
+                          font=fnt)
+                draw.text([0, mosaic.shape[0] / 2], "L", fill=255, font=fnt)
+                draw.text([mosaic.shape[1] - 40, mosaic.shape[0] / 2], "R", fill=255,
+                          font=fnt)
+            mosaic = np.array(img)
+
+        if cmap is not None:
+            colormap = get_cmap(cmap)
+            mosaic = colormap(mosaic/255.0) * 255
+
+        if axe == 0:
+            final_mosaic = mosaic
         else:
-            data *= 255
+            final_mosaic = np.concatenate([final_mosaic, mosaic])
 
-    mosaic = np.zeros(shape)
-    for i, idx in enumerate(range_row):
-        corner = i % nb_columns
-        row = int(i / nb_columns)
-        curr_img = np.rot90(data[:, :, idx])
-
-        curr_img = np.pad(curr_img, padding, 'constant')
-        curr_shape = curr_img.shape
-        mosaic[curr_shape[0] * row + row * pad:
-               row * curr_shape[0] + curr_shape[0] + row * pad,
-               curr_shape[1] * corner + corner * pad:
-               corner * curr_shape[1] + curr_shape[1] + corner * pad] = curr_img
-
-    if axis and not is_4d:
-        mosaic = np.pad(mosaic, ((50, 50), (50, 50)), 'constant')
-        img = Image.fromarray(mosaic)
-        draw = ImageDraw.Draw(img)
-
-        fnt = ImageFont.truetype('/usr/share/fonts/truetype/freefont/FreeSans.ttf', 40)
-        draw.text([mosaic.shape[1] / 2, 0], "A", fill=255, font=fnt)
-        draw.text([mosaic.shape[1] / 2, mosaic.shape[0] - 40], "P", fill=255,
-                  font=fnt)
-        draw.text([0, mosaic.shape[0] / 2], "L", fill=255, font=fnt)
-        draw.text([mosaic.shape[1] - 40, mosaic.shape[0] / 2], "R", fill=255,
-                  font=fnt)
-        mosaic = np.array(img)
-
-    if cmap is not None:
-        colormap = get_cmap(cmap)
-        mosaic = colormap(mosaic/255.0) * 255
-
-    if is_4d and mosaic.shape[2] != 3:
+    if is_4d and final_mosaic.shape[2] != 3:
         gif = []
-        for i in range(mosaic.shape[2]):
-            img_t = np.uint8(np.clip(mosaic[:, :, i], 0, 255))
+        for i in range(final_mosaic.shape[2]):
+            img_t = np.uint8(np.clip(final_mosaic[:, :, i], 0, 255))
             imgs_comb = Image.fromarray(img_t)
 
             draw = ImageDraw.Draw(imgs_comb)
@@ -226,7 +238,7 @@ def screenshot_mosaic(data, skip, pad, nb_columns, axis, cmap):
 
             gif.append(imgs_comb.convert("RGB"))
         return gif
-    img = np.uint8(np.clip(mosaic, 0, 255))
+    img = np.uint8(np.clip(final_mosaic, 0, 255))
     imgs_comb = Image.fromarray(img)
     imgs_comb = imgs_comb.convert("RGB")
     return imgs_comb
