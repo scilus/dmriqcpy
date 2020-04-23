@@ -9,10 +9,25 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
+      name: Clone Docker
+      with:
+        repository: GuillaumeTh/docker-dmriqc
+        ref: master
+    - uses: mr-smithers-excellent/docker-build-push@v3.1
+      name: Docker Build & Push
+      with:
+        image: guillaumeth/docker-dmriqc
+        tag: latest
+        registry: docker.io
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - uses: actions/checkout@v1
+      name: Clone Singularity
       with:
         repository: GuillaumeTh/singularity-dmriqc
         ref: master
-    - name: Install singularity
+    - name: Install and build Singularity
       run: |
           sudo wget -O- http://neuro.debian.net/lists/xenial.us-ca.full | sudo tee /etc/apt/sources.list.d/neurodebian.sources.list
           sudo apt-key adv --recv-keys --keyserver pool.sks-keyservers.net 2649A5A9 || { sudo wget -q -O- http://neuro.debian.net/_static/neuro.debian.net.asc | sudo apt-key add -; }
@@ -23,6 +38,7 @@ jobs:
           sudo singularity build singularity_dmriqc_build/singularity_dmriqc_${curr_date}_${GITHUB_SHA}.img /home/runner/work/dmriqcpy/singularity-dmriqc/singularity_dmriqcpy.def
 
     - uses: actions/upload-artifact@v1
+      name: Push Singularity
       with:
         name: singularity_dmriqc
         path: singularity_dmriqc_build/
