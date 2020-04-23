@@ -435,6 +435,16 @@ function shortcut(e){
             document.getElementById("help").style.display = "none";
         }
     }
+    else if (e.which == 73){
+        curr_rend = document.getElementsByTagName("body")[0].style["image-rendering"];
+        if (curr_rend == "unset" || curr_rend == "")
+        {
+            document.getElementsByTagName("body")[0].style["image-rendering"] = "optimizespeed"
+        }
+        else{
+            document.getElementsByTagName("body")[0].style["image-rendering"] = "unset"
+        }
+    }
 }
 
 document.getElementById("help-div").addEventListener("mouseenter", function(){
