@@ -159,13 +159,14 @@ def screenshot_mosaic(data, skip, pad, nb_columns, axis, cmap):
     nb_rows = int(np.ceil(len(range_row) / nb_columns))
     is_4d = True if len(data.shape) == 4 else False
 
-    unique = np.unique(data)
     min_val = np.min(data[data > 0])
     max_val = np.percentile(data[data > 0], 99)
+    if max_val - min_val < 20 and max_val.is_integer():
+        min_val = data.min()
+        max_val = np.percentile(data[data > 0], 99.99)
     shape = ((data[:, :, 0].shape[1] + pad) * nb_rows + pad * nb_rows,
              (data[:, :, 0].shape[0] + pad) * nb_columns + nb_columns * pad)
     padding = ((int(pad / 2), int(pad / 2)), (int(pad / 2), int(pad / 2)))
-
     is_rgb = False
     if is_4d:
         time = data.shape[3]
@@ -175,15 +176,10 @@ def screenshot_mosaic(data, skip, pad, nb_columns, axis, cmap):
         padding += ((0, 0), )
 
     if not is_rgb:
-        if len(unique) > 20:
-            data = np.float32(data - min_val) \
-                / np.float32(max_val - min_val) * 255.0
-        elif len(unique) > 2:
-            data = np.interp(data, xp=[data.min(), data.max()], fp=[0, 255])
-        else:
-            data *= 255
+        data = np.interp(data, xp=[min_val, max_val], fp=[0, 255])
 
     mosaic = np.zeros(shape)
+
     for i, idx in enumerate(range_row):
         corner = i % nb_columns
         row = int(i / nb_columns)
@@ -193,9 +189,8 @@ def screenshot_mosaic(data, skip, pad, nb_columns, axis, cmap):
         curr_shape = curr_img.shape
         mosaic[curr_shape[0] * row + row * pad:
                row * curr_shape[0] + curr_shape[0] + row * pad,
-               curr_shape[1] * corner + corner * pad:
-               corner * curr_shape[1] + curr_shape[1] + corner * pad] = curr_img
-
+        curr_shape[1] * corner + corner * pad:
+        corner * curr_shape[1] + curr_shape[1] + corner * pad] = curr_img
     if axis and not is_4d:
         mosaic = np.pad(mosaic, ((50, 50), (50, 50)), 'constant')
         img = Image.fromarray(mosaic)
