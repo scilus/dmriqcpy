@@ -28,7 +28,12 @@ def stats_mean_median(column_names, filenames):
     values = []
     for filename in filenames:
         data = nib.load(filename).get_data()
+        shape = data.shape
 
+        if len(shape) > 3:
+            sub = list(data[shape[0]//2, shape[1]//2, shape[2]//2, :])
+            idx = sub.index(max(sub))
+            data = data[:,:,:, idx]
         mean = np.mean(data[data > 0])
         median = np.median(data[data > 0])
 

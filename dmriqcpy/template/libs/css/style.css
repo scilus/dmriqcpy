@@ -563,6 +563,10 @@ html, body {
   width: 100%;
 }
 
+body {
+    image-rendering: unset;
+}
+
 .Flipped, .Flipped .Content
 {
     transform:rotateX(180deg);
