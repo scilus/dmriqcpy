@@ -392,8 +392,27 @@ def screenshot_tracking(tracking, t1, directory="."):
         else:
             image = np.hstack((image, img2))
 
+    streamlines = []
+    it = 0
+    for streamline in tractogram:
+        if it > 10000:
+            break
+        it += 1
+        streamlines.append(streamline.streamline)
+
+    ren = window.Renderer()
+    streamline_actor = actor.streamtube(streamlines, linewidth=0.2)
+    ren.add(streamline_actor)
+    camera = ren.GetActiveCamera()
+    camera.SetViewUp(0, 0, -1)
+    center = streamline_actor.GetCenter()
+    camera.SetPosition(center[0], 350, center[2])
+    camera.SetFocalPoint(center)
+    img2 = renderer_to_arr(ren, (3*1920, 1920))
+    image = np.vstack((image, img2))
+
     imgs_comb = Image.fromarray(image)
-    imgs_comb = imgs_comb.resize((3*1920, 1080))
+    imgs_comb = imgs_comb.resize((3*1920, 1920+1080))
     image_name = os.path.basename(str(tracking)).split(".")[0]
     name = os.path.join(directory, image_name + '.png')
     imgs_comb.save(name)
