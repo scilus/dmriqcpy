@@ -159,13 +159,14 @@ def screenshot_mosaic(data, skip, pad, nb_columns, axis, cmap):
     nb_rows = int(np.ceil(len(range_row) / nb_columns))
     is_4d = True if len(data.shape) == 4 else False
 
-    unique = np.unique(data)
     min_val = np.min(data[data > 0])
     max_val = np.percentile(data[data > 0], 99)
+    if max_val - min_val < 20 and max_val.is_integer():
+        min_val = data.min()
+        max_val = np.percentile(data[data > 0], 99.99)
     shape = ((data[:, :, 0].shape[1] + pad) * nb_rows + pad * nb_rows,
              (data[:, :, 0].shape[0] + pad) * nb_columns + nb_columns * pad)
     padding = ((int(pad / 2), int(pad / 2)), (int(pad / 2), int(pad / 2)))
-
     is_rgb = False
     if is_4d:
         time = data.shape[3]
@@ -175,15 +176,10 @@ def screenshot_mosaic(data, skip, pad, nb_columns, axis, cmap):
         padding += ((0, 0), )
 
     if not is_rgb:
-        if len(unique) > 20:
-            data = np.float32(data - min_val) \
-                / np.float32(max_val - min_val) * 255.0
-        elif len(unique) > 2:
-            data = np.interp(data, xp=[data.min(), data.max()], fp=[0, 255])
-        else:
-            data *= 255
+        data = np.interp(data, xp=[min_val, max_val], fp=[0, 255])
 
     mosaic = np.zeros(shape)
+
     for i, idx in enumerate(range_row):
         corner = i % nb_columns
         row = int(i / nb_columns)
@@ -193,9 +189,8 @@ def screenshot_mosaic(data, skip, pad, nb_columns, axis, cmap):
         curr_shape = curr_img.shape
         mosaic[curr_shape[0] * row + row * pad:
                row * curr_shape[0] + curr_shape[0] + row * pad,
-               curr_shape[1] * corner + corner * pad:
-               corner * curr_shape[1] + curr_shape[1] + corner * pad] = curr_img
-
+        curr_shape[1] * corner + corner * pad:
+        corner * curr_shape[1] + curr_shape[1] + corner * pad] = curr_img
     if axis and not is_4d:
         mosaic = np.pad(mosaic, ((50, 50), (50, 50)), 'constant')
         img = Image.fromarray(mosaic)
@@ -392,8 +387,27 @@ def screenshot_tracking(tracking, t1, directory="."):
         else:
             image = np.hstack((image, img2))
 
+    streamlines = []
+    it = 0
+    for streamline in tractogram:
+        if it > 10000:
+            break
+        it += 1
+        streamlines.append(streamline.streamline)
+
+    ren = window.Renderer()
+    streamline_actor = actor.streamtube(streamlines, linewidth=0.2)
+    ren.add(streamline_actor)
+    camera = ren.GetActiveCamera()
+    camera.SetViewUp(0, 0, -1)
+    center = streamline_actor.GetCenter()
+    camera.SetPosition(center[0], 350, center[2])
+    camera.SetFocalPoint(center)
+    img2 = renderer_to_arr(ren, (3*1920, 1920))
+    image = np.vstack((image, img2))
+
     imgs_comb = Image.fromarray(image)
-    imgs_comb = imgs_comb.resize((3*1920, 1080))
+    imgs_comb = imgs_comb.resize((3*1920, 1920+1080))
     image_name = os.path.basename(str(tracking)).split(".")[0]
     name = os.path.join(directory, image_name + '.png')
     imgs_comb.save(name)
