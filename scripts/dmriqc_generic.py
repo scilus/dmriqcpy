@@ -2,20 +2,20 @@
 # -*- coding: utf-8 -*-
 
 import argparse
+import itertools
+from multiprocessing import Pool
 import os
 import shutil
 
-import itertools
-from multiprocessing import Pool
 import numpy as np
 
-from dmriqcpy.io.report import Report
-from dmriqcpy.viz.graph import graph_mean_in_tissues, graph_mean_median
 from dmriqcpy.analysis.stats import stats_mean_in_tissues, stats_mean_median
+from dmriqcpy.io.report import Report
+from dmriqcpy.io.utils import (add_overwrite_arg, assert_inputs_exist,
+                               assert_outputs_exist)
+from dmriqcpy.viz.graph import graph_mean_in_tissues, graph_mean_median
 from dmriqcpy.viz.screenshot import screenshot_mosaic_wrapper
 from dmriqcpy.viz.utils import analyse_qa, dataframe_to_html
-from dmriqcpy.io.utils import add_overwrite_arg, assert_inputs_exist,\
-                              assert_outputs_exist
 
 DESCRIPTION = """
 Compute report in HTML format from images.
@@ -50,6 +50,9 @@ def _build_arg_parser():
     p.add_argument('--nb_columns', default=12, type=int,
                    help='Number of columns for the mosaic. [%(default)s]')
 
+    p.add_argument('--duration', default=100, type=int,
+                   help='Duration of each image in GIF in milliseconds [%(default)s]')
+
     p.add_argument('--nb_threads', type=int, default=1,
                    help='Number of threads. [%(default)s]')
 
@@ -58,11 +61,12 @@ def _build_arg_parser():
     return p
 
 
-def _subj_parralel(subj_metric, summary, name, skip, nb_columns):
+def _subj_parralel(subj_metric, summary, name, skip, nb_columns, duration):
     subjects_dict = {}
     screenshot_path = screenshot_mosaic_wrapper(subj_metric, output_prefix=name,
                                                 directory="data", skip=skip,
-                                                nb_columns=nb_columns)
+                                                nb_columns=nb_columns,
+                                                duration=duration)
 
     summary_html = dataframe_to_html(summary.loc[subj_metric])
     subjects_dict[subj_metric] = {}
@@ -78,7 +82,8 @@ def main():
     all_images = args.images
     with_tissues = False
     if args.wm is not None and args.gm is not None and args.csf is not None:
-        if not len(args.images) == len(args.wm) == len(args.gm) == len(args.csf):
+        if not len(args.images) == len(args.wm) == len(args.gm) == len(
+                args.csf):
             parser.error("Not the same number of images in input.")
 
         with_tissues = True
@@ -113,7 +118,8 @@ def main():
 
     warning_dict = {}
     warning_dict[name] = analyse_qa(summary, stats, curr_metrics[:3])
-    warning_list = np.concatenate([filenames for filenames in warning_dict[name].values()])
+    warning_list = np.concatenate(
+        [filenames for filenames in warning_dict[name].values()])
     warning_dict[name]['nb_warnings'] = len(np.unique(warning_list))
 
     graphs = []
@@ -128,7 +134,8 @@ def main():
                                           itertools.repeat(summary),
                                           itertools.repeat(name),
                                           itertools.repeat(args.skip),
-                                          itertools.repeat(args.nb_columns)))
+                                          itertools.repeat(args.nb_columns),
+                                          itertools.repeat(args.duration)))
     pool.close()
     pool.join()
 

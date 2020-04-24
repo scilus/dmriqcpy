@@ -2,21 +2,21 @@
 # -*- coding: utf-8 -*-
 
 import argparse
+import itertools
+from multiprocessing import Pool
 import os
 import shutil
 
-import itertools
-from multiprocessing import Pool
 import numpy as np
 
-from dmriqcpy.io.report import Report
-from dmriqcpy.viz.graph import graph_mean_in_tissues
 from dmriqcpy.analysis.stats import stats_mean_in_tissues
-from dmriqcpy.viz.screenshot import screenshot_mosaic_wrapper,\
-                                    screenshot_fa_peaks
+from dmriqcpy.io.report import Report
+from dmriqcpy.io.utils import (add_overwrite_arg, assert_inputs_exist,
+                               assert_outputs_exist)
+from dmriqcpy.viz.graph import graph_mean_in_tissues
+from dmriqcpy.viz.screenshot import (screenshot_fa_peaks,
+                                     screenshot_mosaic_wrapper)
 from dmriqcpy.viz.utils import analyse_qa, dataframe_to_html
-from dmriqcpy.io.utils import add_overwrite_arg, assert_inputs_exist,\
-                              assert_outputs_exist
 
 DESCRIPTION = """
 Compute the DTI report in HTML format.
@@ -78,7 +78,8 @@ def _subj_parralel(subj_metric, summary, name, skip, nb_columns):
         cmap = "hot"
     screenshot_path = screenshot_mosaic_wrapper(subj_metric, output_prefix=name,
                                                 directory="data", skip=skip,
-                                                nb_columns=nb_columns, cmap=cmap)
+                                                nb_columns=nb_columns,
+                                                cmap=cmap)
 
     summary_html = dataframe_to_html(summary.loc[subj_metric])
     subjects_dict[subj_metric] = {}
@@ -91,9 +92,9 @@ def main():
     parser = _build_arg_parser()
     args = parser.parse_args()
 
-    if not len(args.fa) == len(args.md) == len(args.rd) == len(args.ad) ==\
-        len(args.residual) == len(args.evecs_v1) == len(args.wm) ==\
-        len(args.gm) == len(args.csf):
+    if not len(args.fa) == len(args.md) == len(args.rd) == len(args.ad) == \
+           len(args.residual) == len(args.evecs_v1) == len(args.wm) == \
+           len(args.gm) == len(args.csf):
         parser.error("Not the same number of images in input.")
 
     all_images = np.concatenate([args.fa, args.md, args.rd, args.ad,
@@ -126,10 +127,12 @@ def main():
                                                args.gm, args.csf)
 
         warning_dict[name] = analyse_qa(summary, stats, curr_metrics[:3])
-        warning_list = np.concatenate([filenames for filenames in warning_dict[name].values()])
+        warning_list = np.concatenate(
+            [filenames for filenames in warning_dict[name].values()])
         warning_dict[name]['nb_warnings'] = len(np.unique(warning_list))
 
-        graph = graph_mean_in_tissues('Mean {}'.format(name), curr_metrics[:3], summary)
+        graph = graph_mean_in_tissues('Mean {}'.format(name), curr_metrics[:3],
+                                      summary)
         graphs.append(graph)
 
         stats_html = dataframe_to_html(stats)
@@ -141,7 +144,8 @@ def main():
                                               itertools.repeat(summary),
                                               itertools.repeat(name),
                                               itertools.repeat(args.skip),
-                                              itertools.repeat(args.nb_columns)))
+                                              itertools.repeat(
+                                                  args.nb_columns)))
 
         pool.close()
         pool.join()
