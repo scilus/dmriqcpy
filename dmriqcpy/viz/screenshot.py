@@ -237,23 +237,16 @@ def screenshot_3_axis(data, mosaic, cmap=None, is_4d=False):
               data.shape[2] // 2]
     slice_display = [data[middle[0], :, :], data[:, middle[1], :],
                      data[:, :, middle[2]]]
-    max_height = 0
-    for curr in slice_display:
-        if curr.shape[0] > max_height:
-            max_height = curr.shape[0]
-    max_weight = 0
-    for curr in slice_display:
-        if curr.shape[1] > max_weight:
-            max_weight = curr.shape[1]
-    size = max(max_weight, max_height)
+
+    size = max(data.shape)
     image = np.array([])
     for j in range(len(slice_display)):
         img = slice_display[j]
-        pad_w = size % slice_display[j].shape[1]
-        left = pad_w / 2
+        pad_w = size - img.shape[1]
+        left = np.floor(pad_w / 2)
         right = pad_w - left
-        pad_h = size % slice_display[j].shape[0]
-        top = pad_h / 2
+        pad_h = size - img.shape[0]
+        top = np.floor(pad_h / 2)
         bottom = pad_h - top
         padding = ((top, bottom), (left, right))
         if is_4d:
