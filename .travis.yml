@@ -22,7 +22,7 @@ jobs:
       if: tag IS present
       script:
         - cd singularity-dmriqc
-        - travis_wait 60 sudo singularity build singularity_dmriqc_${TRAVIS_TAG}.img singularity_dmriqc.def
+        - travis_wait 60 sudo singularity build singularity_dmriqc_${TRAVIS_TAG}.img singularity_dmriqcpy.def
         - singularity exec singularity_dmriqc_${TRAVIS_TAG}.img echo "Singularity test"
       deploy:
         provider: releases
