@@ -18,6 +18,8 @@ jobs:
         - 'if [ "$TRAVIS_TAG" != "" ]; then echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin; fi'
         - 'if [ "$TRAVIS_TAG" != "" ]; then docker tag docker-dmriqc $DOCKER_USERNAME/docker-dmriqc:$TRAVIS_TAG; fi'
         - 'if [ "$TRAVIS_TAG" != "" ]; then travis_wait 60 docker push $DOCKER_USERNAME/docker-dmriqc:$TRAVIS_TAG; fi'
+        - 'if [ "$TRAVIS_TAG" != "" ]; then docker tag docker-dmriqc $DOCKER_USERNAME/docker-dmriqc:latest; fi'
+        - 'if [ "$TRAVIS_TAG" != "" ]; then travis_wait 60 docker push $DOCKER_USERNAME/docker-dmriqc:latest; fi'
     - stage: build Singularity image
       if: tag IS present
       script:
