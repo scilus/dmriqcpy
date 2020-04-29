@@ -15,11 +15,11 @@ jobs:
         - cd docker-dmriqc
         - travis_wait 60 docker build -t docker-dmriqc .
         - docker images
-        - 'if [ "$TRAVIS_TAG" == "" ]; then echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin; fi'
-        - 'if [ "$TRAVIS_TAG" == "" ]; then docker tag docker-dmriqc $DOCKER_USERNAME/docker-dmriqc:$TRAVIS_TAG; fi'
-        - 'if [ "$TRAVIS_TAG" == "" ]; then travis_wait 60 docker push $DOCKER_USERNAME/docker-dmriqc:$TRAVIS_TAG; fi'
+        - 'if [ "$TRAVIS_TAG" != "" ]; then echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin; fi'
+        - 'if [ "$TRAVIS_TAG" != "" ]; then docker tag docker-dmriqc $DOCKER_USERNAME/docker-dmriqc:$TRAVIS_TAG; fi'
+        - 'if [ "$TRAVIS_TAG" != "" ]; then travis_wait 60 docker push $DOCKER_USERNAME/docker-dmriqc:$TRAVIS_TAG; fi'
     - stage: build Singularity image
-      if: branch = master AND type = push
+      if: tag IS present
       script:
         - cd singularity-dmriqc
         - travis_wait 60 sudo singularity build singularity_dmriqc_${TRAVIS_TAG}.img singularity_dmriqc.def
