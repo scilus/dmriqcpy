@@ -12,7 +12,7 @@ jobs:
   include:
     - stage: build Docker image
       script:
-        - cd /docker-dmriqc
+        - cd docker-dmriqc
         - travis_wait 60 docker build -t docker-dmriqc .
         - docker images
         - 'if [ "$TRAVIS_TAG" == "" ]; then echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin; fi'
@@ -21,7 +21,7 @@ jobs:
     - stage: build Singularity image
       if: branch = master AND type = push
       script:
-        - cd /singularity-dmriqc
+        - cd singularity-dmriqc
         - travis_wait 60 sudo singularity build singularity_dmriqc_${TRAVIS_TAG}.img singularity_dmriqc.def
         - singularity exec singularity_dmriqc_${TRAVIS_TAG}.img echo "Singularity test"
       deploy:
