@@ -217,6 +217,11 @@ def screenshot_mosaic(data, skip, pad, nb_columns, axis, cmap):
         for i in range(mosaic.shape[2]):
             img_t = np.uint8(np.clip(mosaic[:, :, i], 0, 255))
             imgs_comb = Image.fromarray(img_t)
+            if mosaic[:, :, i].shape[1] > 1920:
+                basewidth = 1920
+                wpercent = (basewidth / float(imgs_comb.size[0]))
+                hsize = int((float(imgs_comb.size[1]) * float(wpercent)))
+                imgs_comb = imgs_comb.resize((basewidth, hsize), Image.ANTIALIAS)
 
             draw = ImageDraw.Draw(imgs_comb)
             fnt = ImageFont.truetype(
@@ -228,6 +233,11 @@ def screenshot_mosaic(data, skip, pad, nb_columns, axis, cmap):
 
     img = np.uint8(np.clip(mosaic, 0, 255))
     imgs_comb = Image.fromarray(img)
+    if mosaic[:, :].shape[1] > 1920:
+        basewidth = 1920
+        wpercent = (basewidth / float(imgs_comb.size[0]))
+        hsize = int((float(imgs_comb.size[1]) * float(wpercent)))
+        imgs_comb = imgs_comb.resize((basewidth, hsize), Image.ANTIALIAS)
     imgs_comb = imgs_comb.convert("RGB")
     return imgs_comb
 
@@ -257,43 +267,44 @@ def screenshot_3_axis(data, mosaic, cmap=None, is_4d=False):
             image = img2
         else:
             image = np.hstack((image, img2))
-    if cmap is not None:
-        colormap = get_cmap(cmap)
-        image = np.array(colormap(image / 255.0) * 255).astype(dtype=np.uint8)
+
     if is_4d:
-        tmp = np.zeros(mosaic.shape)
-        for i in range(mosaic.shape[2]):
+        tmp = []
+        for i in range(image.shape[2]):
             three_axis = Image.fromarray(np.uint8(image[:, :, i]))
             three_axis_np = np.array(three_axis)
-            tmp[:, :, i] = _resize_mosaic(mosaic[:, :, i], three_axis,
-                                          three_axis_np)
+            tmp.append(_resize_mosaic(mosaic[:, :, i], three_axis,
+                                      three_axis_np))
+        image = np.moveaxis(np.array(tmp), 0, 2)
     else:
         three_axis = Image.fromarray(np.uint8(image))
         three_axis_np = np.array(three_axis)
-        tmp = _resize_mosaic(mosaic, three_axis, three_axis_np)
-    return np.array(tmp, dtype=np.uint8)
+        image = _resize_mosaic(mosaic, three_axis, three_axis_np)
+    if cmap is not None:
+        colormap = get_cmap(cmap)
+        image = np.array(colormap(image / 255.0) * 255).astype(dtype=np.uint8)
+    return np.array(image, dtype=np.uint8)
 
 
 def _resize_mosaic(mosaic, three_axis, three_axis_np):
-    tmp = np.zeros(mosaic.shape)
+    ratio = min(mosaic.shape[0] / three_axis_np.shape[0],
+                mosaic.shape[1] / three_axis_np.shape[1])
+    three_axis = three_axis.resize(
+        (int(np.floor(three_axis_np.shape[1] * ratio)),
+         int(np.floor(three_axis_np.shape[0] * ratio))))
+    three_axis_np = np.array(three_axis)
     if mosaic.shape[0] < mosaic.shape[1]:
-        ratio = min(mosaic.shape[0] / three_axis_np.shape[0],
-                    mosaic.shape[1] / three_axis_np.shape[1])
-        three_axis = three_axis.resize((np.int(three_axis_np.shape[1] * ratio),
-                                        np.int(three_axis_np.shape[0] * ratio)))
-        three_axis_np = np.array(three_axis)
-        diff = np.abs(np.subtract(mosaic.shape, three_axis_np.shape))
+        tmp = np.zeros((three_axis_np.shape[0], mosaic.shape[1]))
+        diff = np.abs(np.subtract(tmp.shape, three_axis_np.shape))
         tmp[diff[0]: three_axis_np.shape[0] + diff[0],
-        np.int(diff[1] / 2): three_axis_np.shape[1] + np.int(
+            np.int(diff[1] / 2): three_axis_np.shape[1] + np.int(
             diff[1] / 2)] = three_axis_np
     else:
-        ratio = np.int(mosaic.shape[1] / np.array(three_axis_np).shape[1])
-        three_axis = three_axis.resize(
-            (mosaic.shape[1], np.int(three_axis_np.shape[0] * ratio)))
-        three_axis_np = np.array(three_axis)
+        tmp = np.zeros((mosaic.shape[0], three_axis_np.shape[1]))
         diff = np.abs(np.subtract(mosaic.shape, three_axis_np.shape))
         tmp[np.int(diff[0] / 2): three_axis_np.shape[0] + np.int(diff[0] / 2),
-        diff[1]: three_axis_np.shape[1] + diff[1]] = three_axis_np
+            diff[1]: three_axis_np.shape[1] + diff[1]] = three_axis_np
+
     return tmp
 
 
