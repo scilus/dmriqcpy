@@ -293,17 +293,11 @@ def _resize_mosaic(mosaic, three_axis, three_axis_np):
         (int(np.floor(three_axis_np.shape[1] * ratio)),
          int(np.floor(three_axis_np.shape[0] * ratio))))
     three_axis_np = np.array(three_axis)
-    if mosaic.shape[0] < mosaic.shape[1]:
-        tmp = np.zeros((three_axis_np.shape[0], mosaic.shape[1]))
-        diff = np.abs(np.subtract(tmp.shape, three_axis_np.shape))
-        tmp[diff[0]: three_axis_np.shape[0] + diff[0],
-            np.int(diff[1] / 2): three_axis_np.shape[1] + np.int(
-            diff[1] / 2)] = three_axis_np
-    else:
-        tmp = np.zeros((mosaic.shape[0], three_axis_np.shape[1]))
-        diff = np.abs(np.subtract(mosaic.shape, three_axis_np.shape))
-        tmp[np.int(diff[0] / 2): three_axis_np.shape[0] + np.int(diff[0] / 2),
-            diff[1]: three_axis_np.shape[1] + diff[1]] = three_axis_np
+    tmp = np.zeros((three_axis_np.shape[0], mosaic.shape[1]))
+    diff = np.abs(np.subtract(tmp.shape, three_axis_np.shape))
+    tmp[diff[0]: three_axis_np.shape[0] + diff[0],
+        np.int(diff[1] / 2): three_axis_np.shape[1] + np.int(
+        diff[1] / 2)] = three_axis_np
 
     return tmp
 
