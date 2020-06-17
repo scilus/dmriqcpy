@@ -3,17 +3,33 @@
 import os
 
 from PIL import Image, ImageDraw, ImageFont
-from fury import actor, window
 from matplotlib.cm import get_cmap
 import nibabel as nib
 import numpy as np
 
-from dmriqcpy.viz.utils import renderer_to_arr
+from dmriqcpy.viz.utils import renderer_to_arr, compute_labels_map
+
+from dipy.data import get_sphere
+from fury import actor, window
+from tempfile import mkstemp
+import fury
+
+
+vtkcolors = [window.colors.blue,
+             window.colors.red,
+             window.colors.yellow,
+             window.colors.purple,
+             window.colors.cyan,
+             window.colors.green,
+             window.colors.orange,
+             window.colors.white,
+             window.colors.brown,
+             window.colors.grey]
 
 
 def screenshot_mosaic_wrapper(filename, output_prefix="", directory=".", skip=1,
                               pad=20, nb_columns=15, axis=True, cmap=None,
-                              return_path=True, duration=100):
+                              return_path=True, duration=100, lut=None):
     """
     Compute mosaic wrapper from an image
 
@@ -37,6 +53,8 @@ def screenshot_mosaic_wrapper(filename, output_prefix="", directory=".", skip=1,
         Colormap name in matplotlib format.
     return_path : bool
         Return path of the mosaic
+    lut : str
+        Look up table
 
 
     Returns
@@ -48,6 +66,14 @@ def screenshot_mosaic_wrapper(filename, output_prefix="", directory=".", skip=1,
     """
     data = nib.load(filename).get_data()
     data = np.nan_to_num(data)
+
+    if lut is not None:
+        lut = compute_labels_map(lut)
+        unique = np.unique(data)
+        tmp = np.zeros(data.shape + (3,))
+        for label in unique:
+            tmp[data == label] = lut[label]
+        data = tmp
 
     imgs_comb = screenshot_mosaic(data, skip, pad, nb_columns, axis, cmap)
     if return_path:
@@ -66,7 +92,7 @@ def screenshot_mosaic_wrapper(filename, output_prefix="", directory=".", skip=1,
 
 def screenshot_mosaic_blend(image, image_blend, output_prefix="", directory=".",
                             blend_val=0.5, skip=1, pad=20, nb_columns=15,
-                            cmap=None, is_mask=False):
+                            cmap=None, is_mask=False, lut=None):
     """
     Compute a blend mosaic from an image and a mask
 
@@ -92,6 +118,8 @@ def screenshot_mosaic_blend(image, image_blend, output_prefix="", directory=".",
         Colormap name in matplotlib format.
     is_mask : bool
         Image blend is a mask.
+    lut : str
+        Look up table
 
 
     Returns
@@ -104,7 +132,7 @@ def screenshot_mosaic_blend(image, image_blend, output_prefix="", directory=".",
                                              cmap=cmap, return_path=False)
     mosaic_blend = screenshot_mosaic_wrapper(image_blend, skip=skip, pad=pad,
                                              nb_columns=nb_columns, axis=False,
-                                             return_path=False)
+                                             return_path=False, lut=lut)
 
     if is_mask:
         data = np.array(mosaic_blend)
@@ -488,3 +516,62 @@ def screenshot_tracking(tracking, t1, directory="."):
     imgs_comb.save(name)
 
     return name
+
+
+def plot_proj_shell(ms, use_sym=True, use_sphere=True, same_color=False,
+                    rad=0.025, opacity=1.0, ofile=None, ores=(300, 300)):
+    """
+    Plot each shell
+
+    Parameters
+    ----------
+    ms: list of numpy.ndarray
+        bvecs for each bvalue
+    use_sym: boolean
+        Plot symmetrical vectors
+    use_sphere: boolean
+        rendering of the sphere
+    same_color: boolean
+        use same color for all shell
+    rad: float
+        radius of each point
+    opacity: float
+        opacity for the shells
+    ofile: str
+        output filename
+    ores: tuple
+        resolution of the output png
+
+    Return
+    ------
+    """
+    global vtkcolors
+    if len(ms) > 10:
+        vtkcolors = fury.colormap.distinguishable_colormap(nb_colors=len(ms))
+
+    ren = window.Renderer()
+    ren.SetBackground(1, 1, 1)
+    if use_sphere:
+        sphere = get_sphere('symmetric724')
+        shape = (1, 1, 1, sphere.vertices.shape[0])
+        fid, fname = mkstemp(suffix='_odf_slicer.mmap')
+        odfs = np.memmap(fname, dtype=np.float64, mode='w+', shape=shape)
+        odfs[:] = 1
+        odfs[..., 0] = 1
+        affine = np.eye(4)
+        sphere_actor = actor.odf_slicer(odfs, affine, sphere=sphere,
+                                        colormap='winter', scale=1.0,
+                                        opacity=opacity)
+
+        ren.add(sphere_actor)
+
+    for i, shell in enumerate(ms):
+        if same_color:
+            i = 0
+        pts_actor = actor.point(shell, vtkcolors[i], point_radius=rad)
+        ren.add(pts_actor)
+        if use_sym:
+            pts_actor = actor.point(-shell, vtkcolors[i], point_radius=rad)
+            ren.add(pts_actor)
+    if ofile:
+        window.snapshot(ren, fname=ofile + '.png', size=ores)

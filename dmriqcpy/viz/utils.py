@@ -3,6 +3,8 @@
 import vtk
 from vtk.util import numpy_support
 
+import numpy as np
+
 
 def analyse_qa(stats_per_subjects, stats_across_subjects, column_names):
     """
@@ -108,3 +110,14 @@ def renderer_to_arr(ren, size):
     components = vtk_array.GetNumberOfComponents()
     arr = numpy_support.vtk_to_numpy(vtk_array).reshape(w, h, components)
     return arr
+
+
+def compute_labels_map(lut_fname):
+    labels = {}
+    with open(lut_fname) as f:
+        for line in f:
+            tokens = ' '.join(line.split()).split()
+            if tokens and not tokens[0].startswith('#'):
+                labels[np.int(tokens[0])] = np.array((tokens[2], tokens[3], tokens[4]), dtype=np.int8)
+
+    return labels
