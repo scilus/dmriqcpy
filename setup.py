@@ -26,7 +26,6 @@ opts = dict(name=NAME,
             install_requires=REQUIRES,
             requires=REQUIRES,
             scripts=SCRIPTS,
-            dependency_links=['git+https://github.com/scilus/scilpy.git#egg=scilpy'],
             include_package_data=True)
 
 
