@@ -1,19 +1,17 @@
 # -*- coding: utf-8 -*-
 
 import os
+from tempfile import mkstemp
 
 from PIL import Image, ImageDraw, ImageFont
+from dipy.data import get_sphere
+import fury
+from fury import actor, window
 from matplotlib.cm import get_cmap
 import nibabel as nib
 import numpy as np
 
-from dmriqcpy.viz.utils import renderer_to_arr, compute_labels_map
-
-from dipy.data import get_sphere
-from fury import actor, window
-from tempfile import mkstemp
-import fury
-
+from dmriqcpy.viz.utils import compute_labels_map, renderer_to_arr
 
 vtkcolors = [window.colors.blue,
              window.colors.red,
@@ -249,7 +247,8 @@ def screenshot_mosaic(data, skip, pad, nb_columns, axis, cmap):
                 basewidth = 1920
                 wpercent = (basewidth / float(imgs_comb.size[0]))
                 hsize = int((float(imgs_comb.size[1]) * float(wpercent)))
-                imgs_comb = imgs_comb.resize((basewidth, hsize), Image.ANTIALIAS)
+                imgs_comb = imgs_comb.resize((basewidth, hsize),
+                                             Image.ANTIALIAS)
 
             draw = ImageDraw.Draw(imgs_comb)
             fnt = ImageFont.truetype(
@@ -324,7 +323,7 @@ def _resize_mosaic(mosaic, three_axis, three_axis_np):
     tmp = np.zeros((three_axis_np.shape[0], mosaic.shape[1]))
     diff = np.abs(np.subtract(tmp.shape, three_axis_np.shape))
     tmp[diff[0]: three_axis_np.shape[0] + diff[0],
-        np.int(diff[1] / 2): three_axis_np.shape[1] + np.int(
+    np.int(diff[1] / 2): three_axis_np.shape[1] + np.int(
         diff[1] / 2)] = three_axis_np
 
     return tmp
@@ -518,7 +517,8 @@ def screenshot_tracking(tracking, t1, directory="."):
     return name
 
 
-def plot_proj_shell(ms, use_sym=True, use_sphere=True, same_color=False,
+def plot_proj_shell(ms, centroids, use_sym=True, use_sphere=True,
+                    same_color=False,
                     rad=0.025, opacity=1.0, ofile=None, ores=(300, 300)):
     """
     Plot each shell
@@ -548,7 +548,8 @@ def plot_proj_shell(ms, use_sym=True, use_sphere=True, same_color=False,
     global vtkcolors
     if len(ms) > 10:
         vtkcolors = fury.colormap.distinguishable_colormap(nb_colors=len(ms))
-
+    radius = np.interp(centroids, xp=[min(centroids), max(centroids)],
+                       fp=[0, 1])
     ren = window.Renderer()
     ren.SetBackground(1, 1, 1)
     if use_sphere:
@@ -559,19 +560,22 @@ def plot_proj_shell(ms, use_sym=True, use_sphere=True, same_color=False,
         odfs[:] = 1
         odfs[..., 0] = 1
         affine = np.eye(4)
-        sphere_actor = actor.odf_slicer(odfs, affine, sphere=sphere,
-                                        colormap='winter', scale=1.0,
-                                        opacity=opacity)
+        for i, shell in enumerate(ms):
+            sphere_actor = actor.odf_slicer(odfs, affine, sphere=sphere,
+                                            colormap='winter', scale=radius[i],
+                                            opacity=opacity)
 
-        ren.add(sphere_actor)
+            ren.add(sphere_actor)
 
     for i, shell in enumerate(ms):
         if same_color:
             i = 0
-        pts_actor = actor.point(shell, vtkcolors[i], point_radius=rad)
+        pts_actor = actor.point(shell * radius[i], vtkcolors[i],
+                                point_radius=rad)
         ren.add(pts_actor)
         if use_sym:
-            pts_actor = actor.point(-shell, vtkcolors[i], point_radius=rad)
+            pts_actor = actor.point(-shell * radius[i], vtkcolors[i],
+                                    point_radius=rad)
             ren.add(pts_actor)
     if ofile:
         window.snapshot(ren, fname=ofile + '.png', size=ores)

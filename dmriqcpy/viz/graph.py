@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-
-from plotly.graph_objs import Box, Figure
+from pandas import DataFrame
+from plotly.graph_objs import Bar, Box, Figure
 import plotly.offline as off
 
 
@@ -271,6 +271,132 @@ def graph_mask_volume(title, column_names, summary):
 
     fig['layout'].update(title=title)
     fig['layout'].update(width=500, height=500)
+    div = off.plot(fig, show_link=False, output_type='div')
+    div = div.replace("<div>", "<div style=\"display:inline-block\">")
+    return div
+
+
+def graph_dwi_protocol(title, column_name, summary):
+    """
+    Compute plotly graph with mean mask volume
+
+    Parameters
+    ----------
+    title : string
+        Title of the graph.
+    column_names : array of strings
+        Name of the columns in the summary DataFrame.
+    summary : DataFrame
+        DataFrame containing the mean stats.
+
+    Returns
+    -------
+    div : html div (string)
+        Graph as a HTML div.
+    """
+    np.random.seed(1)
+    metric = np.concatenate(summary.index)
+    data = np.array(summary[column_name])
+
+    graph = Box(
+        name=column_name,
+        y=data,
+        boxpoints='all',
+        jitter=0.3,
+        text=metric,
+        pointpos=-1.8,
+        hoverinfo="y+text"
+    )
+
+    data = [graph]
+
+    fig = Figure(data=data)
+
+    fig['layout'].update(title=title)
+    fig['layout'].update(width=500, height=500)
+    div = off.plot(fig, show_link=False, output_type='div')
+    div = div.replace("<div>", "<div style=\"display:inline-block\">")
+    return div
+
+
+def graph_directions_per_shells(title, summary):
+    """
+    Compute plotly graph with mean mask volume
+
+    Parameters
+    ----------
+    title : string
+        Title of the graph.
+    summary : dict
+        DataFrame containing the mean stats.
+
+    Returns
+    -------
+    div : html div (string)
+        Graph as a HTML div.
+    """
+    np.random.seed(1)
+    data_graph = []
+    for i in sorted(summary):
+        metric = list(summary[i].keys())
+        data = list(summary[i].values())
+
+        graph = Box(
+            name="b=" + str(i),
+            y=data,
+            boxpoints='all',
+            jitter=0.3,
+            text=metric,
+            pointpos=-1.8,
+            hoverinfo="y+text"
+        )
+
+        data_graph.append(graph)
+
+    fig = Figure(data=data_graph)
+
+    fig['layout'].update(title=title)
+    fig['layout'].update(width=700, height=500)
+    div = off.plot(fig, show_link=False, output_type='div')
+    div = div.replace("<div>", "<div style=\"display:inline-block\">")
+    return div
+
+
+def graph_subjects_per_shells(title, summary):
+    """
+    Compute plotly graph with mean mask volume
+
+    Parameters
+    ----------
+    title : string
+        Title of the graph.
+    summary : dict
+        DataFrame containing the mean stats.
+
+    Returns
+    -------
+    div : html div (string)
+        Graph as a HTML div.
+    """
+    np.random.seed(1)
+    data_graph = []
+    for i in sorted(summary):
+        metric = list(summary[i].keys())
+        data = [len(metric)]
+
+        graph = Bar(
+            name="b=" + str(i),
+            y=data,
+            x=["b=" + str(i)],
+            hoverinfo="y"
+        )
+
+        data_graph.append(graph)
+
+    fig = Figure(data=data_graph)
+
+    fig['layout'].update(title=title)
+    fig['layout'].update(width=700, height=500)
     div = off.plot(fig, show_link=False, output_type='div')
     div = div.replace("<div>", "<div style=\"display:inline-block\">")
     return div
