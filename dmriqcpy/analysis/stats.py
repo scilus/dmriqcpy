@@ -25,6 +25,7 @@ def stats_mean_median(column_names, filenames):
         across subjects.
     """
     values = []
+    import time
     for filename in filenames:
         data = nib.load(filename).get_data()
         shape = data.shape

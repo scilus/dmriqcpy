@@ -222,6 +222,8 @@ var zoom = 2;
 zoom_activated = false;
 help_displayed = false;
 qc_saved = true;
+person = "";
+datetime = "";
 nodes = Array.prototype.slice.call(document.getElementById('navigation').children);
 currentMetric = document.getElementById("navigation").children[0].innerText.replace(/ /g,"_");
 dict_metrics = {};
@@ -721,6 +723,17 @@ function load_qc(){
             }
             else if (importedJSON[dict_idx]["type"] == "settings")
             {
+                if (importedJSON[dict_idx]["username"] != null)
+                {
+                    person = importedJSON[dict_idx]["username"];
+                    document.getElementById("username").innerText = "Username: " + person;
+                }
+
+                if (importedJSON[dict_idx]["date"] != null)
+                {
+                    datetime = importedJSON[dict_idx]["date"];
+                    document.getElementById("datetime").innerText = "Last save: " + datetime;
+                }
                 for (let data_idx in importedJSON[dict_idx]["data"]){
                     name = importedJSON[dict_idx]["data"][data_idx]["tab_name"];
                     idx = importedJSON[dict_idx]["data"][data_idx]["tab_index"];
@@ -737,33 +750,57 @@ function load_qc(){
 
 function save_qc(){
     data = [];
-    settings = {"type": "settings", "data": []};
-    report = {"type": "report", "data": []};
-    for (let metrics of document.getElementsByClassName("tab-pane")){
-        if (metrics.id != "Dashboard"){
-            curr_tab = {};
-            curr_tab["tab_name"] = metrics.id;
-            curr_tab["tab_index"] = dict_metrics[metrics.id];
-            settings["data"].push(curr_tab);
-            for (let subject of metrics.getElementsByClassName("tab")){
-                if (document.getElementById(subject.id + "_status")){
-                    curr_subj = {};
-                    curr_subj["qc"] = metrics.id;
-                    curr_subj["status"] = document.getElementById(subject.id + "_status").innerText;
-                    curr_subj["comments"] = document.getElementById(subject.id + "_comments").value;
-                    curr_subj["filename"] = subject.id;
-                    report["data"].push(curr_subj);
+    settings = {"type": "settings", "data": [], "username": "", "date": ""};
+    if (person == null)
+    {
+        person = "";
+    }
+    if (person != null)
+    {
+        person = prompt("Please enter your name", person);
+    }
+    while (person == "") {
+      person = prompt("Please enter your name");
+    }
+    if (person != null){
+        var currentdate = new Date();
+        var datetime = currentdate.getDate() + "/"
+                        + (currentdate.getMonth()+1)  + "/"
+                        + currentdate.getFullYear() + " @ "
+                        + currentdate.getHours() + ":"
+                        + currentdate.getMinutes() + ":"
+                        + currentdate.getSeconds();
+        settings["date"] = datetime;
+        settings["username"] = person;
+        document.getElementById("username").innerText = "Username: " + person;
+        document.getElementById("datetime").innerText = "Last save: " + datetime;
+        report = {"type": "report", "data": []};
+        for (let metrics of document.getElementsByClassName("tab-pane")){
+            if (metrics.id != "Dashboard"){
+                curr_tab = {};
+                curr_tab["tab_name"] = metrics.id;
+                curr_tab["tab_index"] = dict_metrics[metrics.id];
+                settings["data"].push(curr_tab);
+                for (let subject of metrics.getElementsByClassName("tab")){
+                    if (document.getElementById(subject.id + "_status")){
+                        curr_subj = {};
+                        curr_subj["qc"] = metrics.id;
+                        curr_subj["status"] = document.getElementById(subject.id + "_status").innerText;
+                        curr_subj["comments"] = document.getElementById(subject.id + "_comments").value;
+                        curr_subj["filename"] = subject.id;
+                        report["data"].push(curr_subj);
+                    }
                 }
             }
         }
-    }
 
-    data.push(settings);
-    data.push(report);
-    var jsons = JSON.stringify(data);
-    var blob = new Blob([jsons], {type: "application/json"});
-    saveAs(blob, "data.json");
-    qc_saved = true;
+        data.push(settings);
+        data.push(report);
+        var jsons = JSON.stringify(data);
+        var blob = new Blob([jsons], {type: "application/json"});
+        saveAs(blob, "data.json");
+        qc_saved = true;
+    }
 }
 
 function comment_update(){
