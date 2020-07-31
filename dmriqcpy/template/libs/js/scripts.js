@@ -488,6 +488,25 @@ $(document).on('click', '[data-toggle="lightbox"]', function(event) {
     $(this).ekkoLightbox();
 });
 
+$( ".dataTable tbody " ).on( "click", "td.link", function() {
+    t = Array.prototype.slice.call(document.getElementsByClassName('tab-pane'));
+    old_idx = t.indexOf(document.getElementById(currentMetric));
+    currentMetric = this.parentNode.children[0].innerText;
+    var x = document.getElementById(currentMetric).getElementsByClassName("tab");
+    x[dict_metrics[currentMetric]].style.display = "none";
+    search = Array.prototype.slice.call(document.getElementById(currentMetric).children);
+    subj_id = search.indexOf(document.getElementById($(this).text())) - 1
+    dict_metrics[currentMetric] = subj_id;
+    showTab(subj_id)
+    new_idx = t.indexOf(document.getElementById(currentMetric));
+    document.getElementById("navigation").children[new_idx].classList.add("active");
+    document.getElementById("navigation").children[old_idx].classList.remove("active");
+    document.getElementsByClassName("tab-pane")[new_idx].classList.add("active", "in");
+    document.getElementsByClassName("tab-pane")[old_idx].classList.remove("active", "in");
+    document.getElementById(currentMetric).getElementsByClassName('js-dropdown')[0].selectedIndex = dict_metrics[currentMetric];
+    $(document.getElementById(currentMetric).getElementsByClassName('js-dropdown')[0]).trigger("change");
+});
+
 $('select').on('select2:opening', function( event ) {
     document.removeEventListener("keydown", shortcut);
 });
@@ -537,6 +556,14 @@ function closeForm(event) {
     setTimeout(function(){ div.style.opacity = "0";}, 2000);
 }
 
+function add_to_box() {
+    var tab = document.getElementById(currentMetric);
+    var subj_id = tab.getElementsByClassName("tab")[dict_metrics[currentMetric]].id;
+    console.log(document.getElementById(subj_id + "_comments"));
+    document.getElementById(subj_id + "_comments").value = document.getElementById("comment_choice").value;
+    document.getElementById(subj_id + "_comments").focus();
+}
+
 function matchCustom(params, data) {
     // If there are no search terms, return all of the data
     if ($.trim(params.term) === '') {
@@ -567,6 +594,7 @@ function showTab(n) {
     // This function will display the specified tab of the form...
     var tab = document.getElementById(currentMetric);
     var x = tab.getElementsByClassName("tab");
+    console.log(n, tab);
     x[n].style.display = "block";
     curr_subj = document.getElementById("curr_subj");
     curr_subj.innerText = "";

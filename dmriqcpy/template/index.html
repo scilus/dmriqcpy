@@ -241,7 +241,14 @@
 
     <!-- End page content -->
     </div>
-
+    <style>
+          .link {
+          color: blue;
+          background-color: transparent;
+          text-decoration: underline;
+          cursor: pointer;
+        }
+    </style>
     <script>
         $('.js-dropdown').select2({
             matcher: matchCustom
@@ -253,6 +260,9 @@
             },
             dom: 'Bflrtip',
             deferRender: true,
+            "columnDefs": [
+                { className: "link", "targets": [ 1 ] }
+            ],
             buttons: [
                 {
                     extend: 'csv',
@@ -265,15 +275,13 @@
                     filename: "Quality Control data"
                 }],
         });
+
         update_summ_table()
         function update_summ_table() {
             document.getElementById("Pass").innerText = 0
             document.getElementById("Warning").innerText = 0
             document.getElementById("Fail").innerText = 0
             document.getElementById("Pending").innerText = 0
-            table.column(2).data().each(function (value, index) {
-                document.getElementById(value).innerText = parseInt(document.getElementById(value).innerText) + 1;
-            });
         }
 
         function load_summ(data) {
