@@ -214,6 +214,7 @@
 }));
 
 $(document).ready(function(){
+$('.comment_choice').multiselect({numberDisplayed: 1});
 var native_width = 0;
 var native_height = 0;
 var loadLocker = true;
@@ -548,7 +549,9 @@ function openForm(event) {
 }
 
 function closeForm(event) {
-    document.getElementById(event.offsetParent.id).style.display = "none";
+    var tab = document.getElementById(currentMetric);
+    var subj_id = tab.getElementsByClassName("tab")[dict_metrics[currentMetric]].id;
+    document.getElementById(subj_id + "_comment_box").style.display = "none";
     var div = document.getElementsByClassName("info")[0];
     div.style.display = "block";
     div.style.opacity = 1;
@@ -559,8 +562,14 @@ function closeForm(event) {
 function add_to_box() {
     var tab = document.getElementById(currentMetric);
     var subj_id = tab.getElementsByClassName("tab")[dict_metrics[currentMetric]].id;
-    console.log(document.getElementById(subj_id + "_comments"));
-    document.getElementById(subj_id + "_comments").value = document.getElementById("comment_choice").value;
+    console.log(document.getElementsByClassName("comment_choice")[0]);
+    for (let selected of document.getElementById(subj_id + "_comment_choice").selectedOptions){
+        if (document.getElementById(subj_id + "_comments").value != "")
+        {
+            document.getElementById(subj_id + "_comments").value += "\n"
+        }
+        document.getElementById(subj_id + "_comments").value += selected.value;
+    }
     document.getElementById(subj_id + "_comments").focus();
 }
 

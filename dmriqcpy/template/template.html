@@ -78,7 +78,8 @@
         <br><br>
         <form>
             <label>Classic comments:</label>
-            <select style="width: 60%; display: inline" id="comment_choice">
+            <br>
+            <select style="width: 60%; display: inline" class="comment_choice" id="{{ subject_name }}_comment_choice" multiple="multiple">
                 <optgroup label="Pass">
                     <option>black holes</option>
                 </optgroup>
@@ -92,6 +93,7 @@
                     <option>missing image sections / DWI</option>
                 </optgroup>
             </select>
+            <br>
             <button style="display: inline; width: 35%; padding:2px 0px; margin-bottom:0px" type="button" class="btn" onclick="add_to_box()">
             Add
         </button>
