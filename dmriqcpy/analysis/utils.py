@@ -27,7 +27,7 @@ def get_nearest_bval(bvals, curr_bval, tol=20):
 
 
     """
-    indices = np.where(np.logical_and(bvals < curr_bval + tol, bvals > curr_bval - tol))[0]
+    indices = np.where(np.logical_and(bvals <= curr_bval + tol, bvals >= curr_bval - tol))[0]
     if len(indices) > 0:
         bval = bvals[indices[0]]
     else:
@@ -73,7 +73,10 @@ def dwi_protocol(bvals, tol=20):
             nb_directions = len(shells_indices[shells_indices ==
                                                np.where(centroids == centroid)[
                                                    0]])
-            shells[np.int(nearest_centroid)][filename] = nb_directions
+            print(centroid, nb_directions)
+            if filename not in shells[np.int(nearest_centroid)]:
+                shells[np.int(nearest_centroid)][filename] = 0
+            shells[np.int(nearest_centroid)][filename] += nb_directions
             values.append(nb_directions)
             columns.append("Nbr bval {}".format(centroid))
 
