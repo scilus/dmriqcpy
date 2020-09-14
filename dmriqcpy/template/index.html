@@ -285,6 +285,9 @@
             document.getElementById("Warning").innerText = 0
             document.getElementById("Fail").innerText = 0
             document.getElementById("Pending").innerText = 0
+            table.column(2).data().each(function (value, index) {
+                document.getElementById(value).innerText = parseInt(document.getElementById(value).innerText) + 1;
+            });
         }
 
         function load_summ(data) {
