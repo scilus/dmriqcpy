@@ -2,7 +2,13 @@
 
 {% block screenshot_block %}
 <div scroll="no" class="magnify" style='height: min-content; width: min-content'>
-    <img class="small" data-src="{{subject_values.screenshot}}" style='max-height: 720px; max-width: 1700px'>
+    {% if subject_values.screenshot.endswith('webm') %}
+        <video width="" loop="true" autoplay="true" muted="true">
+            <source src="{{ subject_values.screenshot }}" type="video/webm">
+        </video>
+    {% else %}
+        <img class="small" data-src="{{subject_values.screenshot}}" style='max-height: 720px; max-width: 1700px'>
+    {% endif %}
     <div class="large" style="background: url('{{subject_values.screenshot}}') no-repeat;"></div>
 </div>
 {% endblock %}
