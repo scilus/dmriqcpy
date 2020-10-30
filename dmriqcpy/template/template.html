@@ -3,7 +3,7 @@
 {% block screenshot_block %}
 <div scroll="no" class="magnify" style='height: min-content; width: min-content'>
     {% if subject_values.screenshot.endswith('webm') %}
-        <video width="" controls="false" loop="true" autoplay="true" muted="true">
+        <video width="" loop="true" autoplay="true" muted="true">
             <source src="{{ subject_values.screenshot }}" type="video/webm">
         </video>
     {% else %}
