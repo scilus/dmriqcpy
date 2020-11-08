@@ -136,7 +136,20 @@ iframe {
 .status {
   border-radius: 8px;
   color: white;
-  padding: 2px;
+}
+
+.link {
+  color: blue;
+  background-color: transparent;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+[data-theme="dark"] .link {
+  color: white;
+  background-color: transparent;
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 @font-face {
