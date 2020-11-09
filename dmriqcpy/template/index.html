@@ -244,14 +244,6 @@
 
     <!-- End page content -->
     </div>
-    <style>
-          .link {
-          color: blue;
-          background-color: transparent;
-          text-decoration: underline;
-          cursor: pointer;
-        }
-    </style>
     <script>
         $('.js-dropdown').select2({
             matcher: matchCustom
@@ -270,12 +262,16 @@
                 {
                     extend: 'csv',
                     text: 'Export to .csv',
-                    filename: "Quality Control data",
+                    filename: function(){
+                        return get_filename(get_person());
+                    }
                 },
                 {
                     extend: 'pdf',
                     text: 'Export to .pdf',
-                    filename: "Quality Control data"
+                    filename: function(){
+                        return get_filename(get_person());
+                    }
                 }],
         });
 
@@ -286,7 +282,8 @@
             document.getElementById("Fail").innerText = 0
             document.getElementById("Pending").innerText = 0
             table.column(2).data().each(function (value, index) {
-                document.getElementById(value).innerText = parseInt(document.getElementById(value).innerText) + 1;
+                val = value.trim();
+                document.getElementById(val).innerText = parseInt(document.getElementById(val).innerText) + 1;
             });
         }
 

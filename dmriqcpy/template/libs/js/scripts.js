@@ -1,4 +1,4 @@
-
+person = "";
 (function (factory) {
     if ( typeof define === 'function' && define.amd ) {
         // AMD. Register as an anonymous module.
@@ -223,7 +223,6 @@ var zoom = 2;
 zoom_activated = false;
 help_displayed = false;
 qc_saved = true;
-person = "";
 datetime = "";
 nodes = Array.prototype.slice.call(document.getElementById('navigation').children);
 currentMetric = document.getElementById("navigation").children[0].innerText.replace(/ /g,"_");
@@ -562,7 +561,6 @@ function closeForm(event) {
 function add_to_box() {
     var tab = document.getElementById(currentMetric);
     var subj_id = tab.getElementsByClassName("tab")[dict_metrics[currentMetric]].id;
-    console.log(document.getElementsByClassName("comment_choice")[0]);
     for (let selected of document.getElementById(subj_id + "_comment_choice").selectedOptions){
         if (document.getElementById(subj_id + "_comments").value != "")
         {
@@ -603,7 +601,6 @@ function showTab(n) {
     // This function will display the specified tab of the form...
     var tab = document.getElementById(currentMetric);
     var x = tab.getElementsByClassName("tab");
-    console.log(n, tab);
     x[n].style.display = "block";
     curr_subj = document.getElementById("curr_subj");
     curr_subj.innerText = "";
@@ -620,7 +617,7 @@ function showTab(n) {
             document.getElementById("curr_subj").style.backgroundColor = document.getElementById(x[n].id + "_status").style.backgroundColor;
         }
         else{
-            document.getElementById("curr_subj").style.backgroundColor = "";
+            document.getElementById("curr_subj").style.backgroundColor = "grey";
         }
 
         if (x[n].getElementsByClassName("small").length > 0){
@@ -725,17 +722,15 @@ function update_status(object) {
         document.getElementById("curr_subj").style.backgroundColor = object.style.backgroundColor;
     }
     else{
-        document.getElementById("curr_subj").style.backgroundColor = "";
+        document.getElementById("curr_subj").style.backgroundColor = "grey";
     }
     qc_saved=false;
     copy = document.getElementById(object.name+"_status").cloneNode(true);
     copy.removeAttribute("id");
-    // update_summ(object.name+'_status_summ', copy.innerText);
 }
 
 function load_qc(){
     color_dict = {"Pass": "green", "Warning": "orange", "Fail": "red", "Pending": "grey"};
-    var table = $('#table_sort').DataTable();
     var selectedFile = document.getElementById('load_file').files[0];
     var reader = new FileReader();
     var x = document.getElementById(currentMetric).getElementsByClassName("tab");
@@ -752,10 +747,8 @@ function load_qc(){
                     document.getElementById(filename + "_comments").value = comments;
                     curr = importedJSON[dict_idx]["data"][data_idx];
                     test.push([curr["qc"], curr["filename"], curr["status"], curr["comments"]])
-                    // update_summ(filename+'_comments_summ', document.getElementById(filename + "_comments").value);
                     document.getElementById(filename + "_status").innerText = status;
-                    document.getElementById(filename + "_status").style.backgroundColor = color_dict[status];
-                    // update_summ(filename+'_status_summ', document.getElementById(filename+"_status").outerHTML);
+                    document.getElementById(filename + "_status").style.backgroundColor = color_dict[status.trim()];
                 }
             }
             else if (importedJSON[dict_idx]["type"] == "settings")
@@ -801,8 +794,8 @@ function save_qc(){
     }
     if (person != null){
         var currentdate = new Date();
-        var datetime = currentdate.getDate() + "/"
-                        + (currentdate.getMonth()+1)  + "/"
+        var datetime = String(currentdate.getDate()).padStart(2, "0") + "/"
+                        + String(currentdate.getMonth() + 1).padStart(2, "0") + "/"
                         + currentdate.getFullYear() + " @ "
                         + currentdate.getHours() + ":"
                         + currentdate.getMinutes() + ":"
@@ -835,9 +828,24 @@ function save_qc(){
         data.push(report);
         var jsons = JSON.stringify(data);
         var blob = new Blob([jsons], {type: "application/json"});
-        saveAs(blob, "data.json");
+        file = get_filename(person)
+        saveAs(blob, file + ".json");
         qc_saved = true;
     }
+}
+
+function get_person()
+{
+    return person;
+}
+
+function get_filename(person){
+    var currentdate = new Date();
+    var date = currentdate.getFullYear().toString() + String(currentdate.getMonth() + 1).padStart(2, "0") + String(currentdate.getDate()).padStart(2, "0");
+    var loc = window.location.pathname;
+    var whole_dir = loc.substring(0, loc.lastIndexOf('/'));
+    var dir = whole_dir.substring(whole_dir.lastIndexOf('/') + 1);
+    return date + "_" + person.replace(" ", "_") + "_" + dir;
 }
 
 function comment_update(){
