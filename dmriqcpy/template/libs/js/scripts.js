@@ -727,7 +727,6 @@ function update_status(object) {
     qc_saved=false;
     copy = document.getElementById(object.name+"_status").cloneNode(true);
     copy.removeAttribute("id");
-    // update_summ(object.name+'_status_summ', copy.innerText);
 }
 
 function load_qc(){
@@ -748,10 +747,8 @@ function load_qc(){
                     document.getElementById(filename + "_comments").value = comments;
                     curr = importedJSON[dict_idx]["data"][data_idx];
                     test.push([curr["qc"], curr["filename"], curr["status"], curr["comments"]])
-                    // update_summ(filename+'_comments_summ', document.getElementById(filename + "_comments").value);
                     document.getElementById(filename + "_status").innerText = status;
                     document.getElementById(filename + "_status").style.backgroundColor = color_dict[status.trim()];
-                    // update_summ(filename+'_status_summ', document.getElementById(filename+"_status").outerHTML);
                 }
             }
             else if (importedJSON[dict_idx]["type"] == "settings")
@@ -797,8 +794,8 @@ function save_qc(){
     }
     if (person != null){
         var currentdate = new Date();
-        var datetime = ("0" + currentdate.getDate()).slice(-2) + "/"
-                        + ("0" + (currentdate.getMonth() + 1)).slice(-2)  + "/"
+        var datetime = String(currentdate.getDate()).padStart(2, "0") + "/"
+                        + String(currentdate.getMonth() + 1).padStart(2, "0") + "/"
                         + currentdate.getFullYear() + " @ "
                         + currentdate.getHours() + ":"
                         + currentdate.getMinutes() + ":"
@@ -844,7 +841,7 @@ function get_person()
 
 function get_filename(person){
     var currentdate = new Date();
-    var date = currentdate.getFullYear().toString() + ("0" + (currentdate.getMonth() + 1)).slice(-2).toString() + ("0" + currentdate.getDate()).slice(-2).toString();
+    var date = currentdate.getFullYear().toString() + String(currentdate.getMonth() + 1).padStart(2, "0") + String(currentdate.getDate()).padStart(2, "0");
     var loc = window.location.pathname;
     var whole_dir = loc.substring(0, loc.lastIndexOf('/'));
     var dir = whole_dir.substring(whole_dir.lastIndexOf('/') + 1);
