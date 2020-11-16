@@ -343,6 +343,11 @@ $(document).ready(function () {
         }
     }
 
+    function roundTime(time) {
+        const offsettime = time * 10;
+        return Math.round(offsettime) / 10;
+    }
+
     function shortcut(e) {
         if (e.ctrlKey && e.which == 37) {
             idx = nodes.indexOf(document.getElementById("navigation").getElementsByClassName("active")[0]);
@@ -430,6 +435,21 @@ $(document).ready(function () {
             }
             else {
                 document.getElementsByTagName("body")[0].style["image-rendering"] = "unset"
+            }
+        } else if (e.key == "n") {// Add previous and next frame id in video. Shit by step of 100ms
+            const video = $("video").filter(function (k, el) { return !$(el).is(":hidden"); })[0];
+            video.pause();
+            video.currentTime = roundTime(video.currentTime) + 0.1;
+            if (video.currentTime > video.duration) {
+                video.currentTime = 0;
+            }
+        } else if (e.key == "p") {
+            const video = $("video").filter(function (k, el) { return !$(el).is(":hidden"); })[0];
+            video.pause();
+            if (video.currentTime - 0.1 < 0) {
+                video.currentTime = video.duration - 0.01;
+            } else {
+                video.currentTime = roundTime(video.currentTime) - 0.1;
             }
         }
     }
@@ -525,6 +545,36 @@ $(document).ready(function () {
         showTab(dict_metrics[currentMetric]);
     });
 
+    const config = { attributes: true };
+    function videos_observer(k, v) {
+        const observer = new MutationObserver(function (mutations) {
+            const videos = $(mutations[0]["target"]).find("video");
+            if (videos.length == 0) {
+                return;
+            }
+            videos.each(function (k, el) {
+                if ($(el).is(":hidden")) {
+                    el.pause();
+                } else if (el.paused) {
+                    el.play();
+                }
+                el.currentTime = 0;
+            });
+        });
+        observer.observe(v, config);
+    };
+
+    $(".tab").each(videos_observer);
+    $("#main").children().slice(1).each(videos_observer);
+
+    $("video").each(function (k, v) {
+        $(v).on("click", function (event) {
+            if (event.currentTarget.paused)
+                event.currentTarget.play();
+            else
+                event.currentTarget.pause();
+        });
+    });
 })
 
 function openForm(event) {
