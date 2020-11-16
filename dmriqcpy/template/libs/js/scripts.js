@@ -1,6 +1,7 @@
 person = "";
+
 (function (factory) {
-    if ( typeof define === 'function' && define.amd ) {
+    if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
         define(['jquery'], factory);
     } else if (typeof exports === 'object') {
@@ -12,25 +13,25 @@ person = "";
     }
 }(function ($) {
 
-    var toFix  = ['wheel', 'mousewheel', 'DOMMouseScroll', 'MozMousePixelScroll'],
-        toBind = ( 'onwheel' in document || document.documentMode >= 9 ) ?
-                    ['wheel'] : ['mousewheel', 'DomMouseScroll', 'MozMousePixelScroll'],
-        slice  = Array.prototype.slice,
+    var toFix = ['wheel', 'mousewheel', 'DOMMouseScroll', 'MozMousePixelScroll'],
+        toBind = ('onwheel' in document || document.documentMode >= 9) ?
+            ['wheel'] : ['mousewheel', 'DomMouseScroll', 'MozMousePixelScroll'],
+        slice = Array.prototype.slice,
         nullLowestDeltaTimeout, lowestDelta;
 
-    if ( $.event.fixHooks ) {
-        for ( var i = toFix.length; i; ) {
-            $.event.fixHooks[ toFix[--i] ] = $.event.mouseHooks;
+    if ($.event.fixHooks) {
+        for (var i = toFix.length; i;) {
+            $.event.fixHooks[toFix[--i]] = $.event.mouseHooks;
         }
     }
 
     var special = $.event.special.mousewheel = {
         version: '3.1.12',
 
-        setup: function() {
-            if ( this.addEventListener ) {
-                for ( var i = toBind.length; i; ) {
-                    this.addEventListener( toBind[--i], handler, false );
+        setup: function () {
+            if (this.addEventListener) {
+                for (var i = toBind.length; i;) {
+                    this.addEventListener(toBind[--i], handler, false);
                 }
             } else {
                 this.onmousewheel = handler;
@@ -40,10 +41,10 @@ person = "";
             $.data(this, 'mousewheel-page-height', special.getPageHeight(this));
         },
 
-        teardown: function() {
-            if ( this.removeEventListener ) {
-                for ( var i = toBind.length; i; ) {
-                    this.removeEventListener( toBind[--i], handler, false );
+        teardown: function () {
+            if (this.removeEventListener) {
+                for (var i = toBind.length; i;) {
+                    this.removeEventListener(toBind[--i], handler, false);
                 }
             } else {
                 this.onmousewheel = null;
@@ -53,7 +54,7 @@ person = "";
             $.removeData(this, 'mousewheel-page-height');
         },
 
-        getLineHeight: function(elem) {
+        getLineHeight: function (elem) {
             var $elem = $(elem),
                 $parent = $elem['offsetParent' in $.fn ? 'offsetParent' : 'parent']();
             if (!$parent.length) {
@@ -62,7 +63,7 @@ person = "";
             return parseInt($parent.css('fontSize'), 10) || parseInt($elem.css('fontSize'), 10) || 16;
         },
 
-        getPageHeight: function(elem) {
+        getPageHeight: function (elem) {
             return $(elem).height();
         },
 
@@ -73,36 +74,36 @@ person = "";
     };
 
     $.fn.extend({
-        mousewheel: function(fn) {
+        mousewheel: function (fn) {
             return fn ? this.bind('mousewheel', fn) : this.trigger('mousewheel');
         },
 
-        unmousewheel: function(fn) {
+        unmousewheel: function (fn) {
             return this.unbind('mousewheel', fn);
         }
     });
 
 
     function handler(event) {
-        var orgEvent   = event || window.event,
-            args       = slice.call(arguments, 1),
-            delta      = 0,
-            deltaX     = 0,
-            deltaY     = 0,
-            absDelta   = 0,
-            offsetX    = 0,
-            offsetY    = 0;
+        var orgEvent = event || window.event,
+            args = slice.call(arguments, 1),
+            delta = 0,
+            deltaX = 0,
+            deltaY = 0,
+            absDelta = 0,
+            offsetX = 0,
+            offsetY = 0;
         event = $.event.fix(orgEvent);
         event.type = 'mousewheel';
 
         // Old school scrollwheel delta
-        if ( 'detail'      in orgEvent ) { deltaY = orgEvent.detail * -1;      }
-        if ( 'wheelDelta'  in orgEvent ) { deltaY = orgEvent.wheelDelta;       }
-        if ( 'wheelDeltaY' in orgEvent ) { deltaY = orgEvent.wheelDeltaY;      }
-        if ( 'wheelDeltaX' in orgEvent ) { deltaX = orgEvent.wheelDeltaX * -1; }
+        if ('detail' in orgEvent) { deltaY = orgEvent.detail * -1; }
+        if ('wheelDelta' in orgEvent) { deltaY = orgEvent.wheelDelta; }
+        if ('wheelDeltaY' in orgEvent) { deltaY = orgEvent.wheelDeltaY; }
+        if ('wheelDeltaX' in orgEvent) { deltaX = orgEvent.wheelDeltaX * -1; }
 
         // Firefox < 17 horizontal scrolling related to DOMMouseScroll event
-        if ( 'axis' in orgEvent && orgEvent.axis === orgEvent.HORIZONTAL_AXIS ) {
+        if ('axis' in orgEvent && orgEvent.axis === orgEvent.HORIZONTAL_AXIS) {
             deltaX = deltaY * -1;
             deltaY = 0;
         }
@@ -111,62 +112,62 @@ person = "";
         delta = deltaY === 0 ? deltaX : deltaY;
 
         // New school wheel delta (wheel event)
-        if ( 'deltaY' in orgEvent ) {
+        if ('deltaY' in orgEvent) {
             deltaY = orgEvent.deltaY * -1;
-            delta  = deltaY;
+            delta = deltaY;
         }
-        if ( 'deltaX' in orgEvent ) {
+        if ('deltaX' in orgEvent) {
             deltaX = orgEvent.deltaX;
-            if ( deltaY === 0 ) { delta  = deltaX * -1; }
+            if (deltaY === 0) { delta = deltaX * -1; }
         }
 
         // No change actually happened, no reason to go any further
-        if ( deltaY === 0 && deltaX === 0 ) { return; }
+        if (deltaY === 0 && deltaX === 0) { return; }
 
         // Need to convert lines and pages to pixels if we aren't already in pixels
         // There are three delta modes:
         //   * deltaMode 0 is by pixels, nothing to do
         //   * deltaMode 1 is by lines
         //   * deltaMode 2 is by pages
-        if ( orgEvent.deltaMode === 1 ) {
+        if (orgEvent.deltaMode === 1) {
             var lineHeight = $.data(this, 'mousewheel-line-height');
-            delta  *= lineHeight;
+            delta *= lineHeight;
             deltaY *= lineHeight;
             deltaX *= lineHeight;
-        } else if ( orgEvent.deltaMode === 2 ) {
+        } else if (orgEvent.deltaMode === 2) {
             var pageHeight = $.data(this, 'mousewheel-page-height');
-            delta  *= pageHeight;
+            delta *= pageHeight;
             deltaY *= pageHeight;
             deltaX *= pageHeight;
         }
 
         // Store lowest absolute delta to normalize the delta values
-        absDelta = Math.max( Math.abs(deltaY), Math.abs(deltaX) );
+        absDelta = Math.max(Math.abs(deltaY), Math.abs(deltaX));
 
-        if ( !lowestDelta || absDelta < lowestDelta ) {
+        if (!lowestDelta || absDelta < lowestDelta) {
             lowestDelta = absDelta;
 
             // Adjust older deltas if necessary
-            if ( shouldAdjustOldDeltas(orgEvent, absDelta) ) {
+            if (shouldAdjustOldDeltas(orgEvent, absDelta)) {
                 lowestDelta /= 40;
             }
         }
 
         // Adjust older deltas if necessary
-        if ( shouldAdjustOldDeltas(orgEvent, absDelta) ) {
+        if (shouldAdjustOldDeltas(orgEvent, absDelta)) {
             // Divide all the things by 40!
-            delta  /= 40;
+            delta /= 40;
             deltaX /= 40;
             deltaY /= 40;
         }
 
         // Get a whole, normalized value for the deltas
-        delta  = Math[ delta  >= 1 ? 'floor' : 'ceil' ](delta  / lowestDelta);
-        deltaX = Math[ deltaX >= 1 ? 'floor' : 'ceil' ](deltaX / lowestDelta);
-        deltaY = Math[ deltaY >= 1 ? 'floor' : 'ceil' ](deltaY / lowestDelta);
+        delta = Math[delta >= 1 ? 'floor' : 'ceil'](delta / lowestDelta);
+        deltaX = Math[deltaX >= 1 ? 'floor' : 'ceil'](deltaX / lowestDelta);
+        deltaY = Math[deltaY >= 1 ? 'floor' : 'ceil'](deltaY / lowestDelta);
 
         // Normalise offsetX and offsetY properties
-        if ( special.settings.normalizeOffset && this.getBoundingClientRect ) {
+        if (special.settings.normalizeOffset && this.getBoundingClientRect) {
             var boundingRect = this.getBoundingClientRect();
             offsetX = event.clientX - boundingRect.left;
             offsetY = event.clientY - boundingRect.top;
@@ -213,333 +214,316 @@ person = "";
 
 }));
 
-$(document).ready(function(){
-$('.comment_choice').multiselect({numberDisplayed: 1});
-var native_width = 0;
-var native_height = 0;
-var loadLocker = true;
-var image_object = null;
-var zoom = 2;
-zoom_activated = false;
-help_displayed = false;
-qc_saved = true;
-datetime = "";
-nodes = Array.prototype.slice.call(document.getElementById('navigation').children);
-currentMetric = document.getElementById("navigation").children[0].innerText.replace(/ /g,"_");
-dict_metrics = {};
-for (let child of document.getElementById("navigation").children){
-    dict_metrics[child.innerText.replace(/ /g,"_")] = 0;
-}
-
-showTab(dict_metrics[currentMetric]);
-function update(mx, my) {
-    var rx = Math.round(mx - $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".large").width()/(2*zoom))*-1;
-    var ry = Math.round(my - $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".large").height()/(2*zoom))*-1;
-    var bgp = rx * zoom + "px " + ry * zoom + "px";
-    var bgs = ($(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".small").width() * zoom) + "px " + ($(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".small").height() * zoom) + "px";
-    //Time to move the magnifying glass with the mouse
-    var px = mx - $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".large").width()/2;
-    var py = my - $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".large").height()/2;
-    //Now the glass moves with the mouse
-    //The logic is to deduct half of the glass's width and height from the
-    //mouse coordinates to place it with its center at the mouse coordinates
-
-    //If you hover on the image now, you should see the magnifying glass in action
-    $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".large").css({left: px, top: py, backgroundPosition: bgp, backgroundSize: bgs});
-}
-
-
-$('.large').on('mousewheel', function(event) {
-    loadLocker = false;
-    image_object = new Image();
-    image_object.src = $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".small").attr("src");
-    native_width = image_object.width;
-    native_height = image_object.height;
-    if (zoom + event.deltaY > 1 && zoom + event.deltaY < 7) {
-        zoom += event.deltaY;
-        var magnify_offset = $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).offset();
-        update(event.pageX - magnify_offset.left, event.pageY - magnify_offset.top);
+$(document).ready(function () {
+    $('.comment_choice').multiselect({ numberDisplayed: 1 });
+    var native_width = 0;
+    var native_height = 0;
+    var loadLocker = true;
+    var image_object = null;
+    var zoom = 2;
+    zoom_activated = false;
+    help_displayed = false;
+    qc_saved = true;
+    datetime = "";
+    nodes = Array.prototype.slice.call(document.getElementById('navigation').children);
+    currentMetric = document.getElementById("navigation").children[0].innerText.replace(/ /g, "_");
+    dict_metrics = {};
+    for (let child of document.getElementById("navigation").children) {
+        dict_metrics[child.innerText.replace(/ /g, "_")] = 0;
     }
-});
 
-//Now the mousemove function
-$(".magnify").mousemove(function(e){
-    if (zoom_activated){
-        //When the user hovers on the image, the script will first calculate
-    //the native dimensions if they don't exist. Only after the native dimensions
-    //are available, the script will show the zoomed version.
-    if(!native_width && !native_height)
-    {
-    //This will create a new image object with the same image as that in .small
-    //We cannot directly get the dimensions from .small because of the
-    //width specified to 200px in the html. To get the actual dimensions we have
-    //created this image object.
-    if (loadLocker) {
-        loadLocker = false;
-        image_object = new Image();
-        image_object.src = $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".small").attr("src");
-    }
-    //This code is wrapped in the .load function which is important.
-    //width and height of the object would return 0 if accessed before
-    //the image gets loaded.
-
-    native_width = image_object.width;
-    native_height = image_object.height;
-    }
-    else
-    {
-    //x/y coordinates of the mouse
-    //This is the position of .magnify with respect to the document.
-    var magnify_offset = $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).offset();
-    //We will deduct the positions of .magnify from the mouse positions with
-    //respect to the document to get the mouse positions with respect to the
-    //container(.magnify)
-    var mx = e.pageX - magnify_offset.left;
-    var my = e.pageY - magnify_offset.top;
-
-    //Finally the code to fade out the glass if the mouse is outside the container
-    if(mx < $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).width() && my < $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).height() && mx > 0 && my > 0)
-    {
-        $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".large").fadeIn(100);
-    }
-    else
-    {
-        $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".large").fadeOut(100);
-    }
-    if($(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".large").is(":visible"))
-    {
-        //The background position of .large will be changed according to the position
-        //of the mouse over the .small image. So we will get the ratio of the pixel
-        //under the mouse pointer with respect to the image and use that to position the
-        //large image inside the magnifying glass
-        var rx = Math.round(mx - $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".large").width()/(2*zoom))*-1;
-        var ry = Math.round(my - $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".large").height()/(2*zoom))*-1;
+    showTab(dict_metrics[currentMetric]);
+    function update(mx, my) {
+        var rx = Math.round(mx - $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".large").width() / (2 * zoom)) * -1;
+        var ry = Math.round(my - $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".large").height() / (2 * zoom)) * -1;
         var bgp = rx * zoom + "px " + ry * zoom + "px";
         var bgs = ($(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".small").width() * zoom) + "px " + ($(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".small").height() * zoom) + "px";
-
         //Time to move the magnifying glass with the mouse
-        var px = mx - $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".large").width()/2;
-        var py = my - $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".large").height()/2;
+        var px = mx - $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".large").width() / 2;
+        var py = my - $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".large").height() / 2;
         //Now the glass moves with the mouse
         //The logic is to deduct half of the glass's width and height from the
         //mouse coordinates to place it with its center at the mouse coordinates
 
         //If you hover on the image now, you should see the magnifying glass in action
-        $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".large").css({left: px, top: py, backgroundPosition: bgp, backgroundSize: bgs});
+        $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".large").css({ left: px, top: py, backgroundPosition: bgp, backgroundSize: bgs });
     }
-    }
-    }
-}).on("mouseleave", function(){
-    native_width = 0;
-    native_height = 0;
-    loadLocker = true;
-});
+
+
+    $('.large').on('mousewheel', function (event) {
+        loadLocker = false;
+        image_object = new Image();
+        image_object.src = $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".small").attr("src");
+        native_width = image_object.width;
+        native_height = image_object.height;
+        if (zoom + event.deltaY > 1 && zoom + event.deltaY < 7) {
+            zoom += event.deltaY;
+            var magnify_offset = $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).offset();
+            update(event.pageX - magnify_offset.left, event.pageY - magnify_offset.top);
+        }
+    });
+
+    //Now the mousemove function
+    $(".magnify").mousemove(function (e) {
+        if (zoom_activated) {
+            //When the user hovers on the image, the script will first calculate
+            //the native dimensions if they don't exist. Only after the native dimensions
+            //are available, the script will show the zoomed version.
+            if (!native_width && !native_height) {
+                //This will create a new image object with the same image as that in .small
+                //We cannot directly get the dimensions from .small because of the
+                //width specified to 200px in the html. To get the actual dimensions we have
+                //created this image object.
+                if (loadLocker) {
+                    loadLocker = false;
+                    image_object = new Image();
+                    image_object.src = $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".small").attr("src");
+                }
+                //This code is wrapped in the .load function which is important.
+                //width and height of the object would return 0 if accessed before
+                //the image gets loaded.
+
+                native_width = image_object.width;
+                native_height = image_object.height;
+            }
+            else {
+                //x/y coordinates of the mouse
+                //This is the position of .magnify with respect to the document.
+                var magnify_offset = $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).offset();
+                //We will deduct the positions of .magnify from the mouse positions with
+                //respect to the document to get the mouse positions with respect to the
+                //container(.magnify)
+                var mx = e.pageX - magnify_offset.left;
+                var my = e.pageY - magnify_offset.top;
+
+                //Finally the code to fade out the glass if the mouse is outside the container
+                if (mx < $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).width() && my < $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).height() && mx > 0 && my > 0) {
+                    $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".large").fadeIn(100);
+                }
+                else {
+                    $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".large").fadeOut(100);
+                }
+                if ($(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".large").is(":visible")) {
+                    //The background position of .large will be changed according to the position
+                    //of the mouse over the .small image. So we will get the ratio of the pixel
+                    //under the mouse pointer with respect to the image and use that to position the
+                    //large image inside the magnifying glass
+                    var rx = Math.round(mx - $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".large").width() / (2 * zoom)) * -1;
+                    var ry = Math.round(my - $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".large").height() / (2 * zoom)) * -1;
+                    var bgp = rx * zoom + "px " + ry * zoom + "px";
+                    var bgs = ($(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".small").width() * zoom) + "px " + ($(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".small").height() * zoom) + "px";
+
+                    //Time to move the magnifying glass with the mouse
+                    var px = mx - $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".large").width() / 2;
+                    var py = my - $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".large").height() / 2;
+                    //Now the glass moves with the mouse
+                    //The logic is to deduct half of the glass's width and height from the
+                    //mouse coordinates to place it with its center at the mouse coordinates
+
+                    //If you hover on the image now, you should see the magnifying glass in action
+                    $(document.getElementById(currentMetric).getElementsByClassName('magnify')[dict_metrics[currentMetric]]).children(".large").css({ left: px, top: py, backgroundPosition: bgp, backgroundSize: bgs });
+                }
+            }
+        }
+    }).on("mouseleave", function () {
+        native_width = 0;
+        native_height = 0;
+        loadLocker = true;
+    });
 
 
 
-function zoom_f(zoom_activated)
-{
-    if (zoom_activated)
-    {
-        $(".magnify").mousewheel(doMouseWheel);
-    }
-    else
-    {
-        $(".magnify").unmousewheel(doMouseWheel);
-        $(".magnify").children(".large").fadeOut(100);
-    }
-}
-
-function shortcut(e){
-    if (e.ctrlKey && e.which == 37){
-        idx = nodes.indexOf(document.getElementById("navigation").getElementsByClassName("active")[0]);
-        if (idx - 1 >= 0){
-            curr_scroll = $(document.getElementById("navigation"))[0].scrollLeft
-            if ($(document.getElementById("navigation").children[idx - 1]).position().left - $(document.getElementById("navigation").children[0]).position().left < curr_scroll)
-                $(document.getElementById("navigation")).scrollLeft($(document.getElementById("navigation").children[idx - 1]).position().left - $(document.getElementById("navigation").children[0]).position().left)
-            currentMetric = document.getElementById("navigation").children[idx - 1].innerText.replace(/ /g,"_");
-            showTab(dict_metrics[currentMetric]);
-            document.getElementById("navigation").children[idx - 1].classList.add("active");
-            document.getElementById("navigation").children[idx].classList.remove("active");
-            document.getElementsByClassName("tab-pane")[idx - 1].classList.add("active", "in");
-            document.getElementsByClassName("tab-pane")[idx].classList.remove("active", "in");
+    function zoom_f(zoom_activated) {
+        if (zoom_activated) {
+            $(".magnify").mousewheel(doMouseWheel);
+        }
+        else {
+            $(".magnify").unmousewheel(doMouseWheel);
+            $(".magnify").children(".large").fadeOut(100);
         }
     }
-    else if (e.ctrlKey && e.which == 39){
-        idx = nodes.indexOf(document.getElementById("navigation").getElementsByClassName("active")[0]);
-        if (idx + 1 < document.getElementById("navigation").children.length){
-            curr_scroll = $(document.getElementById("navigation"))[0].scrollLeft
-            if (document.getElementById("navigation").children[idx + 1].clientWidth + $(document.getElementById("navigation").children[idx + 1]).position().left - $(document.getElementById("navigation").children[0]).position().left > document.getElementById("navigation").clientWidth + curr_scroll)
-                $(document.getElementById("navigation")).scrollLeft($(document.getElementById("navigation").children[idx + 1]).position().left - $(document.getElementById("navigation").children[0]).position().left)
-            currentMetric = document.getElementById("navigation").children[idx + 1].innerText.replace(/ /g,"_");
-            showTab(dict_metrics[currentMetric]);
-            document.getElementById("navigation").children[idx + 1].classList.add("active");
-            document.getElementById("navigation").children[idx].classList.remove("active");
-            document.getElementsByClassName("tab-pane")[idx + 1].classList.add("active", "in");
-            document.getElementsByClassName("tab-pane")[idx].classList.remove("active", "in");
+
+    function shortcut(e) {
+        if (e.ctrlKey && e.which == 37) {
+            idx = nodes.indexOf(document.getElementById("navigation").getElementsByClassName("active")[0]);
+            if (idx - 1 >= 0) {
+                curr_scroll = $(document.getElementById("navigation"))[0].scrollLeft
+                if ($(document.getElementById("navigation").children[idx - 1]).position().left - $(document.getElementById("navigation").children[0]).position().left < curr_scroll)
+                    $(document.getElementById("navigation")).scrollLeft($(document.getElementById("navigation").children[idx - 1]).position().left - $(document.getElementById("navigation").children[0]).position().left)
+                currentMetric = document.getElementById("navigation").children[idx - 1].innerText.replace(/ /g, "_");
+                showTab(dict_metrics[currentMetric]);
+                document.getElementById("navigation").children[idx - 1].classList.add("active");
+                document.getElementById("navigation").children[idx].classList.remove("active");
+                document.getElementsByClassName("tab-pane")[idx - 1].classList.add("active", "in");
+                document.getElementsByClassName("tab-pane")[idx].classList.remove("active", "in");
+            }
+        }
+        else if (e.ctrlKey && e.which == 39) {
+            idx = nodes.indexOf(document.getElementById("navigation").getElementsByClassName("active")[0]);
+            if (idx + 1 < document.getElementById("navigation").children.length) {
+                curr_scroll = $(document.getElementById("navigation"))[0].scrollLeft
+                if (document.getElementById("navigation").children[idx + 1].clientWidth + $(document.getElementById("navigation").children[idx + 1]).position().left - $(document.getElementById("navigation").children[0]).position().left > document.getElementById("navigation").clientWidth + curr_scroll)
+                    $(document.getElementById("navigation")).scrollLeft($(document.getElementById("navigation").children[idx + 1]).position().left - $(document.getElementById("navigation").children[0]).position().left)
+                currentMetric = document.getElementById("navigation").children[idx + 1].innerText.replace(/ /g, "_");
+                showTab(dict_metrics[currentMetric]);
+                document.getElementById("navigation").children[idx + 1].classList.add("active");
+                document.getElementById("navigation").children[idx].classList.remove("active");
+                document.getElementsByClassName("tab-pane")[idx + 1].classList.add("active", "in");
+                document.getElementsByClassName("tab-pane")[idx].classList.remove("active", "in");
+            }
+        }
+        else if (e.which == 37) {
+            nextPrev(-1);
+        }
+        else if (e.which == 39) {
+            nextPrev(1);
+        }
+        else if (e.which == 49) {
+            var tab = document.getElementById(currentMetric);
+            var subj_id = tab.getElementsByClassName("tab")[dict_metrics[currentMetric]].id;
+            update_status(document.getElementById(subj_id + "_pass"));
+            qc_saved = false;
+        }
+        else if (e.which == 50) {
+            var tab = document.getElementById(currentMetric);
+            var subj_id = tab.getElementsByClassName("tab")[dict_metrics[currentMetric]].id;
+            update_status(document.getElementById(subj_id + "_warning"));
+            qc_saved = false;
+        }
+        else if (e.which == 51) {
+            var tab = document.getElementById(currentMetric);
+            var subj_id = tab.getElementsByClassName("tab")[dict_metrics[currentMetric]].id;
+            update_status(document.getElementById(subj_id + "_fail"));
+            qc_saved = false;
+        }
+        else if (e.which == 52) {
+            var tab = document.getElementById(currentMetric);
+            var subj_id = tab.getElementsByClassName("tab")[dict_metrics[currentMetric]].id;
+            update_status(document.getElementById(subj_id + "_pending"));
+            qc_saved = false;
+        }
+        else if (e.which == 67) {
+            e.preventDefault();
+            var tab = document.getElementById(currentMetric);
+            var subj_id = tab.getElementsByClassName("tab")[dict_metrics[currentMetric]].id;
+            openForm(document.getElementById(subj_id + "_comment"));
+            document.getElementById(subj_id + "_comments").focus();
+            document.removeEventListener("keydown", shortcut);
+        }
+        else if (e.which == 90) {
+            zoom_activated = !zoom_activated;
+            zoom_f(zoom_activated);
+        }
+        else if (e.which == 72) {
+            help_displayed = !help_displayed;
+            if (help_displayed) {
+                document.getElementById("help").style.display = "block";
+            }
+            else {
+                document.getElementById("help").style.display = "none";
+            }
+        }
+        else if (e.which == 73) {
+            curr_rend = document.getElementsByTagName("body")[0].style["image-rendering"];
+            if (curr_rend == "unset" || curr_rend == "") {
+                document.getElementsByTagName("body")[0].style["image-rendering"] = "optimizespeed"
+            }
+            else {
+                document.getElementsByTagName("body")[0].style["image-rendering"] = "unset"
+            }
         }
     }
-    else if (e.which == 37){
-        nextPrev(-1);
+
+    document.getElementById("help-div").addEventListener("mouseenter", function () {
+        help_displayed = true;
+        document.getElementById("help").style.display = "block";
+    });
+
+    document.getElementById("help-div").addEventListener("mouseleave", function () {
+        help_displayed = false;
+        document.getElementById("help").style.display = "none";
+    });
+
+    function close_comment(e) {
+        if (e.which == 27) {
+            var tab = document.getElementById(currentMetric);
+            var subj_id = tab.getElementsByClassName("tab")[dict_metrics[currentMetric]].id;
+            closeForm(document.getElementById(subj_id + "_comment_box").getElementsByClassName("btn")[0]);
+            document.addEventListener("keydown", shortcut);
+            update_summ_table();
+        }
     }
-    else if (e.which == 39){
-        nextPrev(1);
-    }
-    else if (e.which == 49)
-    {
-        var tab = document.getElementById(currentMetric);
-        var subj_id = tab.getElementsByClassName("tab")[dict_metrics[currentMetric]].id;
-        update_status(document.getElementById(subj_id + "_pass"));
-        qc_saved=false;
-    }
-    else if (e.which == 50)
-    {
-        var tab = document.getElementById(currentMetric);
-        var subj_id = tab.getElementsByClassName("tab")[dict_metrics[currentMetric]].id;
-        update_status(document.getElementById(subj_id + "_warning"));
-        qc_saved=false;
-    }
-    else if (e.which == 51)
-    {
-        var tab = document.getElementById(currentMetric);
-        var subj_id = tab.getElementsByClassName("tab")[dict_metrics[currentMetric]].id;
-        update_status(document.getElementById(subj_id + "_fail"));
-        qc_saved=false;
-    }
-    else if (e.which == 52)
-    {
-        var tab = document.getElementById(currentMetric);
-        var subj_id = tab.getElementsByClassName("tab")[dict_metrics[currentMetric]].id;
-        update_status(document.getElementById(subj_id + "_pending"));
-        qc_saved=false;
-    }
-    else if(e.which == 67)
-    {
-        e.preventDefault();
-        var tab = document.getElementById(currentMetric);
-        var subj_id = tab.getElementsByClassName("tab")[dict_metrics[currentMetric]].id;
-        openForm(document.getElementById(subj_id + "_comment"));
-        document.getElementById(subj_id + "_comments").focus();
+
+    document.addEventListener("keydown", shortcut);
+    document.addEventListener("keydown", close_comment);
+
+    $(".js-dropdown").change(function () {
+        var x = document.getElementById(currentMetric).getElementsByClassName("tab");
+        x[dict_metrics[currentMetric]].style.display = "none";
+        if (x[dict_metrics[currentMetric]].getElementsByClassName("small").length > 0) {
+            x[dict_metrics[currentMetric]].getElementsByClassName("small")[0].removeAttribute("src");
+        }
+        dict_metrics[currentMetric] = document.getElementById(currentMetric).getElementsByClassName('js-dropdown')[0].selectedIndex;
+        showTab(dict_metrics[currentMetric])
+    });
+
+    $(document).on('click', '[data-toggle="lightbox"]', function (event) {
+        event.preventDefault();
+        $(this).ekkoLightbox();
+    });
+
+    $(".dataTable tbody ").on("click", "td.link", function () {
+        t = Array.prototype.slice.call(document.getElementsByClassName('tab-pane'));
+        old_idx = t.indexOf(document.getElementById(currentMetric));
+        currentMetric = this.parentNode.children[0].innerText;
+        var x = document.getElementById(currentMetric).getElementsByClassName("tab");
+        x[dict_metrics[currentMetric]].style.display = "none";
+        search = Array.prototype.slice.call(document.getElementById(currentMetric).children);
+        subj_id = search.indexOf(document.getElementById($(this).text())) - 1
+        dict_metrics[currentMetric] = subj_id;
+        showTab(subj_id)
+        new_idx = t.indexOf(document.getElementById(currentMetric));
+        document.getElementById("navigation").children[new_idx].classList.add("active");
+        document.getElementById("navigation").children[old_idx].classList.remove("active");
+        document.getElementsByClassName("tab-pane")[new_idx].classList.add("active", "in");
+        document.getElementsByClassName("tab-pane")[old_idx].classList.remove("active", "in");
+        document.getElementById(currentMetric).getElementsByClassName('js-dropdown')[0].selectedIndex = dict_metrics[currentMetric];
+        $(document.getElementById(currentMetric).getElementsByClassName('js-dropdown')[0]).trigger("change");
+    });
+
+    $('select').on('select2:opening', function (event) {
         document.removeEventListener("keydown", shortcut);
-    }
-    else if(e.which == 90)
-    {
-        zoom_activated = !zoom_activated;
-        zoom_f(zoom_activated);
-    }
-    else if(e.which == 72)
-    {
-        help_displayed = !help_displayed;
-        if (help_displayed){
-            document.getElementById("help").style.display = "block";
-        }
-        else{
-            document.getElementById("help").style.display = "none";
-        }
-    }
-    else if (e.which == 73){
-        curr_rend = document.getElementsByTagName("body")[0].style["image-rendering"];
-        if (curr_rend == "unset" || curr_rend == "")
-        {
-            document.getElementsByTagName("body")[0].style["image-rendering"] = "optimizespeed"
-        }
-        else{
-            document.getElementsByTagName("body")[0].style["image-rendering"] = "unset"
-        }
-    }
-}
+    });
 
-document.getElementById("help-div").addEventListener("mouseenter", function(){
-    help_displayed = true;
-    document.getElementById("help").style.display = "block";
-});
-
-document.getElementById("help-div").addEventListener("mouseleave", function(){
-    help_displayed = false;
-    document.getElementById("help").style.display = "none";
-});
-
-function close_comment(e){
-    if(e.which == 27)
-    {
-        var tab = document.getElementById(currentMetric);
-        var subj_id = tab.getElementsByClassName("tab")[dict_metrics[currentMetric]].id;
-        closeForm(document.getElementById(subj_id + "_comment_box").getElementsByClassName("btn")[0]);
+    $('select').on('select2:closing', function (event) {
         document.addEventListener("keydown", shortcut);
+    });
+
+    $('textarea').on('focus', function (event) {
+        document.removeEventListener("keydown", shortcut);
+    });
+
+    $('textarea').on('blur', function (event) {
         update_summ_table();
-    }
-}
+        document.addEventListener("keydown", shortcut);
+    });
 
-document.addEventListener("keydown", shortcut);
-document.addEventListener("keydown", close_comment);
+    $('input').on('focus', function (event) {
+        document.removeEventListener("keydown", shortcut);
+    });
 
-$(".js-dropdown").change(function(){
-    var x = document.getElementById(currentMetric).getElementsByClassName("tab");
-    x[dict_metrics[currentMetric]].style.display = "none";
-    if (x[dict_metrics[currentMetric]].getElementsByClassName("small").length > 0){
-        x[dict_metrics[currentMetric]].getElementsByClassName("small")[0].removeAttribute("src");
-    }
-    dict_metrics[currentMetric] = document.getElementById(currentMetric).getElementsByClassName('js-dropdown')[0].selectedIndex;
-    showTab(dict_metrics[currentMetric])
-});
+    $('input').on('blur', function (event) {
+        document.addEventListener("keydown", shortcut);
+    });
 
-$(document).on('click', '[data-toggle="lightbox"]', function(event) {
-    event.preventDefault();
-    $(this).ekkoLightbox();
-});
+    $(".nav-tabs a").click(function () {
+        $(this).tab('show');
+    });
 
-$( ".dataTable tbody " ).on( "click", "td.link", function() {
-    t = Array.prototype.slice.call(document.getElementsByClassName('tab-pane'));
-    old_idx = t.indexOf(document.getElementById(currentMetric));
-    currentMetric = this.parentNode.children[0].innerText;
-    var x = document.getElementById(currentMetric).getElementsByClassName("tab");
-    x[dict_metrics[currentMetric]].style.display = "none";
-    search = Array.prototype.slice.call(document.getElementById(currentMetric).children);
-    subj_id = search.indexOf(document.getElementById($(this).text())) - 1
-    dict_metrics[currentMetric] = subj_id;
-    showTab(subj_id)
-    new_idx = t.indexOf(document.getElementById(currentMetric));
-    document.getElementById("navigation").children[new_idx].classList.add("active");
-    document.getElementById("navigation").children[old_idx].classList.remove("active");
-    document.getElementsByClassName("tab-pane")[new_idx].classList.add("active", "in");
-    document.getElementsByClassName("tab-pane")[old_idx].classList.remove("active", "in");
-    document.getElementById(currentMetric).getElementsByClassName('js-dropdown')[0].selectedIndex = dict_metrics[currentMetric];
-    $(document.getElementById(currentMetric).getElementsByClassName('js-dropdown')[0]).trigger("change");
-});
-
-$('select').on('select2:opening', function( event ) {
-    document.removeEventListener("keydown", shortcut);
-});
-
-$('select').on('select2:closing', function( event ) {
-    document.addEventListener("keydown", shortcut);
-});
-
-$('textarea').on('focus', function( event ) {
-    document.removeEventListener("keydown", shortcut);
-});
-
-$('textarea').on('blur', function( event ) {
-    update_summ_table();
-    document.addEventListener("keydown", shortcut);
-});
-
-$('input').on('focus', function( event ) {
-    document.removeEventListener("keydown", shortcut);
-});
-
-$('input').on('blur', function( event ) {
-    document.addEventListener("keydown", shortcut);
-});
-
-$(".nav-tabs a").click(function(){
-    $(this).tab('show');
-  });
-
-$('#navigation li a').click(function() {
-    currentMetric = this.innerText.replace(/ /g,"_");
-    showTab(dict_metrics[currentMetric]);
-});
+    $('#navigation li a').click(function () {
+        currentMetric = this.innerText.replace(/ /g, "_");
+        showTab(dict_metrics[currentMetric]);
+    });
 
 })
 
@@ -554,16 +538,15 @@ function closeForm(event) {
     var div = document.getElementsByClassName("info")[0];
     div.style.display = "block";
     div.style.opacity = 1;
-    setTimeout(function(){ div.style.display = "none";}, 3000);
-    setTimeout(function(){ div.style.opacity = "0";}, 2000);
+    setTimeout(function () { div.style.display = "none"; }, 3000);
+    setTimeout(function () { div.style.opacity = "0"; }, 2000);
 }
 
 function add_to_box() {
     var tab = document.getElementById(currentMetric);
     var subj_id = tab.getElementsByClassName("tab")[dict_metrics[currentMetric]].id;
-    for (let selected of document.getElementById(subj_id + "_comment_choice").selectedOptions){
-        if (document.getElementById(subj_id + "_comments").value != "")
-        {
+    for (let selected of document.getElementById(subj_id + "_comment_choice").selectedOptions) {
+        if (document.getElementById(subj_id + "_comments").value != "") {
             document.getElementById(subj_id + "_comments").value += "\n"
         }
         document.getElementById(subj_id + "_comments").value += selected.value;
@@ -609,38 +592,38 @@ function showTab(n) {
     counter.style.backgroundColor = "";
     document.getElementById("curr_subj").style.backgroundColor = "";
 
-    if (tab.id != "Summary" && tab.id != "Dashboard"){
+    if (tab.id != "Summary" && tab.id != "Dashboard") {
         curr_subj.innerText = "Current subject: " + x[n].id;
         counter.innerText = (n + 1) + "/" + x.length;
         counter.style.backgroundColor = "#19568b";
-        if (document.getElementById(x[n].id + "_status").innerText != "Pending"){
+        if (document.getElementById(x[n].id + "_status").innerText != "Pending") {
             document.getElementById("curr_subj").style.backgroundColor = document.getElementById(x[n].id + "_status").style.backgroundColor;
         }
-        else{
+        else {
             document.getElementById("curr_subj").style.backgroundColor = "grey";
         }
 
-        if (x[n].getElementsByClassName("small").length > 0){
+        if (x[n].getElementsByClassName("small").length > 0) {
             var img = x[n].getElementsByClassName("small")[0];
 
             img.src = img.getAttribute('data-src');
 
-            img.onload = function(){
+            img.onload = function () {
                 max_h = parseInt(img.style.maxHeight.replace("px", ''));
                 max_w = parseInt(img.style.maxWidth.replace("px", ''));
                 height_diff = max_h - this.height;
                 width_diff = max_w - this.width;
                 ratio_height = height_diff / this.height;
                 ratio_width = width_diff / this.width;
-                if (this.width + ratio_height * this.width <= max_w && this.height + ratio_height * this.height <= max_h){
+                if (this.width + ratio_height * this.width <= max_w && this.height + ratio_height * this.height <= max_h) {
                     this.width = this.width + ratio_height * this.width;
                     this.height = this.height + ratio_height * this.height;
                 }
-                else if(this.width + ratio_width * this.width <= max_w && this.height + ratio_width * this.height <= max_h){
+                else if (this.width + ratio_width * this.width <= max_w && this.height + ratio_width * this.height <= max_h) {
                     this.width = this.width + ratio_width * this.width;
                     this.height = this.height + ratio_width * this.height;
                 }
-                else{
+                else {
                     console.log("ERROR");
                 }
             }
@@ -657,14 +640,13 @@ function showTab(n) {
             tab.getElementsByTagName("button")[1].disabled = false;
         }
     }
-    else if (tab.id == "Summary")
-    {
+    else if (tab.id == "Summary") {
         data = []
-        report = {"type": "report", "data": []};
-        for (let metrics of document.getElementsByClassName("tab-pane")){
-            if (metrics.id != "Dashboard"){
-                for (let subject of metrics.getElementsByClassName("tab")){
-                    if (document.getElementById(subject.id + "_status")){
+        report = { "type": "report", "data": [] };
+        for (let metrics of document.getElementsByClassName("tab-pane")) {
+            if (metrics.id != "Dashboard") {
+                for (let subject of metrics.getElementsByClassName("tab")) {
+                    if (document.getElementById(subject.id + "_status")) {
                         data.push([metrics.id, subject.id, document.getElementById(subject.id + "_status").innerText, document.getElementById(subject.id + "_comments").value])
                     }
                 }
@@ -681,13 +663,13 @@ function nextPrev(n) {
     var x = document.getElementById(currentMetric).getElementsByClassName("tab");
     // Increase or decrease the current tab by 1:
     if (dict_metrics[currentMetric] + n >= x.length || dict_metrics[currentMetric] + n < 0) {
-    // ... the form gets submitted:
-    return false;
+        // ... the form gets submitted:
+        return false;
     }
 
     // Hide the current tab:
     x[dict_metrics[currentMetric]].style.display = "none";
-    if (x[dict_metrics[currentMetric]].getElementsByClassName("small").length > 0){
+    if (x[dict_metrics[currentMetric]].getElementsByClassName("small").length > 0) {
         x[dict_metrics[currentMetric]].getElementsByClassName("small")[0].removeAttribute("src");
     }
     dict_metrics[currentMetric] = dict_metrics[currentMetric] + n;
@@ -716,31 +698,31 @@ function doMouseWheel(event) {
 }
 
 function update_status(object) {
-    document.getElementById(object.name+"_status").innerText = object.innerText;
-    document.getElementById(object.name+"_status").style.backgroundColor = object.style.backgroundColor;
-    if (object.innerText != "Pending"){
+    document.getElementById(object.name + "_status").innerText = object.innerText;
+    document.getElementById(object.name + "_status").style.backgroundColor = object.style.backgroundColor;
+    if (object.innerText != "Pending") {
         document.getElementById("curr_subj").style.backgroundColor = object.style.backgroundColor;
     }
-    else{
+    else {
         document.getElementById("curr_subj").style.backgroundColor = "grey";
     }
-    qc_saved=false;
-    copy = document.getElementById(object.name+"_status").cloneNode(true);
+    qc_saved = false;
+    copy = document.getElementById(object.name + "_status").cloneNode(true);
     copy.removeAttribute("id");
 }
 
-function load_qc(){
-    color_dict = {"Pass": "green", "Warning": "orange", "Fail": "red", "Pending": "grey"};
+function load_qc() {
+    color_dict = { "Pass": "green", "Warning": "orange", "Fail": "red", "Pending": "grey" };
     var selectedFile = document.getElementById('load_file').files[0];
     var reader = new FileReader();
     var x = document.getElementById(currentMetric).getElementsByClassName("tab");
     x[dict_metrics[currentMetric]].style.display = "none";
     test = []
-    reader.onload = function(event) {
+    reader.onload = function (event) {
         let importedJSON = JSON.parse(event.target.result);
-        for (let dict_idx in importedJSON){
-            if (importedJSON[dict_idx]["type"] == "report"){
-                for (let data_idx in importedJSON[dict_idx]["data"]){
+        for (let dict_idx in importedJSON) {
+            if (importedJSON[dict_idx]["type"] == "report") {
+                for (let data_idx in importedJSON[dict_idx]["data"]) {
                     filename = importedJSON[dict_idx]["data"][data_idx]["filename"];
                     status = importedJSON[dict_idx]["data"][data_idx]["status"];
                     comments = importedJSON[dict_idx]["data"][data_idx]["comments"];
@@ -751,20 +733,17 @@ function load_qc(){
                     document.getElementById(filename + "_status").style.backgroundColor = color_dict[status.trim()];
                 }
             }
-            else if (importedJSON[dict_idx]["type"] == "settings")
-            {
-                if (importedJSON[dict_idx]["username"] != null)
-                {
+            else if (importedJSON[dict_idx]["type"] == "settings") {
+                if (importedJSON[dict_idx]["username"] != null) {
                     person = importedJSON[dict_idx]["username"];
                     document.getElementById("username").innerText = "Username: " + person;
                 }
 
-                if (importedJSON[dict_idx]["date"] != null)
-                {
+                if (importedJSON[dict_idx]["date"] != null) {
                     datetime = importedJSON[dict_idx]["date"];
                     document.getElementById("datetime").innerText = "Last save: " + datetime;
                 }
-                for (let data_idx in importedJSON[dict_idx]["data"]){
+                for (let data_idx in importedJSON[dict_idx]["data"]) {
                     name = importedJSON[dict_idx]["data"][data_idx]["tab_name"];
                     idx = importedJSON[dict_idx]["data"][data_idx]["tab_index"];
                     dict_metrics[name] = idx;
@@ -778,41 +757,39 @@ function load_qc(){
     reader.readAsText(selectedFile);
 }
 
-function save_qc(){
+function save_qc() {
     data = [];
-    settings = {"type": "settings", "data": [], "username": "", "date": ""};
-    if (person == null)
-    {
+    settings = { "type": "settings", "data": [], "username": "", "date": "" };
+    if (person == null) {
         person = "";
     }
-    if (person != null)
-    {
+    if (person != null) {
         person = prompt("Please enter your name", person);
     }
     while (person == "") {
-      person = prompt("Please enter your name");
+        person = prompt("Please enter your name");
     }
-    if (person != null){
+    if (person != null) {
         var currentdate = new Date();
         var datetime = String(currentdate.getDate()).padStart(2, "0") + "/"
-                        + String(currentdate.getMonth() + 1).padStart(2, "0") + "/"
-                        + currentdate.getFullYear() + " @ "
-                        + currentdate.getHours() + ":"
-                        + currentdate.getMinutes() + ":"
-                        + currentdate.getSeconds();
+            + String(currentdate.getMonth() + 1).padStart(2, "0") + "/"
+            + currentdate.getFullYear() + " @ "
+            + currentdate.getHours() + ":"
+            + currentdate.getMinutes() + ":"
+            + currentdate.getSeconds();
         settings["date"] = datetime;
         settings["username"] = person;
         document.getElementById("username").innerText = "Username: " + person;
         document.getElementById("datetime").innerText = "Last save: " + datetime;
-        report = {"type": "report", "data": []};
-        for (let metrics of document.getElementsByClassName("tab-pane")){
-            if (metrics.id != "Dashboard"){
+        report = { "type": "report", "data": [] };
+        for (let metrics of document.getElementsByClassName("tab-pane")) {
+            if (metrics.id != "Dashboard") {
                 curr_tab = {};
                 curr_tab["tab_name"] = metrics.id;
                 curr_tab["tab_index"] = dict_metrics[metrics.id];
                 settings["data"].push(curr_tab);
-                for (let subject of metrics.getElementsByClassName("tab")){
-                    if (document.getElementById(subject.id + "_status")){
+                for (let subject of metrics.getElementsByClassName("tab")) {
+                    if (document.getElementById(subject.id + "_status")) {
                         curr_subj = {};
                         curr_subj["qc"] = metrics.id;
                         curr_subj["status"] = document.getElementById(subject.id + "_status").innerText;
@@ -827,19 +804,18 @@ function save_qc(){
         data.push(settings);
         data.push(report);
         var jsons = JSON.stringify(data);
-        var blob = new Blob([jsons], {type: "application/json"});
+        var blob = new Blob([jsons], { type: "application/json" });
         file = get_filename(person)
         saveAs(blob, file + ".json");
         qc_saved = true;
     }
 }
 
-function get_person()
-{
+function get_person() {
     return person;
 }
 
-function get_filename(person){
+function get_filename(person) {
     var currentdate = new Date();
     var date = currentdate.getFullYear().toString() + String(currentdate.getMonth() + 1).padStart(2, "0") + String(currentdate.getDate()).padStart(2, "0");
     var loc = window.location.pathname;
@@ -848,8 +824,8 @@ function get_filename(person){
     return date + "_" + person.replace(" ", "_") + "_" + dir;
 }
 
-function comment_update(){
-    qc_saved=false;
+function comment_update() {
+    qc_saved = false;
 }
 
 window.onbeforeunload = function (e) {
