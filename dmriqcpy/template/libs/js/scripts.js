@@ -438,31 +438,40 @@ $(document).ready(function () {
             }
         }
         else if (e.key == "n") {// Add previous and next frame id in video. Shit by step of 100ms
-            const video = $("video").filter(function (k, el) { return !$(el).is(":hidden"); })[0];
-            video.pause();
-            video.currentTime = roundTime(video.currentTime) + 0.1;
-            if (video.currentTime > video.duration) {
-                video.currentTime = 0;
+            const videos = $("video").filter(function (k, el) { return !$(el).is(":hidden"); });
+            if (videos.length > 0) {
+                const video = videos[0];
+                video.pause();
+                video.currentTime = roundTime(video.currentTime) + 0.1;
+                if (video.currentTime > video.duration) {
+                    video.currentTime = 0;
+                }
             }
         }
         else if (e.key == "p") {
-            const video = $("video").filter(function (k, el) { return !$(el).is(":hidden"); })[0];
-            video.pause();
-            if (video.currentTime - 0.1 < 0) {
-                video.currentTime = video.duration - 0.01;
-            }
-            else {
-                video.currentTime = roundTime(video.currentTime) - 0.1;
+            const videos = $("video").filter(function (k, el) { return !$(el).is(":hidden"); });
+            if (videos.length > 0) {
+                const video = videos[0];
+                video.pause();
+                if (video.currentTime - 0.1 < 0) {
+                    video.currentTime = video.duration - 0.01;
+                }
+                else {
+                    video.currentTime = roundTime(video.currentTime) - 0.1;
+                }
             }
         }
         else if (e.key == " ") {
             e.preventDefault();
-            const video = $("video").filter(function (k, el) { return !$(el).is(":hidden"); })[0];
-            if (video.paused) {
-                video.play();
-            }
-            else {
-                video.pause();
+            const videos = $("video").filter(function (k, el) { return !$(el).is(":hidden"); });
+            if (videos.length > 0) {
+                const video = videos[0];
+                if (video.paused) {
+                    video.play();
+                }
+                else {
+                    video.pause();
+                }
             }
         }
     }
