@@ -343,8 +343,13 @@ $(document).ready(function () {
         }
     }
 
+    function roundTime(time) {
+        const offsettime = time * 10;
+        return Math.round(offsettime) / 10;
+    }
+
     function shortcut(e) {
-        if (e.ctrlKey && e.which == 37) {
+        if (e.ctrlKey && e.key == "ArrowLeft") {
             idx = nodes.indexOf(document.getElementById("navigation").getElementsByClassName("active")[0]);
             if (idx - 1 >= 0) {
                 curr_scroll = $(document.getElementById("navigation"))[0].scrollLeft
@@ -358,7 +363,7 @@ $(document).ready(function () {
                 document.getElementsByClassName("tab-pane")[idx].classList.remove("active", "in");
             }
         }
-        else if (e.ctrlKey && e.which == 39) {
+        else if (e.ctrlKey && e.key == "ArrowRight") {
             idx = nodes.indexOf(document.getElementById("navigation").getElementsByClassName("active")[0]);
             if (idx + 1 < document.getElementById("navigation").children.length) {
                 curr_scroll = $(document.getElementById("navigation"))[0].scrollLeft
@@ -372,37 +377,37 @@ $(document).ready(function () {
                 document.getElementsByClassName("tab-pane")[idx].classList.remove("active", "in");
             }
         }
-        else if (e.which == 37) {
+        else if (e.key == "ArrowLeft") {
             nextPrev(-1);
         }
-        else if (e.which == 39) {
+        else if (e.key == "ArrowRight") {
             nextPrev(1);
         }
-        else if (e.which == 49) {
+        else if (e.key == "1") {
             var tab = document.getElementById(currentMetric);
             var subj_id = tab.getElementsByClassName("tab")[dict_metrics[currentMetric]].id;
             update_status(document.getElementById(subj_id + "_pass"));
             qc_saved = false;
         }
-        else if (e.which == 50) {
+        else if (e.key == "2") {
             var tab = document.getElementById(currentMetric);
             var subj_id = tab.getElementsByClassName("tab")[dict_metrics[currentMetric]].id;
             update_status(document.getElementById(subj_id + "_warning"));
             qc_saved = false;
         }
-        else if (e.which == 51) {
+        else if (e.key == "3") {
             var tab = document.getElementById(currentMetric);
             var subj_id = tab.getElementsByClassName("tab")[dict_metrics[currentMetric]].id;
             update_status(document.getElementById(subj_id + "_fail"));
             qc_saved = false;
         }
-        else if (e.which == 52) {
+        else if (e.key == "4") {
             var tab = document.getElementById(currentMetric);
             var subj_id = tab.getElementsByClassName("tab")[dict_metrics[currentMetric]].id;
             update_status(document.getElementById(subj_id + "_pending"));
             qc_saved = false;
         }
-        else if (e.which == 67) {
+        else if (e.key == "c") {
             e.preventDefault();
             var tab = document.getElementById(currentMetric);
             var subj_id = tab.getElementsByClassName("tab")[dict_metrics[currentMetric]].id;
@@ -410,11 +415,11 @@ $(document).ready(function () {
             document.getElementById(subj_id + "_comments").focus();
             document.removeEventListener("keydown", shortcut);
         }
-        else if (e.which == 90) {
+        else if (e.key == "z") {
             zoom_activated = !zoom_activated;
             zoom_f(zoom_activated);
         }
-        else if (e.which == 72) {
+        else if (e.key == "h") {
             help_displayed = !help_displayed;
             if (help_displayed) {
                 document.getElementById("help").style.display = "block";
@@ -423,13 +428,50 @@ $(document).ready(function () {
                 document.getElementById("help").style.display = "none";
             }
         }
-        else if (e.which == 73) {
+        else if (e.key == "i") {
             curr_rend = document.getElementsByTagName("body")[0].style["image-rendering"];
             if (curr_rend == "unset" || curr_rend == "") {
                 document.getElementsByTagName("body")[0].style["image-rendering"] = "optimizespeed"
             }
             else {
                 document.getElementsByTagName("body")[0].style["image-rendering"] = "unset"
+            }
+        }
+        else if (e.key == "n") {// Add previous and next frame id in video. Shit by step of 100ms
+            const videos = $("video").filter(function (k, el) { return !$(el).is(":hidden"); });
+            if (videos.length > 0) {
+                const video = videos[0];
+                video.pause();
+                video.currentTime = roundTime(video.currentTime) + 0.1;
+                if (video.currentTime > video.duration) {
+                    video.currentTime = 0;
+                }
+            }
+        }
+        else if (e.key == "p") {
+            const videos = $("video").filter(function (k, el) { return !$(el).is(":hidden"); });
+            if (videos.length > 0) {
+                const video = videos[0];
+                video.pause();
+                if (video.currentTime - 0.1 < 0) {
+                    video.currentTime = video.duration - 0.01;
+                }
+                else {
+                    video.currentTime = roundTime(video.currentTime) - 0.1;
+                }
+            }
+        }
+        else if (e.key == " ") {
+            e.preventDefault();
+            const videos = $("video").filter(function (k, el) { return !$(el).is(":hidden"); });
+            if (videos.length > 0) {
+                const video = videos[0];
+                if (video.paused) {
+                    video.play();
+                }
+                else {
+                    video.pause();
+                }
             }
         }
     }
@@ -445,7 +487,7 @@ $(document).ready(function () {
     });
 
     function close_comment(e) {
-        if (e.which == 27) {
+        if (e.key == "Escape") {
             var tab = document.getElementById(currentMetric);
             var subj_id = tab.getElementsByClassName("tab")[dict_metrics[currentMetric]].id;
             closeForm(document.getElementById(subj_id + "_comment_box").getElementsByClassName("btn")[0]);
@@ -525,6 +567,28 @@ $(document).ready(function () {
         showTab(dict_metrics[currentMetric]);
     });
 
+    const config = { attributes: true };
+    function videos_observer(k, v) {
+        const observer = new MutationObserver(function (mutations) {
+            const videos = $(mutations[0]["target"]).find("video");
+            if (videos.length == 0) {
+                return;
+            }
+            videos.each(function (k, el) {
+                if ($(el).is(":hidden")) {
+                    el.pause();
+                }
+                else if (el.paused) {
+                    el.play();
+                }
+                el.currentTime = 0;
+            });
+        });
+        observer.observe(v, config);
+    };
+
+    $(".tab").each(videos_observer);
+    $("#main").children().slice(1).each(videos_observer);
 })
 
 function openForm(event) {
