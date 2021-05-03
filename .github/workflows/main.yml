@@ -3,7 +3,7 @@ name: Build Docker and Singularity
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   Build_Docker:
