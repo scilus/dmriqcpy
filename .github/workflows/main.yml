@@ -14,14 +14,14 @@ jobs:
     - uses: actions/checkout@v1
       name: Clone Docker
       with:
-        repository: scilus/docker-dmriqc
+        repository: scilus/containers-dmriqc
         ref: master
     - uses: mr-smithers-excellent/docker-build-push@v3.1
       name: Docker Build & Push
       with:
-        image: scilus/dmriqc_flow
+        image: scilus/dmriqcpy
         tag: latest
-        dockerfile: /home/runner/work/dmriqcpy/docker-dmriqc/Dockerfile
+        dockerfile: /home/runner/work/dmriqcpy/containers-dmriqc/Dockerfile
         registry: docker.io
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
