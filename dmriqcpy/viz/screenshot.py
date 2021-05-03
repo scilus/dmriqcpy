@@ -253,7 +253,7 @@ def screenshot_mosaic(data, skip, pad, nb_columns, axis, cmap):
             draw = ImageDraw.Draw(imgs_comb)
             fnt = ImageFont.truetype(
                 '/usr/share/fonts/truetype/freefont/FreeSans.ttf', 40)
-            draw.text([0, 0], str(i) + "/" + str(len(mosaic.shape[2])),
+            draw.text([0, 0], str(i) + "/" + str(mosaic.shape[2]),
                       fill=255, font=fnt)
 
             gif.append(imgs_comb.convert("RGB"))

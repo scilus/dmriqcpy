@@ -1,6 +1,9 @@
 name: Build Docker and Singularity
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   Build_Docker:
@@ -11,12 +14,12 @@ jobs:
     - uses: actions/checkout@v1
       name: Clone Docker
       with:
-        repository: GuillaumeTh/docker-dmriqc
+        repository: scilus/docker-dmriqc
         ref: master
     - uses: mr-smithers-excellent/docker-build-push@v3.1
       name: Docker Build & Push
       with:
-        image: guillaumeth/docker-dmriqc
+        image: scilus/dmriqc_flow
         tag: latest
         dockerfile: /home/runner/work/dmriqcpy/docker-dmriqc/Dockerfile
         registry: docker.io
