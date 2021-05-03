@@ -57,7 +57,8 @@ class Report():
                                           'nb_warnings': NUMBER_OF_SUBJECTS}
         """
 
-        copytree(join(self.path, "../template/libs"), "libs")
+        copytree(join(self.path, "../template/libs"), "libs",
+                 copy_function=copy)
 
         with open(self.report_name, 'w') as out_file:
             template = self.env.get_template('template.html')
