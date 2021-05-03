@@ -3,7 +3,7 @@ name: Build Docker and Singularity
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   Build_Docker:
@@ -14,14 +14,14 @@ jobs:
     - uses: actions/checkout@v1
       name: Clone Docker
       with:
-        repository: scilus/docker-dmriqc
+        repository: scilus/containers-dmriqc
         ref: master
     - uses: mr-smithers-excellent/docker-build-push@v3.1
       name: Docker Build & Push
       with:
-        image: scilus/dmriqc_flow
+        image: scilus/dmriqcpy
         tag: latest
-        dockerfile: /home/runner/work/dmriqcpy/docker-dmriqc/Dockerfile
+        dockerfile: /home/runner/work/dmriqcpy/containers-dmriqc/Dockerfile
         registry: docker.io
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
@@ -35,7 +35,7 @@ jobs:
     - uses: actions/checkout@v1
       name: Clone Singularity
       with:
-        repository: GuillaumeTh/singularity-dmriqc
+        repository: scilus/containers-dmriqc
         ref: master
     - name: Install and build Singularity
       run: |
@@ -45,7 +45,7 @@ jobs:
         sudo apt-get install -y singularity-container
         mkdir singularity_dmriqc_build
         curr_date=$(date "+%Y%m%d")
-        sudo singularity build singularity_dmriqc_build/singularity_dmriqc_${curr_date}_${GITHUB_SHA}.img /home/runner/work/dmriqcpy/singularity-dmriqc/singularity_dmriqcpy.def
+        sudo singularity build singularity_dmriqc_build/singularity_dmriqc_${curr_date}_${GITHUB_SHA}.img /home/runner/work/dmriqcpy/containers-dmriqc/singularity_dmriqc.def
 
     - uses: actions/upload-artifact@v1
       name: Push Singularity
