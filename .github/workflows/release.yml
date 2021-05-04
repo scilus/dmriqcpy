@@ -1,0 +1,60 @@
+on:
+  release:
+    types: [created]
+
+name: Release container
+
+jobs:
+  Build_Docker:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+        name: Clone Docker
+        with:
+          repository: scilus/containers-dmriqc
+          ref: master
+      - uses: mr-smithers-excellent/docker-build-push@v5
+        name: Docker Build & Push
+        with:
+          image: scilus/dmriqcpy
+          tags: ${{ github.event.release.tag_name }}, latest
+          dockerfile: /home/runner/work/dmriqcpy/containers-dmriqc/Dockerfile
+          registry: docker.io
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+  Build_Singularity:
+    needs: Build_Docker
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+        name: Clone Singularity
+        with:
+          repository: scilus/containers-dmriqc
+          ref: master
+      - name: Install and build Singularity
+        run: |
+          sudo wget -O- http://neuro.debian.net/lists/xenial.us-ca.full | sudo tee /etc/apt/sources.list.d/neurodebian.sources.list
+          sudo apt-key adv --recv-keys --keyserver pool.sks-keyservers.net 2649A5A9 || { sudo wget -q -O- http://neuro.debian.net/_static/neuro.debian.net.asc | sudo apt-key add -; }
+          sudo apt-get update
+          sudo apt-get install -y singularity-container
+          mkdir singularity_dmriqc_build
+          sudo singularity build singularity_dmriqc_build/singularity_dmriqc_${{ github.event.release.tag_name }}.img /home/runner/work/dmriqcpy/containers-dmriqc/singularity_dmriqc.def
+      - name: Get release
+        id: get_release
+        uses: bruceadams/get-release@v1.2.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.get_release.outputs.upload_url }}
+          asset_path: singularity_dmriqc_build/singularity_dmriqc_${{ github.event.release.tag_name }}.img
+          asset_name: singularity_dmriqc_${{ github.event.release.tag_name }}.img
+          asset_content_type: application
