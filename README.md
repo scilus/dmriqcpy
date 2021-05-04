@@ -1,6 +1,8 @@
-[![Build Status](https://travis-ci.org/GuillaumeTh/dmriqcpy.svg?branch=master)](https://travis-ci.org/GuillaumeTh/dmriqcpy)
-
 # dMRIqcpy
+[![Build Docker and Singularity](https://github.com/scilus/dmriqcpy/actions/workflows/main.yml/badge.svg)](https://github.com/scilus/dmriqcpy/actions/workflows/main.yml)
+[![Release container](https://github.com/scilus/dmriqcpy/actions/workflows/release.yml/badge.svg)](https://github.com/scilus/dmriqcpy/actions/workflows/release.yml)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/scilus/dmriqcpy)](https://github.com/scilus/dmriqcpy/releases)
+
 Diffusion MRI Quality Check in python
 
 To install dmriqcpy, run the following command: 

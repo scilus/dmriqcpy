@@ -2,7 +2,7 @@ on:
   release:
     types: [created]
 
-name: Upload Release Asset
+name: Release container
 
 jobs:
   Build_Docker:
