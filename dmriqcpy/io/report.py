@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from os.path import dirname, join, realpath
-from shutil import copytree
+from shutil import copytree, copy
 
 from jinja2 import Environment, FileSystemLoader
 
