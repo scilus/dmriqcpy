@@ -437,7 +437,9 @@ def screenshot_tracking(tracking, t1, directory="."):
     img_center = [(int(t1_data.shape[0] / 2) + 5, None, None),
                   (None, int(t1_data.shape[1] / 2), None),
                   (None, None, int(t1_data.shape[2] / 2))]
-    center = [(330, 90, 60), (70, 330, 60), (70, 90, 400)]
+    center = [(img_center[0][0] - 350, img_center[1][1], img_center[2][2]),
+              (img_center[0][0], img_center[1][1] + 350, img_center[2][2]),
+              (img_center[0][0], img_center[1][1], img_center[2][2] + 350)]
     viewup = [(0, 0, -1), (0, 0, -1), (0, -1, 0)]
     size = (1920, 1080)
 
