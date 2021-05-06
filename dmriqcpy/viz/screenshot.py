@@ -375,7 +375,7 @@ def screenshot_fa_peaks(fa, peaks, directory='.'):
         peak_actor.display(slice_display[j][0], slice_display[j][1],
                            slice_display[j][2])
 
-        renderer = window.ren()
+        renderer = window.Scene()
 
         renderer.add(slice_actor)
         renderer.add(peak_actor)
@@ -463,7 +463,7 @@ def screenshot_tracking(tracking, t1, directory="."):
                     upper = len(stream) - 1
                 streamlines.append(stream[lower:upper])
 
-        ren = window.Renderer()
+        ren = window.Scene()
 
         streamline_actor = actor.line(streamlines, linewidth=0.2)
         ren.add(streamline_actor)
@@ -498,7 +498,7 @@ def screenshot_tracking(tracking, t1, directory="."):
         it += 1
         streamlines.append(streamline.streamline)
 
-    ren = window.Renderer()
+    ren = window.Scene()
     streamline_actor = actor.streamtube(streamlines, linewidth=0.2)
     ren.add(streamline_actor)
     camera = ren.GetActiveCamera()
@@ -551,7 +551,7 @@ def plot_proj_shell(ms, centroids, use_sym=True, use_sphere=True,
         vtkcolors = fury.colormap.distinguishable_colormap(nb_colors=len(ms))
     radius = np.interp(centroids, xp=[min(centroids), max(centroids)],
                        fp=[0, 1])
-    ren = window.Renderer()
+    ren = window.Scene()
     ren.SetBackground(1, 1, 1)
     if use_sphere:
         sphere = get_sphere('symmetric724')
