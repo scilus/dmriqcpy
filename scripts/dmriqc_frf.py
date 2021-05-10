@@ -40,7 +40,7 @@ def main():
     args = parser.parse_args()
 
     assert_inputs_exist(parser, args.frf)
-    assert_outputs_exist(parser, args, [args.output_report, libs"])
+    assert_outputs_exist(parser, args, [args.output_report, "libs"])
 
     if os.path.exists("libs"):
         shutil.rmtree("libs")
