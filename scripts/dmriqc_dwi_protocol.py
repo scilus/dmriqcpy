@@ -9,11 +9,12 @@ import numpy as np
 from scilpy.utils.bvec_bval_tools import identify_shells
 from scilpy.viz.gradient_sampling import build_ms_from_shell_idx
 
-from dmriqcpy.analysis.utils import dwi_protocol
+from dmriqcpy.analysis.utils import dwi_protocol, read_protocol
 from dmriqcpy.io.report import Report
 from dmriqcpy.io.utils import (add_overwrite_arg, assert_inputs_exist,
                                assert_outputs_exist)
-from dmriqcpy.viz.graph import (graph_directions_per_shells, graph_dwi_protocol,
+from dmriqcpy.viz.graph import (graph_directions_per_shells,
+                                graph_dwi_protocol,
                                 graph_subjects_per_shells)
 from dmriqcpy.viz.screenshot import plot_proj_shell
 from dmriqcpy.viz.utils import analyse_qa, dataframe_to_html
@@ -36,6 +37,14 @@ def _build_arg_parser():
     p.add_argument('--bvec', nargs='+', required=True,
                    help='List of bvec files.')
 
+    p.add_argument('--metadata', nargs='+',
+                   default='None',
+                   help='Json files to get the metadata.')
+
+    p.add_argument('--tags', nargs='+',
+                   default=["EchoTime", "RepetitionTime", "SliceThickness"],
+                   help='DICOM tags used to compare information.')
+
     p.add_argument('--tolerance', '-t',
                    metavar='INT', type=int, default=20,
                    help='The tolerated gap between the b-values to '
@@ -52,6 +61,12 @@ def main():
 
     if not len(args.bval) == len(args.bvec):
         parser.error("Not the same number of images in input.")
+
+    if args.metadata is not None:
+        if not len(args.metadata) == len(args.bval):
+            parser.error("Not the same number of images in input.")
+        else:
+            stats_tags = read_protocol(args.metadata, args.tags)
 
     all_data = np.concatenate([args.bval,
                                args.bvec])
@@ -78,6 +93,9 @@ def main():
     summary_dict = {}
     summary_dict[name] = stats_html
 
+    for curr_tag in stats_tags:
+        summary_dict[curr_tag[0]] = dataframe_to_html(curr_tag[1], index=False)
+
     graphs = []
     graphs.append(
         graph_directions_per_shells("Nbr directions per shell", shells))
@@ -101,7 +119,8 @@ def main():
                         ofile=os.path.join("data", name + filename),
                         ores=(800, 800))
         subjects_dict[bval]['screenshot'] = os.path.join("data",
-                                                         name + filename + '.png')
+                                                         name + filename +
+                                                         '.png')
     metrics_dict = {}
     for subj in args.bval:
         summary_html = dataframe_to_html(summary[subj])

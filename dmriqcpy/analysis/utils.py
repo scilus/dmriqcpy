@@ -27,12 +27,48 @@ def get_nearest_bval(bvals, curr_bval, tol=20):
 
 
     """
-    indices = np.where(np.logical_and(bvals <= curr_bval + tol, bvals >= curr_bval - tol))[0]
+    indices = np.where(np.logical_and(bvals <= curr_bval + tol,
+                                      bvals >= curr_bval - tol))[0]
     if len(indices) > 0:
         bval = bvals[indices[0]]
     else:
         bval = curr_bval
     return bval
+
+
+def read_protocol(in_jsons, tags):
+    """
+    Return dwi protocol for each subject
+
+    Parameters
+    ----------
+    in_json : List
+        List of jsons files
+    tags: List
+        List of tags to check
+
+    Returns
+    -------
+
+    """
+    dfs = []
+    for in_json in in_jsons:
+        data = pd.read_json(in_json, orient='index')
+        dfs.append(data.T)
+
+    temp = pd.concat(dfs, ignore_index=True)
+
+    dfs = []
+    for tag in tags:
+        if tag in temp.columns:
+            ts = temp.groupby(tag)[tag].count()
+            tdf = pd.DataFrame(ts)
+            tdf = tdf.rename(columns={tag: "Number of subjects"})
+            tdf.reset_index(inplace=True)
+            tdf = tdf.rename(columns={tag: "Value(s)"})
+            dfs.append((tag, tdf))
+
+    return dfs
 
 
 def dwi_protocol(bvals, tol=20):
@@ -73,7 +109,6 @@ def dwi_protocol(bvals, tol=20):
             nb_directions = len(shells_indices[shells_indices ==
                                                np.where(centroids == centroid)[
                                                    0]])
-            print(centroid, nb_directions)
             if filename not in shells[np.int(nearest_centroid)]:
                 shells[np.int(nearest_centroid)][filename] = 0
             shells[np.int(nearest_centroid)][filename] += nb_directions
