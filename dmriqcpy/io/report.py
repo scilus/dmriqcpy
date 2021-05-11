@@ -24,6 +24,7 @@ class Report():
             join(self.path, "../template")))
 
         self.report_name = report_name
+        self.out_dir = dirname(report_name)
         if ".html" not in self.report_name:
             self.report_name += ".html"
 
@@ -57,8 +58,8 @@ class Report():
                                           'nb_warnings': NUMBER_OF_SUBJECTS}
         """
 
-        copytree(join(self.path, "../template/libs"), "libs",
-                 copy_function=copy)
+        copytree(join(self.path, "../template/libs"),
+                 join(self.out_dir, "libs"))
 
         with open(self.report_name, 'w') as out_file:
             template = self.env.get_template('template.html')
