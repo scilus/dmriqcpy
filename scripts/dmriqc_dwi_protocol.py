@@ -42,7 +42,8 @@ def _build_arg_parser():
                    help='Json files to get the metadata.')
 
     p.add_argument('--tags', nargs='+',
-                   default=["EchoTime", "RepetitionTime", "SliceThickness"],
+                   default=["EchoTime", "RepetitionTime", "SliceThickness",
+                   "Manufacturer", "ManufacturersModelName"],
                    help='DICOM tags used to compare information.')
 
     p.add_argument('--tolerance', '-t',
@@ -64,6 +65,9 @@ def main():
 
     if args.metadata is not None:
         if not len(args.metadata) == len(args.bval):
+            print('Number of metadata files: {}.\n'
+                  'Number of bval files: {}.'.format(len(args.metadata),
+                                                  len(args.bval)))
             parser.error("Not the same number of images in input.")
         else:
             stats_tags = read_protocol(args.metadata, args.tags)
