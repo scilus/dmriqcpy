@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-
 import numpy as np
+import os
 import pandas as pd
 
 from scilpy.utils.bvec_bval_tools import identify_shells
@@ -57,7 +57,7 @@ def read_protocol(in_jsons, tags):
         dfs.append(data.T)
 
     temp = pd.concat(dfs, ignore_index=True)
-
+    index = [os.path.basename(item).split('.')[0] for item in in_jsons]
     dfs = []
     for tag in tags:
         if tag in temp.columns:
@@ -66,9 +66,17 @@ def read_protocol(in_jsons, tags):
             tdf = tdf.rename(columns={tag: "Number of subjects"})
             tdf.reset_index(inplace=True)
             tdf = tdf.rename(columns={tag: "Value(s)"})
-            tdf = tdf.sort_values(by=['Number of subjects'],
+            print(tdf)
+            tdf = tdf.sort_values(by=['Value(s)'],
                                   ascending=False)
+            print(tdf)
             dfs.append((tag, tdf))
+
+            t = temp[tag]
+            t.index = index
+            tdf = pd.DataFrame(t)
+
+            dfs.append(('complete_' + tag, tdf))
 
     return dfs
 

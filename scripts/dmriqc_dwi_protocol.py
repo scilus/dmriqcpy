@@ -72,6 +72,7 @@ def main():
         else:
             stats_tags = read_protocol(args.metadata, args.tags)
 
+
     all_data = np.concatenate([args.bval,
                                args.bvec])
     assert_inputs_exist(parser, all_data)
@@ -98,7 +99,10 @@ def main():
     summary_dict[name] = stats_html
 
     for curr_tag in stats_tags:
-        summary_dict[curr_tag[0]] = dataframe_to_html(curr_tag[1], index=False)
+        if 'complete_' in curr_tag[0]:
+            summary_dict[curr_tag[0]] = dataframe_to_html(curr_tag[1])
+        else:
+            summary_dict[curr_tag[0]] = dataframe_to_html(curr_tag[1], index=False)
 
     graphs = []
     graphs.append(
