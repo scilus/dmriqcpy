@@ -3,33 +3,30 @@
 <title>{{ title }}</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" type="text/css" href="libs/css/w3.css">
-<link rel="stylesheet" type="text/css" href="libs/css/bootstrap.min.css">
-<link rel="stylesheet" type="text/css" href="libs/css/select2.min.css">
-<link rel="stylesheet" type="text/css" href="libs/css/ekko-lightbox.css">
-<link rel="stylesheet" type="text/css" href="libs/fontawesome-free-5.11.2-web/css/all.css">
-<link rel="stylesheet" type="text/css" href="libs/DataTables/datatables.min.css">
-<link rel="stylesheet" type="text/css" href="libs/DataTables/Buttons-1.6.1/css/buttons.dataTables.css">
 
-<script type="text/javascript" src="libs/js/jquery.min.js"></script>
-<script type="text/javascript" src="libs/js/jquery-3.3.1.js"></script>
-<script type="text/javascript" src="libs/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="libs/js/ekko-lightbox.js"></script>
-<script type="text/javascript" src="libs/js/ekko-lightbox.min.js"></script>
-<script type="text/javascript" src="libs/js/select2.min.js"></script>
+<link rel="stylesheet" type="text/css" href="libs/css/w3.css">
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.24/b-1.7.0/b-html5-1.7.0/b-print-1.7.0/datatables.min.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.16/css/bootstrap-multiselect.min.css" integrity="sha512-wHTuOcR1pyFeyXVkwg3fhfK46QulKXkLq1kxcEEpjnAPv63B/R49bBqkJHLvoGFq6lvAEKlln2rE1JfIPeQ+iw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.css" integrity="sha512-Velp0ebMKjcd9RiCoaHhLXkR1sFoCCWXNp6w4zj1hfMifYB5441C+sKeBl/T/Ka6NjBiRfBBQRaQq65ekYz3UQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" integrity="sha512-nMNlpuaDPrqlEls3IX/Q56H36qvBASwb3ipuo3MxeWbsQB1881ox0cRv7UPTgBlriqoynt35KjEwgGUeUXIPnw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha512-+NqPlbbtM1QqiK8ZAo4Yrj2c4lNQoGv8P79DPtKzj++l5jnN39rHA/xsqn8zE9l0uSoxaCdrOgFs6yjyfbBxSg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.24/b-1.7.0/b-html5-1.7.0/b-print-1.7.0/datatables.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.16/js/bootstrap-multiselect.min.js" integrity="sha512-ljeReA8Eplz6P7m1hwWa+XdPmhawNmo9I0/qyZANCCFvZ845anQE+35TuZl9+velym0TKanM2DXVLxSJLLpQWw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.min.js" integrity="sha512-Y2IiVZeaBwXG1wSV7f13plqlmFOx8MdjuHyYFVoYzhyRr3nH/NMDjTBSswijzADdNzMyWNetbLMfOpIPl6Cv9g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
 <script type="text/javascript" src="libs/js/StreamSaver.min.js"></script>
 <script type="text/javascript" src="libs/js/FileSaver.js"></script>
 <script type="text/javascript" src="libs/js/scripts.js"></script>
-<script type="text/javascript" src="libs/DataTables/datatables.min.js"></script>
-<script type="text/javascript" src="libs/DataTables/Buttons-1.6.1/js/dataTables.buttons.js"></script>
-<script type="text/javascript" src="libs/DataTables/Buttons-1.6.1/js/buttons.print.min.js"></script>
-<script type="text/javascript" src="libs/DataTables/Buttons-1.6.1/js/buttons.html5.min.js"></script>
-<script type="text/javascript" src="libs/js/pdfmake.min.js"></script>
-<script type="text/javascript" src="libs/js/vfs_fonts.js"></script>
-<link rel="stylesheet" href="libs/css/bootstrap-multiselect.css">
 
 <!-- Bootstrap Multiselect JS -->
-<script type="text/javascript" src="libs/js/bootstrap-multiselect.js"></script>
 <script>
     function hideLoader() {
         $('.loader').hide();
