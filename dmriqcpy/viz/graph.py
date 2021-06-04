@@ -61,7 +61,7 @@ def graph_mean_median(title, column_names, summary):
     fig['layout']['yaxis'].update(range=range_yaxis)
     fig['layout'].update(title=title)
     fig['layout'].update(width=500, height=500)
-    div = off.plot(fig, show_link=False, output_type='div')
+    div = off.plot(fig, show_link=False, include_plotlyjs=False, output_type='div')
     div = div.replace("<div>", "<div style=\"display:inline-block\">")
     return div
 
@@ -130,7 +130,7 @@ def graph_mean_in_tissues(title, column_names, summary):
     fig['layout']['yaxis'].update(range=range_yaxis)
     fig['layout'].update(title=title)
     fig['layout'].update(width=500, height=500)
-    div = off.plot(fig, show_link=False, output_type='div')
+    div = off.plot(fig, show_link=False, include_plotlyjs=False, output_type='div')
     div = div.replace("<div>", "<div style=\"display:inline-block\">")
     return div
 
@@ -184,7 +184,7 @@ def graph_frf(title, column_names, summary):
 
     fig['layout'].update(title=title)
     fig['layout'].update(width=500, height=500)
-    div = off.plot(fig, show_link=False, output_type='div')
+    div = off.plot(fig, show_link=False, include_plotlyjs=False, output_type='div')
     div = div.replace("<div>", "<div style=\"display:inline-block\">")
     return div
 
@@ -228,7 +228,7 @@ def graph_tractogram(title, column_names, summary):
 
     fig['layout'].update(title=title)
     fig['layout'].update(width=500, height=500)
-    div = off.plot(fig, show_link=False, output_type='div')
+    div = off.plot(fig, show_link=False, include_plotlyjs=False, output_type='div')
     div = div.replace("<div>", "<div style=\"display:inline-block\">")
     return div
 
@@ -271,7 +271,7 @@ def graph_mask_volume(title, column_names, summary):
 
     fig['layout'].update(title=title)
     fig['layout'].update(width=500, height=500)
-    div = off.plot(fig, show_link=False, output_type='div')
+    div = off.plot(fig, show_link=False, include_plotlyjs=False, output_type='div')
     div = div.replace("<div>", "<div style=\"display:inline-block\">")
     return div
 
@@ -314,7 +314,7 @@ def graph_dwi_protocol(title, column_name, summary):
 
     fig['layout'].update(title=title)
     fig['layout'].update(width=500, height=500)
-    div = off.plot(fig, show_link=False, output_type='div')
+    div = off.plot(fig, show_link=False, include_plotlyjs=False, output_type='div')
     div = div.replace("<div>", "<div style=\"display:inline-block\">")
     return div
 
@@ -357,7 +357,7 @@ def graph_directions_per_shells(title, summary):
 
     fig['layout'].update(title=title)
     fig['layout'].update(width=700, height=500)
-    div = off.plot(fig, show_link=False, output_type='div')
+    div = off.plot(fig, show_link=False, include_plotlyjs=False, output_type='div')
     div = div.replace("<div>", "<div style=\"display:inline-block\">")
     return div
 
@@ -397,6 +397,6 @@ def graph_subjects_per_shells(title, summary):
 
     fig['layout'].update(title=title)
     fig['layout'].update(width=700, height=500)
-    div = off.plot(fig, show_link=False, output_type='div')
+    div = off.plot(fig, show_link=False, include_plotlyjs=False, output_type='div')
     div = div.replace("<div>", "<div style=\"display:inline-block\">")
     return div
