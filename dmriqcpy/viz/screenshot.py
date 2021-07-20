@@ -12,6 +12,7 @@ import nibabel as nib
 import numpy as np
 
 from dmriqcpy.viz.utils import compute_labels_map, renderer_to_arr
+from dipy.io.streamline import load_tractogram
 
 vtkcolors = [window.colors.blue,
              window.colors.red,
@@ -429,7 +430,8 @@ def screenshot_tracking(tracking, t1, directory="."):
     name : string
         Path of the mosaic
     """
-    tractogram = nib.streamlines.load(tracking, True).tractogram
+    sft = load_tractogram(tracking, 'same')
+    sft.to_vox()
     t1 = nib.load(t1)
     t1_data = t1.get_data()
 
@@ -437,9 +439,9 @@ def screenshot_tracking(tracking, t1, directory="."):
     img_center = [(int(t1_data.shape[0] / 2) + 5, None, None),
                   (None, int(t1_data.shape[1] / 2), None),
                   (None, None, int(t1_data.shape[2] / 2))]
-    center = [(img_center[0][0] - 350, img_center[1][1], img_center[2][2]),
-              (img_center[0][0], img_center[1][1] + 350, img_center[2][2]),
-              (img_center[0][0], img_center[1][1], img_center[2][2] + 350)]
+    center = [(img_center[0][0] - 350 - (1 - t1.header.get_zooms()[0]) * 350, img_center[1][1], img_center[2][2]),
+              (img_center[0][0], img_center[1][1] + 350 + (1 - t1.header.get_zooms()[1]) * 350, img_center[2][2]),
+              (img_center[0][0], img_center[1][1], img_center[2][2] + 350 + (1 - t1.header.get_zooms()[2]) * 350)]
     viewup = [(0, 0, -1), (0, 0, -1), (0, -1, 0)]
     size = (1920, 1080)
 
@@ -449,10 +451,9 @@ def screenshot_tracking(tracking, t1, directory="."):
         it = 0
         slice_idx = img_center[i][i]
 
-        for streamline in tractogram:
+        for stream in sft.streamlines:
             if it > 10000:
                 break
-            stream = streamline.streamline
             if slice_idx in np.array(stream, dtype=int)[:, i]:
                 it += 1
                 idx = np.where(np.array(stream, dtype=int)[:, i] == \
@@ -494,19 +495,19 @@ def screenshot_tracking(tracking, t1, directory="."):
 
     streamlines = []
     it = 0
-    for streamline in tractogram:
+    for streamline in sft.streamlines:
         if it > 10000:
             break
         it += 1
-        streamlines.append(streamline.streamline)
+        streamlines.append(streamline)
 
     ren = window.Scene()
-    streamline_actor = actor.streamtube(streamlines, linewidth=0.2)
+    streamline_actor = actor.line(streamlines, linewidth=0.2)
     ren.add(streamline_actor)
     camera = ren.GetActiveCamera()
     camera.SetViewUp(0, 0, -1)
     center = streamline_actor.GetCenter()
-    camera.SetPosition(center[0], 350, center[2])
+    camera.SetPosition(center[0], 350 + (1 - t1.header.get_zooms()[1]) * 350, center[2])
     camera.SetFocalPoint(center)
     img2 = renderer_to_arr(ren, (3 * 1920, 1920))
     image = np.vstack((image, img2))
