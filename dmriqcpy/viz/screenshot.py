@@ -451,20 +451,20 @@ def screenshot_tracking(tracking, t1, directory="."):
         it = 0
         slice_idx = img_center[i][i]
 
-        for stream in sft.streamlines:
+        for streamline in sft.streamlines:
             if it > 10000:
                 break
-            if slice_idx in np.array(stream, dtype=int)[:, i]:
+            if slice_idx in np.array(streamline, dtype=int)[:, i]:
                 it += 1
-                idx = np.where(np.array(stream, dtype=int)[:, i] == \
+                idx = np.where(np.array(streamline, dtype=int)[:, i] == \
                                slice_idx)[0][0]
                 lower = idx - 2
                 if lower < 0:
                     lower = 0
                 upper = idx + 2
-                if upper > len(stream) - 1:
-                    upper = len(stream) - 1
-                streamlines.append(stream[lower:upper])
+                if upper > len(streamline) - 1:
+                    upper = len(streamline) - 1
+                streamlines.append(streamline[lower:upper])
 
         ren = window.Scene()
 
