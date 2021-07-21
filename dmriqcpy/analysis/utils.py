@@ -66,10 +66,8 @@ def read_protocol(in_jsons, tags):
             tdf = tdf.rename(columns={tag: "Number of subjects"})
             tdf.reset_index(inplace=True)
             tdf = tdf.rename(columns={tag: "Value(s)"})
-            print(tdf)
             tdf = tdf.sort_values(by=['Value(s)'],
                                   ascending=False)
-            print(tdf)
             dfs.append((tag, tdf))
 
             t = temp[tag]
