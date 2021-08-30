@@ -119,7 +119,7 @@ def main():
 
     if args.metadata:
         for curr_tag in stats_tags:
-            if 'complete_' in curr_tag[0]:
+            if 'complete_' not in curr_tag[0]:
                 summary_dict[curr_tag[0]] = dataframe_to_html(curr_tag[1])
 
     graphs = []
