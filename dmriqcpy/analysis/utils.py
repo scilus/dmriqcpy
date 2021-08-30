@@ -73,7 +73,6 @@ def dwi_protocol(bvals, tol=20):
             nb_directions = len(shells_indices[shells_indices ==
                                                np.where(centroids == centroid)[
                                                    0]])
-            print(centroid, nb_directions)
             if filename not in shells[np.int(nearest_centroid)]:
                 shells[np.int(nearest_centroid)][filename] = 0
             shells[np.int(nearest_centroid)][filename] += nb_directions
