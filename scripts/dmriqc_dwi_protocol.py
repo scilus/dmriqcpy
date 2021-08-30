@@ -6,6 +6,7 @@ import os
 import shutil
 
 import numpy as np
+import pandas as pd
 from scilpy.utils.bvec_bval_tools import identify_shells
 from scilpy.viz.gradient_sampling import build_ms_from_shell_idx
 
@@ -70,8 +71,7 @@ def main():
                                                   len(args.bval)))
             parser.error("Not the same number of images in input.")
         else:
-            stats_tags = read_protocol(args.metadata, args.tags)
-
+            stats_tags, stats_tags_for_graph, stats_tags_all = read_protocol(args.metadata, args.tags)
 
     all_data = np.concatenate([args.bval,
                                args.bvec])
@@ -87,9 +87,16 @@ def main():
 
     name = "DWI Protocol"
     summary, stats_for_graph, stats_all, shells = dwi_protocol(args.bval)
+
+    if not isinstance(stats_tags_for_graph, list):
+        stats_for_graph = pd.concat([stats_for_graph, stats_tags_for_graph],
+                                    axis=1, join="inner")
+        stats_all = pd.concat([stats_all, stats_tags_all],
+                               axis=1, join="inner")
+
     warning_dict = {}
     warning_dict[name] = analyse_qa(stats_for_graph, stats_all,
-                                    ["Nbr shells", "Nbr directions"])
+                                    stats_all.columns)
     warning_images = [filenames for filenames in warning_dict[name].values()]
     warning_list = np.concatenate(warning_images)
     warning_dict[name]['nb_warnings'] = len(np.unique(warning_list))
@@ -105,10 +112,11 @@ def main():
             summary_dict[curr_tag[0]] = dataframe_to_html(curr_tag[1], index=False)
 
     graphs = []
-    graphs.append(
-        graph_directions_per_shells("Nbr directions per shell", shells))
+    graphs.append(graph_directions_per_shells("Nbr directions per shell",
+                                              shells))
     graphs.append(graph_subjects_per_shells("Nbr subjects per shell", shells))
-    for c in ["Nbr shells", "Nbr directions"]:
+
+    for c in stats_for_graph.columns:#["Nbr shells", "Nbr directions"]:
         graph = graph_dwi_protocol(c, c, stats_for_graph)
         graphs.append(graph)
 

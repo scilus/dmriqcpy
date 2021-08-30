@@ -59,6 +59,8 @@ def read_protocol(in_jsons, tags):
     temp = pd.concat(dfs, ignore_index=True)
     index = [os.path.basename(item).split('.')[0] for item in in_jsons]
     dfs = []
+    tmp_dfs_for_graph = []
+    dfs_for_graph = []
     for tag in tags:
         if tag in temp.columns:
             if not isinstance(temp[tag][0], list):
@@ -75,9 +77,22 @@ def read_protocol(in_jsons, tags):
                 t.index = index
                 tdf = pd.DataFrame(t)
 
+                if isinstance(temp[tag][0], int) or isinstance(temp[tag][0], float):
+                    tmp_dfs_for_graph.append(tdf)
+
                 dfs.append(('complete_' + tag, tdf))
 
-    return dfs
+
+    if tmp_dfs_for_graph:
+        dfs_for_graph = pd.concat(tmp_dfs_for_graph, axis=1, join="inner")
+        dfs_for_graph_all = pd.DataFrame([dfs_for_graph.mean(),
+                                          dfs_for_graph.std(),
+                                          dfs_for_graph.min(),
+                                          dfs_for_graph.max()],
+                                          index=['mean', 'std', 'min', 'max'],
+                                          columns=dfs_for_graph.columns)
+
+    return dfs, dfs_for_graph, dfs_for_graph_all
 
 
 def dwi_protocol(bvals, tol=20):
@@ -100,6 +115,7 @@ def dwi_protocol(bvals, tol=20):
     values_stats = []
     column_names = ["Nbr shells", "Nbr directions"]
     shells = {}
+    index = [os.path.basename(item).split('.')[0] for item in bvals]
     for i, filename in enumerate(bvals):
         values = []
 
@@ -126,17 +142,17 @@ def dwi_protocol(bvals, tol=20):
 
         values_stats.append([len(centroids) - 1, len(shells_indices)])
 
-        stats_per_subjects[filename] = pd.DataFrame([values], index=[bvals[i]],
+        stats_per_subjects[filename] = pd.DataFrame([values], index=[index[i]],
                                                     columns=columns)
 
-    stats = pd.DataFrame(values_stats, index=[bvals],
+    stats = pd.DataFrame(values_stats, index=index,
                          columns=column_names)
 
     stats_across_subjects = pd.DataFrame([stats.mean(),
                                           stats.std(),
                                           stats.min(),
                                           stats.max()],
-                                         index=['mean', 'std', 'min', 'max'],
-                                         columns=column_names)
+                                          index=['mean', 'std', 'min', 'max'],
+                                          columns=column_names)
 
     return stats_per_subjects, stats, stats_across_subjects, shells

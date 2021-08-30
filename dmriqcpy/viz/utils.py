@@ -32,7 +32,7 @@ def analyse_qa(stats_per_subjects, stats_across_subjects, column_names):
         for name in stats_per_subjects.index:
             if stats_per_subjects.at[name, metric] > mean + 2 * std or\
                stats_per_subjects.at[name, metric] < mean - 2 * std:
-                warning[metric].append(name[0])
+                warning[metric].append(name)
     return warning
 
 

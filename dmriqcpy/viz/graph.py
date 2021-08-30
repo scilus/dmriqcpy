@@ -295,7 +295,7 @@ def graph_dwi_protocol(title, column_name, summary):
         Graph as a HTML div.
     """
     np.random.seed(1)
-    metric = np.concatenate(summary.index)
+    metric = summary.index#np.concatenate(summary.index)
     data = np.array(summary[column_name])
 
     graph = Box(
