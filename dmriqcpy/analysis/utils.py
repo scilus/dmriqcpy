@@ -77,20 +77,20 @@ def read_protocol(in_jsons, tags):
                 t.index = index
                 tdf = pd.DataFrame(t)
 
-                if isinstance(temp[tag][0], int) or isinstance(temp[tag][0], float):
+                if isinstance(temp[tag][0], int) or\
+                   isinstance(temp[tag][0], float):
                     tmp_dfs_for_graph.append(tdf)
 
                 dfs.append(('complete_' + tag, tdf))
 
-
     if tmp_dfs_for_graph:
         dfs_for_graph = pd.concat(tmp_dfs_for_graph, axis=1, join="inner")
         dfs_for_graph_all = pd.DataFrame([dfs_for_graph.mean(),
-                                          dfs_for_graph.std(),
-                                          dfs_for_graph.min(),
-                                          dfs_for_graph.max()],
-                                          index=['mean', 'std', 'min', 'max'],
-                                          columns=dfs_for_graph.columns)
+                                         dfs_for_graph.std(),
+                                         dfs_for_graph.min(),
+                                         dfs_for_graph.max()],
+                                         index=['mean', 'std', 'min', 'max'],
+                                         columns=dfs_for_graph.columns)
 
     return dfs, dfs_for_graph, dfs_for_graph_all
 
@@ -149,10 +149,10 @@ def dwi_protocol(bvals, tol=20):
                          columns=column_names)
 
     stats_across_subjects = pd.DataFrame([stats.mean(),
-                                          stats.std(),
-                                          stats.min(),
-                                          stats.max()],
-                                          index=['mean', 'std', 'min', 'max'],
-                                          columns=column_names)
+                                         stats.std(),
+                                         stats.min(),
+                                         stats.max()],
+                                         index=['mean', 'std', 'min', 'max'],
+                                         columns=column_names)
 
     return stats_per_subjects, stats, stats_across_subjects, shells

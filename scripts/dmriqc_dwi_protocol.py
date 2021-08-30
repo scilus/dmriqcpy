@@ -44,7 +44,7 @@ def _build_arg_parser():
 
     p.add_argument('--tags', nargs='+',
                    default=["EchoTime", "RepetitionTime", "SliceThickness",
-                   "Manufacturer", "ManufacturersModelName"],
+                            "Manufacturer", "ManufacturersModelName"],
                    help='DICOM tags used to compare information. %(default)s')
 
     p.add_argument('--tolerance', '-t',
@@ -68,10 +68,11 @@ def main():
         if not len(args.metadata) == len(args.bval):
             print('Number of metadata files: {}.\n'
                   'Number of bval files: {}.'.format(len(args.metadata),
-                                                  len(args.bval)))
+                                                     len(args.bval)))
             parser.error("Not the same number of images in input.")
         else:
-            stats_tags, stats_tags_for_graph, stats_tags_all = read_protocol(args.metadata, args.tags)
+            stats_tags, stats_tags_for_graph,\
+                stats_tags_all = read_protocol(args.metadata, args.tags)
 
     all_data = np.concatenate([args.bval,
                                args.bvec])
@@ -92,7 +93,7 @@ def main():
         stats_for_graph = pd.concat([stats_for_graph, stats_tags_for_graph],
                                     axis=1, join="inner")
         stats_all = pd.concat([stats_all, stats_tags_all],
-                               axis=1, join="inner")
+                              axis=1, join="inner")
 
     warning_dict = {}
     warning_dict[name] = analyse_qa(stats_for_graph, stats_all,
@@ -109,14 +110,15 @@ def main():
         if 'complete_' in curr_tag[0]:
             summary_dict[curr_tag[0]] = dataframe_to_html(curr_tag[1])
         else:
-            summary_dict[curr_tag[0]] = dataframe_to_html(curr_tag[1], index=False)
+            summary_dict[curr_tag[0]] = dataframe_to_html(curr_tag[1],
+                                                          index=False)
 
     graphs = []
     graphs.append(graph_directions_per_shells("Nbr directions per shell",
                                               shells))
     graphs.append(graph_subjects_per_shells("Nbr subjects per shell", shells))
 
-    for c in stats_for_graph.columns:#["Nbr shells", "Nbr directions"]:
+    for c in stats_for_graph.columns:
         graph = graph_dwi_protocol(c, c, stats_for_graph)
         graphs.append(graph)
 

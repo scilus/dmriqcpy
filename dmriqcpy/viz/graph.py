@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-from pandas import DataFrame
 from plotly.graph_objs import Bar, Box, Figure
 import plotly.offline as off
 
@@ -295,7 +294,7 @@ def graph_dwi_protocol(title, column_name, summary):
         Graph as a HTML div.
     """
     np.random.seed(1)
-    metric = summary.index#np.concatenate(summary.index)
+    metric = summary.index
     data = np.array(summary[column_name])
 
     graph = Box(
