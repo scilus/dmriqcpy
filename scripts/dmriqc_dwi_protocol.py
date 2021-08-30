@@ -44,12 +44,12 @@ def _build_arg_parser():
     p.add_argument('--tags', nargs='+',
                    default=["EchoTime", "RepetitionTime", "SliceThickness",
                    "Manufacturer", "ManufacturersModelName"],
-                   help='DICOM tags used to compare information.')
+                   help='DICOM tags used to compare information. %(default)s')
 
     p.add_argument('--tolerance', '-t',
                    metavar='INT', type=int, default=20,
                    help='The tolerated gap between the b-values to '
-                        'extract\nand the actual b-values.')
+                        'extract\nand the actual b-values. [%(default)s]')
 
     add_overwrite_arg(p)
 

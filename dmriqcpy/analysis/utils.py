@@ -61,20 +61,21 @@ def read_protocol(in_jsons, tags):
     dfs = []
     for tag in tags:
         if tag in temp.columns:
-            ts = temp.groupby(tag)[tag].count()
-            tdf = pd.DataFrame(ts)
-            tdf = tdf.rename(columns={tag: "Number of subjects"})
-            tdf.reset_index(inplace=True)
-            tdf = tdf.rename(columns={tag: "Value(s)"})
-            tdf = tdf.sort_values(by=['Value(s)'],
-                                  ascending=False)
-            dfs.append((tag, tdf))
+            if not isinstance(temp[tag][0], list):
+                ts = temp.groupby(tag)[tag].count()
+                tdf = pd.DataFrame(ts)
+                tdf = tdf.rename(columns={tag: "Number of subjects"})
+                tdf.reset_index(inplace=True)
+                tdf = tdf.rename(columns={tag: "Value(s)"})
+                tdf = tdf.sort_values(by=['Value(s)'],
+                                      ascending=False)
+                dfs.append((tag, tdf))
 
-            t = temp[tag]
-            t.index = index
-            tdf = pd.DataFrame(t)
+                t = temp[tag]
+                t.index = index
+                tdf = pd.DataFrame(t)
 
-            dfs.append(('complete_' + tag, tdf))
+                dfs.append(('complete_' + tag, tdf))
 
     return dfs
 
