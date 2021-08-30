@@ -39,7 +39,6 @@ def _build_arg_parser():
                    help='List of bvec files.')
 
     p.add_argument('--metadata', nargs='+',
-                   default='None',
                    help='Json files to get the metadata.')
 
     p.add_argument('--tags', nargs='+',
@@ -64,7 +63,8 @@ def main():
     if not len(args.bval) == len(args.bvec):
         parser.error("Not the same number of images in input.")
 
-    if args.metadata is not None:
+    stats_tags_for_graph = []
+    if args.metadata:
         if not len(args.metadata) == len(args.bval):
             print('Number of metadata files: {}.\n'
                   'Number of bval files: {}.'.format(len(args.metadata),
@@ -72,7 +72,8 @@ def main():
             parser.error("Not the same number of images in input.")
         else:
             stats_tags, stats_tags_for_graph,\
-                stats_tags_all = read_protocol(args.metadata, args.tags)
+                stats_tags_for_graph_all = read_protocol(args.metadata,
+                                                         args.tags)
 
     all_data = np.concatenate([args.bval,
                                args.bvec])
@@ -89,10 +90,20 @@ def main():
     name = "DWI Protocol"
     summary, stats_for_graph, stats_all, shells = dwi_protocol(args.bval)
 
+    if stats_tags:
+        for curr_column in stats_tags:
+            tag = curr_column[0]
+            curr_df = curr_column[1]
+            if 'complete_' in tag:
+                metric = curr_df.columns[0]
+                for nSub in curr_df.index:
+                    currKey = [nKey for nKey in summary.keys() if nSub in nKey]
+                    summary[currKey[0]][metric] = curr_df[metric][nSub]
+
     if not isinstance(stats_tags_for_graph, list):
         stats_for_graph = pd.concat([stats_for_graph, stats_tags_for_graph],
                                     axis=1, join="inner")
-        stats_all = pd.concat([stats_all, stats_tags_all],
+        stats_all = pd.concat([stats_all, stats_tags_for_graph_all],
                               axis=1, join="inner")
 
     warning_dict = {}
@@ -106,12 +117,10 @@ def main():
     summary_dict = {}
     summary_dict[name] = stats_html
 
-    for curr_tag in stats_tags:
-        if 'complete_' in curr_tag[0]:
-            summary_dict[curr_tag[0]] = dataframe_to_html(curr_tag[1])
-        else:
-            summary_dict[curr_tag[0]] = dataframe_to_html(curr_tag[1],
-                                                          index=False)
+    if args.metadata:
+        for curr_tag in stats_tags:
+            if 'complete_' in curr_tag[0]:
+                summary_dict[curr_tag[0]] = dataframe_to_html(curr_tag[1])
 
     graphs = []
     graphs.append(graph_directions_per_shells("Nbr directions per shell",

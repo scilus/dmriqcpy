@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import logging
 import numpy as np
 import os
 import pandas as pd
@@ -60,6 +61,7 @@ def read_protocol(in_jsons, tags):
     index = [os.path.basename(item).split('.')[0] for item in in_jsons]
     dfs = []
     tmp_dfs_for_graph = []
+    dfs_for_graph_all = []
     dfs_for_graph = []
     for tag in tags:
         if tag in temp.columns:
@@ -82,6 +84,8 @@ def read_protocol(in_jsons, tags):
                     tmp_dfs_for_graph.append(tdf)
 
                 dfs.append(('complete_' + tag, tdf))
+        else:
+            logging.warning("{} does not exist in the metadata.".format(tag))
 
     if tmp_dfs_for_graph:
         dfs_for_graph = pd.concat(tmp_dfs_for_graph, axis=1, join="inner")
