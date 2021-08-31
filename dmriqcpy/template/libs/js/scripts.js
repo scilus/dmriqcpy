@@ -433,9 +433,11 @@ $(document).ready(function () {
             dark_mode = !dark_mode;
             if (dark_mode) {
                 document.body.setAttribute('data-theme', 'dark');
+                document.getElementById('darkSwitch').checked = true;
             }
             else {
                 document.body.removeAttribute('data-theme');
+                document.getElementById('darkSwitch').checked = false;
             }
         }
         else if (e.key == "i") {
