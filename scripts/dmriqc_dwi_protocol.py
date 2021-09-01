@@ -11,9 +11,10 @@ from scilpy.viz.gradient_sampling import build_ms_from_shell_idx
 
 from dmriqcpy.analysis.utils import dwi_protocol
 from dmriqcpy.io.report import Report
-from dmriqcpy.io.utils import (add_overwrite_arg, assert_inputs_exist,
-                               assert_outputs_exist)
-from dmriqcpy.viz.graph import (graph_directions_per_shells, graph_dwi_protocol,
+from dmriqcpy.io.utils import (add_online_arg, add_overwrite_arg,
+                               assert_inputs_exist, assert_outputs_exist)
+from dmriqcpy.viz.graph import (graph_directions_per_shells,
+                                graph_dwi_protocol,
                                 graph_subjects_per_shells)
 from dmriqcpy.viz.screenshot import plot_proj_shell
 from dmriqcpy.viz.utils import analyse_qa, dataframe_to_html
@@ -41,6 +42,7 @@ def _build_arg_parser():
                    help='The tolerated gap between the b-values to '
                         'extract\nand the actual b-values.')
 
+    add_online_arg(p)
     add_overwrite_arg(p)
 
     return p
@@ -80,10 +82,12 @@ def main():
 
     graphs = []
     graphs.append(
-        graph_directions_per_shells("Nbr directions per shell", shells))
-    graphs.append(graph_subjects_per_shells("Nbr subjects per shell", shells))
+        graph_directions_per_shells("Nbr directions per shell",
+                                    shells, args.online))
+    graphs.append(graph_subjects_per_shells("Nbr subjects per shell",
+                                            args.online))
     for c in ["Nbr shells", "Nbr directions"]:
-        graph = graph_dwi_protocol(c, c, stats_for_graph)
+        graph = graph_dwi_protocol(c, c, stats_for_graph, args.online)
         graphs.append(graph)
 
     subjects_dict = {}
@@ -101,7 +105,8 @@ def main():
                         ofile=os.path.join("data", name + filename),
                         ores=(800, 800))
         subjects_dict[bval]['screenshot'] = os.path.join("data",
-                                                         name + filename + '.png')
+                                                         name + filename +
+                                                         '.png')
     metrics_dict = {}
     for subj in args.bval:
         summary_html = dataframe_to_html(summary[subj])

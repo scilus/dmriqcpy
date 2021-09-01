@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-from pandas import DataFrame
 from plotly.graph_objs import Bar, Box, Figure
 import plotly.offline as off
 
 
-def graph_mean_median(title, column_names, summary):
+def graph_mean_median(title, column_names, summary, online=False):
     """
     Compute plotly graph with mean and median stats
 
@@ -18,12 +17,16 @@ def graph_mean_median(title, column_names, summary):
         Name of the columns in the summary DataFrame.
     summary : DataFrame
         DataFrame containing the mean and median stats.
+    online: Boolean
+        If false it will include plotlyjs
 
     Returns
     -------
     div : html div (string)
         Graph as a HTML div.
     """
+    include_plotlyjs = not online
+
     means = []
     medians = []
     np.random.seed(1)
@@ -61,12 +64,13 @@ def graph_mean_median(title, column_names, summary):
     fig['layout']['yaxis'].update(range=range_yaxis)
     fig['layout'].update(title=title)
     fig['layout'].update(width=500, height=500)
-    div = off.plot(fig, show_link=False, output_type='div')
+    div = off.plot(fig, show_link=False, include_plotlyjs=include_plotlyjs,
+                   output_type='div')
     div = div.replace("<div>", "<div style=\"display:inline-block\">")
     return div
 
 
-def graph_mean_in_tissues(title, column_names, summary):
+def graph_mean_in_tissues(title, column_names, summary, online=False):
     """
     Compute plotly graph with mean value in tissue masks
 
@@ -78,12 +82,16 @@ def graph_mean_in_tissues(title, column_names, summary):
         Name of the columns in the summary DataFrame.
     summary : DataFrame
         DataFrame containing the mean stats.
+    online: Boolean
+        If false it will include plotlyjs
 
     Returns
     -------
     div : html div (string)
         Graph as a HTML div.
     """
+    include_plotlyjs = not online
+
     means_wm = []
     means_gm = []
     means_csf = []
@@ -130,12 +138,14 @@ def graph_mean_in_tissues(title, column_names, summary):
     fig['layout']['yaxis'].update(range=range_yaxis)
     fig['layout'].update(title=title)
     fig['layout'].update(width=500, height=500)
-    div = off.plot(fig, show_link=False, output_type='div')
+
+    div = off.plot(fig, show_link=False, include_plotlyjs=include_plotlyjs,
+                   output_type='div')
     div = div.replace("<div>", "<div style=\"display:inline-block\">")
     return div
 
 
-def graph_frf(title, column_names, summary):
+def graph_frf(title, column_names, summary, online=False):
     """
     Compute plotly graph with mean frf values
 
@@ -147,12 +157,16 @@ def graph_frf(title, column_names, summary):
         Name of the columns in the summary DataFrame.
     summary : DataFrame
         DataFrame containing the mean stats.
+    online: Boolean
+        If false it will include plotlyjs
 
     Returns
     -------
     div : html div (string)
         Graph as a HTML div.
     """
+    include_plotlyjs = not online
+
     np.random.seed(1)
     metric = np.concatenate(summary.index)
     e1 = np.array(summary[column_names[0]])
@@ -184,12 +198,13 @@ def graph_frf(title, column_names, summary):
 
     fig['layout'].update(title=title)
     fig['layout'].update(width=500, height=500)
-    div = off.plot(fig, show_link=False, output_type='div')
+    div = off.plot(fig, show_link=False, include_plotlyjs=include_plotlyjs,
+                   output_type='div')
     div = div.replace("<div>", "<div style=\"display:inline-block\">")
     return div
 
 
-def graph_tractogram(title, column_names, summary):
+def graph_tractogram(title, column_names, summary, online=False):
     """
     Compute plotly graph with mean number of streamlines
 
@@ -201,12 +216,16 @@ def graph_tractogram(title, column_names, summary):
         Name of the columns in the summary DataFrame.
     summary : DataFrame
         DataFrame containing the mean stats.
+    online: Boolean
+        If false it will include plotlyjs
 
     Returns
     -------
     div : html div (string)
         Graph as a HTML div.
     """
+    include_plotlyjs = not online
+
     nb_streamlines = []
     np.random.seed(1)
     metric = np.concatenate(summary.index)
@@ -228,12 +247,13 @@ def graph_tractogram(title, column_names, summary):
 
     fig['layout'].update(title=title)
     fig['layout'].update(width=500, height=500)
-    div = off.plot(fig, show_link=False, output_type='div')
+    div = off.plot(fig, show_link=False, include_plotlyjs=include_plotlyjs,
+                   output_type='div')
     div = div.replace("<div>", "<div style=\"display:inline-block\">")
     return div
 
 
-def graph_mask_volume(title, column_names, summary):
+def graph_mask_volume(title, column_names, summary, online=False):
     """
     Compute plotly graph with mean mask volume
 
@@ -245,12 +265,16 @@ def graph_mask_volume(title, column_names, summary):
         Name of the columns in the summary DataFrame.
     summary : DataFrame
         DataFrame containing the mean stats.
+    online: Boolean
+        If false it will include plotlyjs
 
     Returns
     -------
     div : html div (string)
         Graph as a HTML div.
     """
+    include_plotlyjs = not online
+
     np.random.seed(1)
     metric = np.concatenate(summary.index)
     volume = np.array(summary[column_names[0]])
@@ -271,12 +295,13 @@ def graph_mask_volume(title, column_names, summary):
 
     fig['layout'].update(title=title)
     fig['layout'].update(width=500, height=500)
-    div = off.plot(fig, show_link=False, output_type='div')
+    div = off.plot(fig, show_link=False, include_plotlyjs=include_plotlyjs,
+                   output_type='div')
     div = div.replace("<div>", "<div style=\"display:inline-block\">")
     return div
 
 
-def graph_dwi_protocol(title, column_name, summary):
+def graph_dwi_protocol(title, column_name, summary, online=False):
     """
     Compute plotly graph with mean mask volume
 
@@ -288,12 +313,16 @@ def graph_dwi_protocol(title, column_name, summary):
         Name of the columns in the summary DataFrame.
     summary : DataFrame
         DataFrame containing the mean stats.
+    online: Boolean
+        If false it will include plotlyjs
 
     Returns
     -------
     div : html div (string)
         Graph as a HTML div.
     """
+    include_plotlyjs = not online
+
     np.random.seed(1)
     metric = np.concatenate(summary.index)
     data = np.array(summary[column_name])
@@ -314,12 +343,13 @@ def graph_dwi_protocol(title, column_name, summary):
 
     fig['layout'].update(title=title)
     fig['layout'].update(width=500, height=500)
-    div = off.plot(fig, show_link=False, output_type='div')
+    div = off.plot(fig, show_link=False, include_plotlyjs=include_plotlyjs,
+                   output_type='div')
     div = div.replace("<div>", "<div style=\"display:inline-block\">")
     return div
 
 
-def graph_directions_per_shells(title, summary):
+def graph_directions_per_shells(title, summary, online=False):
     """
     Compute plotly graph with mean mask volume
 
@@ -329,12 +359,16 @@ def graph_directions_per_shells(title, summary):
         Title of the graph.
     summary : dict
         DataFrame containing the mean stats.
+    online: Boolean
+        If false it will include plotlyjs
 
     Returns
     -------
     div : html div (string)
         Graph as a HTML div.
     """
+    include_plotlyjs = not online
+
     np.random.seed(1)
     data_graph = []
     for i in sorted(summary):
@@ -357,12 +391,13 @@ def graph_directions_per_shells(title, summary):
 
     fig['layout'].update(title=title)
     fig['layout'].update(width=700, height=500)
-    div = off.plot(fig, show_link=False, output_type='div')
+    div = off.plot(fig, show_link=False, include_plotlyjs=include_plotlyjs,
+                   output_type='div')
     div = div.replace("<div>", "<div style=\"display:inline-block\">")
     return div
 
 
-def graph_subjects_per_shells(title, summary):
+def graph_subjects_per_shells(title, summary, online=False):
     """
     Compute plotly graph with mean mask volume
 
@@ -372,12 +407,16 @@ def graph_subjects_per_shells(title, summary):
         Title of the graph.
     summary : dict
         DataFrame containing the mean stats.
+    online: Boolean
+        If false it will include plotlyjs
 
     Returns
     -------
     div : html div (string)
         Graph as a HTML div.
     """
+    include_plotlyjs = not online
+
     np.random.seed(1)
     data_graph = []
     for i in sorted(summary):
@@ -397,6 +436,7 @@ def graph_subjects_per_shells(title, summary):
 
     fig['layout'].update(title=title)
     fig['layout'].update(width=700, height=500)
-    div = off.plot(fig, show_link=False, output_type='div')
+    div = off.plot(fig, show_link=False, include_plotlyjs=include_plotlyjs,
+                   output_type='div')
     div = div.replace("<div>", "<div style=\"display:inline-block\">")
     return div

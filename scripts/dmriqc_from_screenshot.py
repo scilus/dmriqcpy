@@ -6,8 +6,8 @@ import os
 import shutil
 
 from dmriqcpy.io.report import Report
-from dmriqcpy.io.utils import add_overwrite_arg, assert_inputs_exist,\
-                              assert_outputs_exist
+from dmriqcpy.io.utils import (add_online_arg, add_overwrite_arg,
+                               assert_inputs_exist, assert_outputs_exist)
 
 DESCRIPTION = """
 Compute the screenshot report in HTML format.
@@ -27,6 +27,7 @@ def _build_arg_parser():
     p.add_argument('--sym_link', action="store_true",
                    help='Use symlink instead of copy')
 
+    add_online_arg(p)
     add_overwrite_arg(p)
 
     return p

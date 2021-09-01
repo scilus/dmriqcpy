@@ -10,17 +10,15 @@ from multiprocessing import Pool
 import numpy as np
 
 from dmriqcpy.io.report import Report
-from dmriqcpy.viz.graph import graph_mean_in_tissues
-from dmriqcpy.analysis.stats import stats_mean_in_tissues
+from dmriqcpy.io.utils import (add_online_arg, add_overwrite_arg,
+                               assert_inputs_exist, assert_outputs_exist)
 from dmriqcpy.viz.screenshot import screenshot_mosaic_blend
-from dmriqcpy.viz.utils import analyse_qa, dataframe_to_html
-from dmriqcpy.io.utils import add_overwrite_arg, assert_inputs_exist, \
-    assert_outputs_exist
+
 
 DESCRIPTION = """
 Compute the labels report in HTML format.
 
-Using LUT like: 
+Using LUT like:
 #No. Label Name:                            R   G   B
 """
 
@@ -42,7 +40,8 @@ def _build_arg_parser():
                    help='Label images in Nifti format')
 
     p.add_argument('--skip', default=2, type=int,
-                   help='Number of images skipped to build the mosaic. [%(default)s]')
+                   help='Number of images skipped to build the '
+                        'mosaic. [%(default)s]')
 
     p.add_argument('--nb_columns', default=12, type=int,
                    help='Number of columns for the mosaic. [%(default)s]')
@@ -50,6 +49,7 @@ def _build_arg_parser():
     p.add_argument('--nb_threads', type=int, default=1,
                    help='Number of threads. [%(default)s]')
 
+    add_online_arg(p)
     add_overwrite_arg(p)
 
     return p
