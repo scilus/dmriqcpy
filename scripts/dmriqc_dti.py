@@ -172,7 +172,8 @@ def main():
     report.generate(title="Quality Assurance DTI metrics",
                     nb_subjects=nb_subjects, summary_dict=summary_dict,
                     graph_array=graphs, metrics_dict=metrics_dict,
-                    warning_dict=warning_dict)
+                    warning_dict=warning_dict,
+                    online=args.online)
 
 
 if __name__ == '__main__':

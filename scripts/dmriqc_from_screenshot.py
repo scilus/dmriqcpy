@@ -27,7 +27,6 @@ def _build_arg_parser():
     p.add_argument('--sym_link', action="store_true",
                    help='Use symlink instead of copy')
 
-    add_online_arg(p)
     add_overwrite_arg(p)
 
     return p

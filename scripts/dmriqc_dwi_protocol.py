@@ -85,7 +85,7 @@ def main():
         graph_directions_per_shells("Nbr directions per shell",
                                     shells, args.online))
     graphs.append(graph_subjects_per_shells("Nbr subjects per shell",
-                                            args.online))
+                                            shells, args.online))
     for c in ["Nbr shells", "Nbr directions"]:
         graph = graph_dwi_protocol(c, c, stats_for_graph, args.online)
         graphs.append(graph)
@@ -118,7 +118,8 @@ def main():
     report.generate(title="Quality Assurance DWI protocol",
                     nb_subjects=nb_subjects, metrics_dict=metrics_dict,
                     summary_dict=summary_dict, graph_array=graphs,
-                    warning_dict=warning_dict)
+                    warning_dict=warning_dict,
+                    online=args.online)
 
 
 if __name__ == '__main__':

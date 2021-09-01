@@ -86,5 +86,4 @@ def assert_outputs_exist(parser, args, required, optional=None):
 def add_online_arg(parser):
     parser.add_argument('--online', action='store_true',
                         help='If set, the script will use the internet '
-                             'connexion to grab the needed libraries.'
-                             '[%(default)]')
+                             'connexion to grab the needed libraries.')

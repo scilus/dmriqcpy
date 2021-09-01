@@ -1,9 +1,17 @@
 # -*- coding: utf-8 -*-
 
 from os.path import dirname, join, realpath
-from shutil import copytree, copy
+import os
+from shutil import copytree, copyfile
 
 from jinja2 import Environment, FileSystemLoader
+
+ONLINE_LIBS = ['js/FileSaver.js',
+               'js/StreamSaver.min.js',
+               'js/dark-mode-switch.js',
+               'js/scripts.js',
+               'css/style.css',
+               'css/w3.css']
 
 
 class Report():
@@ -30,7 +38,8 @@ class Report():
 
     def generate(self, title=None, nb_subjects=None,
                  summary_dict=None, graph_array=None, metrics_dict=None,
-                 warning_dict=None):
+                 warning_dict=None,
+                 online=False):
         """
         Generate and save the report.
 
@@ -57,12 +66,21 @@ class Report():
             warning_dict[METRIC_NAME] = { 'WANING_TYPE': ARRAY_OF_SUBJECTS,
                                           'nb_warnings': NUMBER_OF_SUBJECTS}
         """
-
-        copytree(join(self.path, "../template/libs"),
-                 join(self.out_dir, "libs"))
+        curr_template = 'template.html'
+        if online:
+            curr_template = 'online_template.html'
+            os.makedirs(join(self.out_dir, "libs/css"))
+            os.makedirs(join(self.out_dir, "libs/js"))
+            for curr_lib in ONLINE_LIBS:
+                copyfile(join(self.path, "../template/libs/", curr_lib),
+                         join(self.out_dir, "libs/", curr_lib))
+        else:
+            copytree(join(self.path, "../template/libs"),
+                     join(self.out_dir, "libs"))
 
         with open(self.report_name, 'w') as out_file:
-            template = self.env.get_template('template.html')
+            template = self.env.get_template(curr_template)
+
             rendered = template.render(title=title,
                                        nb_subjects=nb_subjects,
                                        summary_dict=summary_dict,
