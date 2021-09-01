@@ -110,7 +110,8 @@ def main():
     nb_subjects = len(args.t1)
     report = Report(args.output_report)
     report.generate(title="Quality Assurance labels",
-                    nb_subjects=nb_subjects, metrics_dict=metrics_dict)
+                    nb_subjects=nb_subjects, metrics_dict=metrics_dict,
+                    online=args.online)
 
 
 if __name__ == '__main__':
