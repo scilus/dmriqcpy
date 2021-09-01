@@ -66,9 +66,7 @@ class Report():
             warning_dict[METRIC_NAME] = { 'WANING_TYPE': ARRAY_OF_SUBJECTS,
                                           'nb_warnings': NUMBER_OF_SUBJECTS}
         """
-        curr_template = 'template.html'
         if online:
-            curr_template = 'online_template.html'
             os.makedirs(join(self.out_dir, "libs/css"))
             os.makedirs(join(self.out_dir, "libs/js"))
             for curr_lib in ONLINE_LIBS:
@@ -79,13 +77,14 @@ class Report():
                      join(self.out_dir, "libs"))
 
         with open(self.report_name, 'w') as out_file:
-            template = self.env.get_template(curr_template)
+            template = self.env.get_template('template.html')
 
             rendered = template.render(title=title,
                                        nb_subjects=nb_subjects,
                                        summary_dict=summary_dict,
                                        graph_summ=graph_array,
                                        metrics_dict=metrics_dict,
-                                       warning_list=warning_dict)
+                                       warning_list=warning_dict,
+                                       online=online)
             out_file.write(rendered)
             out_file.close()
