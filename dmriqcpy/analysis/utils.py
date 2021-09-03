@@ -50,7 +50,14 @@ def read_protocol(in_jsons, tags):
 
     Returns
     -------
+    dfs : Tuple
+        Tuple of DataFrame for each tag (tag_name, DataFrame).
 
+    dfs_for_graph: DataFrame
+        DataFrame containing all valid tag info (mean, std, min, max).
+
+    dfs_for_graph: DataFrame
+        DataFrame containing all valid for all subjects.
     """
     dfs = []
     for in_json in in_jsons:
@@ -93,8 +100,8 @@ def read_protocol(in_jsons, tags):
                                          dfs_for_graph.std(),
                                          dfs_for_graph.min(),
                                          dfs_for_graph.max()],
-                                         index=['mean', 'std', 'min', 'max'],
                                          columns=dfs_for_graph.columns)
+                                         index=['mean', 'std', 'min', 'max'],
 
     return dfs, dfs_for_graph, dfs_for_graph_all
 
