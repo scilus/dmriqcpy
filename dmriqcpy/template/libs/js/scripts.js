@@ -223,6 +223,7 @@ $(document).ready(function () {
     var zoom = 2;
     zoom_activated = false;
     help_displayed = false;
+    dark_mode = document.getElementById('darkSwitch');
     qc_saved = true;
     datetime = "";
     nodes = Array.prototype.slice.call(document.getElementById('navigation').children);
@@ -426,6 +427,17 @@ $(document).ready(function () {
             }
             else {
                 document.getElementById("help").style.display = "none";
+            }
+        }
+        else if (e.key == "d") {
+            dark_mode = !dark_mode;
+            if (dark_mode) {
+                document.body.setAttribute('data-theme', 'dark');
+                document.getElementById('darkSwitch').checked = true;
+            }
+            else {
+                document.body.removeAttribute('data-theme');
+                document.getElementById('darkSwitch').checked = false;
             }
         }
         else if (e.key == "i") {
