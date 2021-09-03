@@ -52,10 +52,8 @@ def read_protocol(in_jsons, tags):
     -------
     dfs : Tuple
         Tuple of DataFrame for each tag (tag_name, DataFrame).
-
     dfs_for_graph: DataFrame
         DataFrame containing all valid tag info (mean, std, min, max).
-
     dfs_for_graph: DataFrame
         DataFrame containing all valid for all subjects.
     """

@@ -66,10 +66,11 @@ def main():
     stats_tags_for_graph = []
     if args.metadata:
         if not len(args.metadata) == len(args.bval):
-            print('Number of metadata files: {}.\n'
-                  'Number of bval files: {}.'.format(len(args.metadata),
-                                                     len(args.bval)))
-            parser.error("Not the same number of images in input.")
+            parser.error('Number of metadata files: {}.\n'
+                         'Number of bval files: {}.\n'
+                         'Not the same number of images '
+                         'in input'.format(len(args.metadata),
+                                           len(args.bval)))
         else:
             stats_tags, stats_tags_for_graph,\
                 stats_tags_for_graph_all = read_protocol(args.metadata,
