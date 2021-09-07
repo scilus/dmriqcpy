@@ -63,6 +63,7 @@ def main():
     if not len(args.bval) == len(args.bvec):
         parser.error("Not the same number of images in input.")
 
+    stats_tags =  []
     stats_tags_for_graph = []
     if args.metadata:
         if not len(args.metadata) == len(args.bval):

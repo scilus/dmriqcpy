@@ -98,8 +98,8 @@ def read_protocol(in_jsons, tags):
                                          dfs_for_graph.std(),
                                          dfs_for_graph.min(),
                                          dfs_for_graph.max()],
-                                         columns=dfs_for_graph.columns)
                                          index=['mean', 'std', 'min', 'max'],
+                                         columns=dfs_for_graph.columns)
 
     return dfs, dfs_for_graph, dfs_for_graph_all
 
@@ -124,7 +124,7 @@ def dwi_protocol(bvals, tol=20):
     values_stats = []
     column_names = ["Nbr shells", "Nbr directions"]
     shells = {}
-    index = [os.path.basename(item).split('.')[0] for item in bvals]
+    index = [item.split('.')[0] for item in bvals]
     for i, filename in enumerate(bvals):
         values = []
 
