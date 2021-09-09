@@ -7,10 +7,8 @@ import shutil
 
 import numpy as np
 import pandas as pd
-from scilpy.utils.bvec_bval_tools import identify_shells
-from scilpy.viz.gradient_sampling import build_ms_from_shell_idx
 
-from dmriqcpy.analysis.utils import dwi_protocol, read_protocol
+from dmriqcpy.analysis.utils import dwi_protocol, read_protocol, identify_shells
 from dmriqcpy.io.report import Report
 from dmriqcpy.io.utils import (add_online_arg, add_overwrite_arg,
                                assert_inputs_exist, assert_outputs_exist)
@@ -18,7 +16,8 @@ from dmriqcpy.viz.graph import (graph_directions_per_shells,
                                 graph_dwi_protocol,
                                 graph_subjects_per_shells)
 from dmriqcpy.viz.screenshot import plot_proj_shell
-from dmriqcpy.viz.utils import analyse_qa, dataframe_to_html
+from dmriqcpy.viz.utils import (analyse_qa, dataframe_to_html,
+                                build_ms_from_shell_idx)
 
 DESCRIPTION = """
 Compute DWI protocol report.

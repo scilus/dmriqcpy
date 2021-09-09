@@ -5,6 +5,11 @@ from vtk.util import numpy_support
 
 import numpy as np
 
+"""
+Some functions comes from
+https://github.com/scilus/scilpy/blob/master/scilpy/viz/gradient_sampling.py
+"""
+
 
 def analyse_qa(stats_per_subjects, stats_across_subjects, column_names):
     """
@@ -124,3 +129,31 @@ def compute_labels_map(lut_fname):
                                                      dtype=np.int8)
 
     return labels
+
+
+def build_ms_from_shell_idx(bvecs, shell_idx):
+    """
+    Get bvecs from indexes
+
+    Parameters
+    ----------
+    bvecs: numpy.ndarray
+        bvecs
+    shell_idx: numpy.ndarray
+        index for each bval
+
+    Return
+    ------
+    ms: list of numpy.ndarray
+        bvecs for each bval
+    """
+
+    S = len(set(shell_idx))
+    if (-1 in set(shell_idx)):
+        S -= 1
+
+    ms = []
+    for i_ms in range(S):
+        ms.append(bvecs[shell_idx == i_ms])
+
+    return ms
