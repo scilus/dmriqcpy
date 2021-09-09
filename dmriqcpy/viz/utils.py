@@ -32,11 +32,11 @@ def analyse_qa(stats_per_subjects, stats_across_subjects, column_names):
         for name in stats_per_subjects.index:
             if stats_per_subjects.at[name, metric] > mean + 2 * std or\
                stats_per_subjects.at[name, metric] < mean - 2 * std:
-                warning[metric].append(name[0])
+                warning[metric].append(name)
     return warning
 
 
-def dataframe_to_html(data_frame):
+def dataframe_to_html(data_frame, index=True):
     """
     Convert DataFrame to HTML table.
 
@@ -50,7 +50,7 @@ def dataframe_to_html(data_frame):
     data_frame_html : string
         HTML table.
     """
-    data_frame_html = data_frame.to_html().replace(
+    data_frame_html = data_frame.to_html(index=index).replace(
         '<table border="1" '
         'class="dataframe">',
         '<table align="center" class="table table-striped">')
@@ -65,7 +65,7 @@ def renderer_to_arr(ren, size):
     ----------
     ren : Renderer
         vtk Renderer.
-    
+
     size : tuple of int
         Size of the output image
 
@@ -73,7 +73,7 @@ def renderer_to_arr(ren, size):
     -------
     arr : array
         Image as numpy array.
-    
+
     Notes
     -----
     Inspired from https://github.com/fury-gl/fury/blob/master/fury/window.py
@@ -118,6 +118,9 @@ def compute_labels_map(lut_fname):
         for line in f:
             tokens = ' '.join(line.split()).split()
             if tokens and not tokens[0].startswith('#'):
-                labels[np.int(tokens[0])] = np.array((tokens[2], tokens[3], tokens[4]), dtype=np.int8)
+                labels[np.int(tokens[0])] = np.array((tokens[2],
+                                                      tokens[3],
+                                                      tokens[4]),
+                                                     dtype=np.int8)
 
     return labels

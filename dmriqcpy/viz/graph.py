@@ -324,7 +324,7 @@ def graph_dwi_protocol(title, column_name, summary, online=False):
     include_plotlyjs = not online
 
     np.random.seed(1)
-    metric = np.concatenate(summary.index)
+    metric = summary.index
     data = np.array(summary[column_name])
 
     graph = Box(
