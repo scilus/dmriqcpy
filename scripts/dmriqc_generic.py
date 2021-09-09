@@ -27,31 +27,33 @@ def _build_arg_parser():
                                 formatter_class=argparse.RawTextHelpFormatter)
 
     p.add_argument('image_type',
-                   help='Type of image (e.g. B0 resample)')
+                   help='Type of image (e.g. B0 resample).')
 
     p.add_argument('output_report',
-                   help='HTML report')
+                   help='HTML report.')
 
     p.add_argument('--images', nargs='+', required=True,
-                   help='Images in Nifti format')
+                   help='Images in Nifti format.')
 
     p.add_argument('--wm', nargs='+',
-                   help='WM mask in Nifti format')
+                   help='WM mask in Nifti format.')
 
     p.add_argument('--gm', nargs='+',
                    help='GM mask in Nifti format')
 
     p.add_argument('--csf', nargs='+',
-                   help='CSF mask in Nifti format')
+                   help='CSF mask in Nifti format.')
 
     p.add_argument('--skip', default=2, type=int,
-                   help='Number of images skipped to build the mosaic. [%(default)s]')
+                   help='Number of images skipped to build the mosaic.'
+                        ' [%(default)s]')
 
     p.add_argument('--nb_columns', default=12, type=int,
                    help='Number of columns for the mosaic. [%(default)s]')
 
     p.add_argument('--duration', default=100, type=int,
-                   help='Duration of each image in GIF in milliseconds [%(default)s]')
+                   help='Duration of each image in GIF in milliseconds.'
+                        ' [%(default)s]')
 
     p.add_argument('--nb_threads', type=int, default=1,
                    help='Number of threads. [%(default)s]')
@@ -63,7 +65,8 @@ def _build_arg_parser():
 
 def _subj_parralel(subj_metric, summary, name, skip, nb_columns, duration):
     subjects_dict = {}
-    screenshot_path = screenshot_mosaic_wrapper(subj_metric, output_prefix=name,
+    screenshot_path = screenshot_mosaic_wrapper(subj_metric,
+                                                output_prefix=name,
                                                 directory="data", skip=skip,
                                                 nb_columns=nb_columns,
                                                 duration=duration)
@@ -114,7 +117,8 @@ def main():
         curr_metrics = ['Mean {}'.format(name),
                         'Median {}'.format(name)]
         summary, stats = stats_mean_median(curr_metrics, args.images)
-        graph = graph_mean_median('Mean {}'.format(name), curr_metrics, summary)
+        graph = graph_mean_median('Mean {}'.format(name),
+                                  curr_metrics, summary)
 
     warning_dict = {}
     warning_dict[name] = analyse_qa(summary, stats, curr_metrics[:3])

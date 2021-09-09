@@ -6,14 +6,16 @@ import os
 import shutil
 
 import numpy as np
+import pandas as pd
 from scilpy.utils.bvec_bval_tools import identify_shells
 from scilpy.viz.gradient_sampling import build_ms_from_shell_idx
 
-from dmriqcpy.analysis.utils import dwi_protocol
+from dmriqcpy.analysis.utils import dwi_protocol, read_protocol
 from dmriqcpy.io.report import Report
 from dmriqcpy.io.utils import (add_overwrite_arg, assert_inputs_exist,
                                assert_outputs_exist)
-from dmriqcpy.viz.graph import (graph_directions_per_shells, graph_dwi_protocol,
+from dmriqcpy.viz.graph import (graph_directions_per_shells,
+                                graph_dwi_protocol,
                                 graph_subjects_per_shells)
 from dmriqcpy.viz.screenshot import plot_proj_shell
 from dmriqcpy.viz.utils import analyse_qa, dataframe_to_html
@@ -36,10 +38,18 @@ def _build_arg_parser():
     p.add_argument('--bvec', nargs='+', required=True,
                    help='List of bvec files.')
 
+    p.add_argument('--metadata', nargs='+',
+                   help='Json files to get the metadata.')
+
+    p.add_argument('--tags', nargs='+',
+                   default=["EchoTime", "RepetitionTime", "SliceThickness",
+                            "Manufacturer", "ManufacturersModelName"],
+                   help='DICOM tags used to compare information. %(default)s')
+
     p.add_argument('--tolerance', '-t',
                    metavar='INT', type=int, default=20,
                    help='The tolerated gap between the b-values to '
-                        'extract\nand the actual b-values.')
+                        'extract\nand the actual b-values. [%(default)s]')
 
     add_overwrite_arg(p)
 
@@ -52,6 +62,20 @@ def main():
 
     if not len(args.bval) == len(args.bvec):
         parser.error("Not the same number of images in input.")
+
+    stats_tags =  []
+    stats_tags_for_graph = []
+    if args.metadata:
+        if not len(args.metadata) == len(args.bval):
+            parser.error('Number of metadata files: {}.\n'
+                         'Number of bval files: {}.\n'
+                         'Not the same number of images '
+                         'in input'.format(len(args.metadata),
+                                           len(args.bval)))
+        else:
+            stats_tags, stats_tags_for_graph,\
+                stats_tags_for_graph_all = read_protocol(args.metadata,
+                                                         args.tags)
 
     all_data = np.concatenate([args.bval,
                                args.bvec])
@@ -67,9 +91,26 @@ def main():
 
     name = "DWI Protocol"
     summary, stats_for_graph, stats_all, shells = dwi_protocol(args.bval)
+
+    if stats_tags:
+        for curr_column in stats_tags:
+            tag = curr_column[0]
+            curr_df = curr_column[1]
+            if 'complete_' in tag:
+                metric = curr_df.columns[0]
+                for nSub in curr_df.index:
+                    currKey = [nKey for nKey in summary.keys() if nSub in nKey]
+                    summary[currKey[0]][metric] = curr_df[metric][nSub]
+
+    if not isinstance(stats_tags_for_graph, list):
+        stats_for_graph = pd.concat([stats_for_graph, stats_tags_for_graph],
+                                    axis=1, join="inner")
+        stats_all = pd.concat([stats_all, stats_tags_for_graph_all],
+                              axis=1, join="inner")
+
     warning_dict = {}
     warning_dict[name] = analyse_qa(stats_for_graph, stats_all,
-                                    ["Nbr shells", "Nbr directions"])
+                                    stats_all.columns)
     warning_images = [filenames for filenames in warning_dict[name].values()]
     warning_list = np.concatenate(warning_images)
     warning_dict[name]['nb_warnings'] = len(np.unique(warning_list))
@@ -78,11 +119,17 @@ def main():
     summary_dict = {}
     summary_dict[name] = stats_html
 
+    if args.metadata:
+        for curr_tag in stats_tags:
+            if 'complete_' not in curr_tag[0]:
+                summary_dict[curr_tag[0]] = dataframe_to_html(curr_tag[1])
+
     graphs = []
-    graphs.append(
-        graph_directions_per_shells("Nbr directions per shell", shells))
+    graphs.append(graph_directions_per_shells("Nbr directions per shell",
+                                              shells))
     graphs.append(graph_subjects_per_shells("Nbr subjects per shell", shells))
-    for c in ["Nbr shells", "Nbr directions"]:
+
+    for c in stats_for_graph.columns:
         graph = graph_dwi_protocol(c, c, stats_for_graph)
         graphs.append(graph)
 
@@ -101,7 +148,8 @@ def main():
                         ofile=os.path.join("data", name + filename),
                         ores=(800, 800))
         subjects_dict[bval]['screenshot'] = os.path.join("data",
-                                                         name + filename + '.png')
+                                                         name + filename +
+                                                         '.png')
     metrics_dict = {}
     for subj in args.bval:
         summary_html = dataframe_to_html(summary[subj])
