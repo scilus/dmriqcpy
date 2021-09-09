@@ -7,13 +7,15 @@ import shutil
 
 import numpy as np
 
+
 from dmriqcpy.io.report import Report
-from dmriqcpy.viz.graph import graph_tractogram
+from dmriqcpy.io.utils import (add_online_arg, add_overwrite_arg,
+                               assert_inputs_exist, assert_outputs_exist)
 from dmriqcpy.analysis.stats import stats_tractogram
+from dmriqcpy.viz.graph import graph_tractogram
 from dmriqcpy.viz.screenshot import screenshot_tracking
 from dmriqcpy.viz.utils import analyse_qa, dataframe_to_html
-from dmriqcpy.io.utils import add_overwrite_arg, assert_inputs_exist,\
-                              assert_outputs_exist
+
 
 DESCRIPTION = """
 Compute the tractogram report in HTML format.
@@ -33,6 +35,7 @@ def _build_arg_parser():
     p.add_argument('--t1', nargs='+',
                    help='T1 images in Nifti format')
 
+    add_online_arg(p)
     add_overwrite_arg(p)
 
     return p
@@ -66,7 +69,7 @@ def main():
     warning_dict[name]['nb_warnings'] = len(np.unique(warning_list))
 
     graphs = []
-    graph = graph_tractogram("Tracking", columns, summary)
+    graph = graph_tractogram("Tracking", columns, summary, args.online)
     graphs.append(graph)
 
     summary_dict = {}
@@ -88,7 +91,8 @@ def main():
     report.generate(title="Quality Assurance tractograms",
                     nb_subjects=nb_subjects, summary_dict=summary_dict,
                     graph_array=graphs, metrics_dict=metrics_dict,
-                    warning_dict=warning_dict)
+                    warning_dict=warning_dict,
+                    online=args.online)
 
 
 if __name__ == '__main__':

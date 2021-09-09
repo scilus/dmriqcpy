@@ -9,13 +9,15 @@ import itertools
 from multiprocessing import Pool
 import numpy as np
 
-from dmriqcpy.io.report import Report
-from dmriqcpy.viz.graph import graph_mean_in_tissues
+
 from dmriqcpy.analysis.stats import stats_mean_in_tissues
+from dmriqcpy.io.report import Report
+from dmriqcpy.io.utils import (add_online_arg, add_overwrite_arg,
+                               assert_inputs_exist, assert_outputs_exist)
+from dmriqcpy.viz.graph import graph_mean_in_tissues
 from dmriqcpy.viz.screenshot import screenshot_mosaic_blend
 from dmriqcpy.viz.utils import analyse_qa, dataframe_to_html
-from dmriqcpy.io.utils import add_overwrite_arg, assert_inputs_exist,\
-                              assert_outputs_exist
+
 
 DESCRIPTION = """
 Compute the registration report in HTML format.
@@ -45,7 +47,8 @@ def _build_arg_parser():
                    help='CSF mask in Nifti format')
 
     p.add_argument('--skip', default=2, type=int,
-                   help='Number of images skipped to build the mosaic. [%(default)s]')
+                   help='Number of images skipped to build the '
+                        'mosaic. [%(default)s]')
 
     p.add_argument('--nb_columns', default=12, type=int,
                    help='Number of columns for the mosaic. [%(default)s]')
@@ -53,6 +56,7 @@ def _build_arg_parser():
     p.add_argument('--nb_threads', type=int, default=1,
                    help='Number of threads. [%(default)s]')
 
+    add_online_arg(p)
     add_overwrite_arg(p)
 
     return p
@@ -100,15 +104,15 @@ def main():
                     'Max {} in WM'.format(name)]
 
     warning_dict = {}
-    summary, stats = stats_mean_in_tissues(curr_metrics, args.t1_warped, args.wm,
-                                           args.gm, args.csf)
+    summary, stats = stats_mean_in_tissues(curr_metrics, args.t1_warped,
+                                           args.wm, args.gm, args.csf)
     warning_dict[name] = analyse_qa(summary, stats, curr_metrics[:3])
     warning_list = np.concatenate([filenames for filenames in warning_dict[name].values()])
     warning_dict[name]['nb_warnings'] = len(np.unique(warning_list))
 
     graphs = []
     graph = graph_mean_in_tissues('Mean {}'.format(name), curr_metrics[:3],
-                                  summary)
+                                  summary, args.online)
     graphs.append(graph)
 
     stats_html = dataframe_to_html(stats)
@@ -138,7 +142,8 @@ def main():
     report.generate(title="Quality Assurance registration",
                     nb_subjects=nb_subjects, summary_dict=summary_dict,
                     graph_array=graphs, metrics_dict=metrics_dict,
-                    warning_dict=warning_dict)
+                    warning_dict=warning_dict,
+                    online=args.online)
 
 
 if __name__ == '__main__':

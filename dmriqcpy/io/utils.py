@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Some functions comes from https://github.com/scilus/scilpy/blob/master/scilpy/io/utils.py
+Some functions comes from
+https://github.com/scilus/scilpy/blob/master/scilpy/io/utils.py
 """
 
 import os
@@ -19,7 +20,8 @@ def add_overwrite_arg(parser):
         help='Force overwriting of the output files.')
 
 
-def assert_inputs_exist(parser, required, optional=None, are_directories=False):
+def assert_inputs_exist(parser, required, optional=None,
+                        are_directories=False):
     """
     Assert that all inputs exist. If not, print parser's usage and exit.
 
@@ -79,3 +81,9 @@ def assert_outputs_exist(parser, args, required, optional=None):
     for optional_file in optional or []:
         if optional_file is not None:
             check(optional_file)
+
+
+def add_online_arg(parser):
+    parser.add_argument('--online', action='store_true',
+                        help='If set, the script will use the internet '
+                             'connexion to grab the needed libraries.')

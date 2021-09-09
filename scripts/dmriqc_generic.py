@@ -11,8 +11,8 @@ import numpy as np
 
 from dmriqcpy.analysis.stats import stats_mean_in_tissues, stats_mean_median
 from dmriqcpy.io.report import Report
-from dmriqcpy.io.utils import (add_overwrite_arg, assert_inputs_exist,
-                               assert_outputs_exist)
+from dmriqcpy.io.utils import (add_online_arg, add_overwrite_arg,
+                               assert_inputs_exist, assert_outputs_exist)
 from dmriqcpy.viz.graph import graph_mean_in_tissues, graph_mean_median
 from dmriqcpy.viz.screenshot import screenshot_mosaic_wrapper
 from dmriqcpy.viz.utils import analyse_qa, dataframe_to_html
@@ -45,8 +45,8 @@ def _build_arg_parser():
                    help='CSF mask in Nifti format.')
 
     p.add_argument('--skip', default=2, type=int,
-                   help='Number of images skipped to build the mosaic.'
-                        ' [%(default)s]')
+                   help='Number of images skipped to build the '
+                        'mosaic. [%(default)s]')
 
     p.add_argument('--nb_columns', default=12, type=int,
                    help='Number of columns for the mosaic. [%(default)s]')
@@ -58,6 +58,7 @@ def _build_arg_parser():
     p.add_argument('--nb_threads', type=int, default=1,
                    help='Number of threads. [%(default)s]')
 
+    add_online_arg(p)
     add_overwrite_arg(p)
 
     return p
@@ -112,13 +113,13 @@ def main():
         summary, stats = stats_mean_in_tissues(curr_metrics, args.images,
                                                args.wm, args.gm, args.csf)
         graph = graph_mean_in_tissues('Mean {}'.format(name), curr_metrics[:3],
-                                      summary)
+                                      summary, args.online)
     else:
         curr_metrics = ['Mean {}'.format(name),
                         'Median {}'.format(name)]
         summary, stats = stats_mean_median(curr_metrics, args.images)
-        graph = graph_mean_median('Mean {}'.format(name),
-                                  curr_metrics, summary)
+        graph = graph_mean_median('Mean {}'.format(name), curr_metrics,
+                                  summary, args.online)
 
     warning_dict = {}
     warning_dict[name] = analyse_qa(summary, stats, curr_metrics[:3])
@@ -155,7 +156,8 @@ def main():
     report.generate(title="Quality Assurance " + args.image_type,
                     nb_subjects=nb_subjects, summary_dict=summary_dict,
                     graph_array=graphs, metrics_dict=metrics_dict,
-                    warning_dict=warning_dict)
+                    warning_dict=warning_dict,
+                    online=args.online)
 
 
 if __name__ == '__main__':

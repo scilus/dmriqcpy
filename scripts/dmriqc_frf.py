@@ -7,12 +7,12 @@ import shutil
 
 import numpy as np
 
-from dmriqcpy.io.report import Report
-from dmriqcpy.viz.graph import graph_frf
 from dmriqcpy.analysis.stats import stats_frf
+from dmriqcpy.io.report import Report
+from dmriqcpy.io.utils import (add_online_arg, add_overwrite_arg,
+                               assert_inputs_exist, assert_outputs_exist)
+from dmriqcpy.viz.graph import graph_frf
 from dmriqcpy.viz.utils import analyse_qa, dataframe_to_html
-from dmriqcpy.io.utils import add_overwrite_arg, assert_inputs_exist,\
-                              assert_outputs_exist
 
 
 DESCRIPTION = """
@@ -30,6 +30,7 @@ def _build_arg_parser():
     p.add_argument('output_report',
                    help='Filename of QC report (in html format).')
 
+    add_online_arg(p)
     add_overwrite_arg(p)
 
     return p
@@ -55,7 +56,7 @@ def main():
     warning_dict[name]['nb_warnings'] = len(np.unique(warning_list))
 
     graphs = []
-    graph = graph_frf("FRF", metrics_names, summary)
+    graph = graph_frf("FRF", metrics_names, summary, args.online)
     graphs.append(graph)
 
     summary_dict = {}
@@ -75,7 +76,8 @@ def main():
     report.generate(title="Quality Assurance FRF",
                     nb_subjects=nb_subjects, summary_dict=summary_dict,
                     graph_array=graphs, metrics_dict=metrics_dict,
-                    warning_dict=warning_dict)
+                    warning_dict=warning_dict,
+                    online=args.online)
 
 
 if __name__ == '__main__':

@@ -12,8 +12,8 @@ from scilpy.viz.gradient_sampling import build_ms_from_shell_idx
 
 from dmriqcpy.analysis.utils import dwi_protocol, read_protocol
 from dmriqcpy.io.report import Report
-from dmriqcpy.io.utils import (add_overwrite_arg, assert_inputs_exist,
-                               assert_outputs_exist)
+from dmriqcpy.io.utils import (add_online_arg, add_overwrite_arg,
+                               assert_inputs_exist, assert_outputs_exist)
 from dmriqcpy.viz.graph import (graph_directions_per_shells,
                                 graph_dwi_protocol,
                                 graph_subjects_per_shells)
@@ -51,6 +51,7 @@ def _build_arg_parser():
                    help='The tolerated gap between the b-values to '
                         'extract\nand the actual b-values. [%(default)s]')
 
+    add_online_arg(p)
     add_overwrite_arg(p)
 
     return p
@@ -125,12 +126,13 @@ def main():
                 summary_dict[curr_tag[0]] = dataframe_to_html(curr_tag[1])
 
     graphs = []
-    graphs.append(graph_directions_per_shells("Nbr directions per shell",
-                                              shells))
-    graphs.append(graph_subjects_per_shells("Nbr subjects per shell", shells))
-
-    for c in stats_for_graph.columns:
-        graph = graph_dwi_protocol(c, c, stats_for_graph)
+    graphs.append(
+        graph_directions_per_shells("Nbr directions per shell",
+                                    shells, args.online))
+    graphs.append(graph_subjects_per_shells("Nbr subjects per shell",
+                                            shells, args.online))
+    for c in ["Nbr shells", "Nbr directions"]:
+        graph = graph_dwi_protocol(c, c, stats_for_graph, args.online)
         graphs.append(graph)
 
     subjects_dict = {}
@@ -161,7 +163,8 @@ def main():
     report.generate(title="Quality Assurance DWI protocol",
                     nb_subjects=nb_subjects, metrics_dict=metrics_dict,
                     summary_dict=summary_dict, graph_array=graphs,
-                    warning_dict=warning_dict)
+                    warning_dict=warning_dict,
+                    online=args.online)
 
 
 if __name__ == '__main__':
