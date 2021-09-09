@@ -7,10 +7,10 @@ import shutil
 
 import numpy as np
 import pandas as pd
-from scilpy.utils.bvec_bval_tools import identify_shells
-from scilpy.viz.gradient_sampling import build_ms_from_shell_idx
 
-from dmriqcpy.analysis.utils import dwi_protocol, read_protocol
+from dmriqcpy.analysis.utils import (dwi_protocol, read_protocol,
+                                     identify_shells,
+                                     build_ms_from_shell_idx)
 from dmriqcpy.io.report import Report
 from dmriqcpy.io.utils import (add_online_arg, add_overwrite_arg,
                                assert_inputs_exist, assert_outputs_exist)

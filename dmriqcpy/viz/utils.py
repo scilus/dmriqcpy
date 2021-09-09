@@ -5,6 +5,11 @@ from vtk.util import numpy_support
 
 import numpy as np
 
+"""
+Some functions comes from
+https://github.com/scilus/scilpy/blob/master/scilpy/viz/gradient_sampling.py
+"""
+
 
 def analyse_qa(stats_per_subjects, stats_across_subjects, column_names):
     """
