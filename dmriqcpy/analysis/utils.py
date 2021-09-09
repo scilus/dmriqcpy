@@ -235,3 +235,31 @@ def identify_shells(bvals, threshold=40.0, roundCentroids=False, sort=False):
         return sorted_centroids, sorted_indices
 
     return centroids, shell_indices
+
+
+def build_ms_from_shell_idx(bvecs, shell_idx):
+    """
+    Get bvecs from indexes
+
+    Parameters
+    ----------
+    bvecs: numpy.ndarray
+        bvecs
+    shell_idx: numpy.ndarray
+        index for each bval
+
+    Return
+    ------
+    ms: list of numpy.ndarray
+        bvecs for each bval
+    """
+
+    S = len(set(shell_idx))
+    if (-1 in set(shell_idx)):
+        S -= 1
+
+    ms = []
+    for i_ms in range(S):
+        ms.append(bvecs[shell_idx == i_ms])
+
+    return ms
