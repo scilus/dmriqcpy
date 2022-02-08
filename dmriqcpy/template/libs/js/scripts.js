@@ -775,7 +775,7 @@ function doMouseWheel(event) {
 }
 
 function update_status(object) {
-    document.getElementById(object.name + "_status").innerText = object.innerText;
+    document.getElementById(object.name + "_status").innerText = object.innerText.trim(" ").trim("\n");
     document.getElementById(object.name + "_status").style.backgroundColor = object.style.backgroundColor;
     if (object.innerText != "Pending") {
         document.getElementById("curr_subj").style.backgroundColor = object.style.backgroundColor;
