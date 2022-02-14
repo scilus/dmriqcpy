@@ -13,7 +13,8 @@ from dmriqcpy.analysis.stats import stats_mean_in_tissues, stats_mean_median
 from dmriqcpy.io.report import Report
 from dmriqcpy.io.utils import (add_online_arg, add_overwrite_arg,
                                assert_inputs_exist, assert_outputs_exist,
-                               list_files_from_paths)
+                               list_files_from_paths, add_skip_arg,
+                               add_nb_columns_arg, add_nb_threads_arg)
 from dmriqcpy.viz.graph import graph_mean_in_tissues, graph_mean_median
 from dmriqcpy.viz.screenshot import screenshot_mosaic_wrapper
 from dmriqcpy.viz.utils import analyse_qa, dataframe_to_html
@@ -45,20 +46,13 @@ def _build_arg_parser():
     p.add_argument('--csf', nargs='+',
                    help='Folder or list of CSF mask in Nifti format.')
 
-    p.add_argument('--skip', default=2, type=int,
-                   help='Number of images skipped to build the '
-                        'mosaic. [%(default)s]')
-
-    p.add_argument('--nb_columns', default=12, type=int,
-                   help='Number of columns for the mosaic. [%(default)s]')
-
     p.add_argument('--duration', default=100, type=int,
                    help='Duration of each image in GIF in milliseconds.'
                         ' [%(default)s]')
 
-    p.add_argument('--nb_threads', type=int, default=1,
-                   help='Number of threads. [%(default)s]')
-
+    add_skip_arg(p)
+    add_nb_columns_arg(p)
+    add_nb_threads_arg(p)
     add_online_arg(p)
     add_overwrite_arg(p)
 

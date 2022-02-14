@@ -10,7 +10,7 @@ import pandas as pd
 
 from dmriqcpy.analysis.utils import (dwi_protocol, read_protocol,
                                      identify_shells,
-                                     build_ms_from_shell_idx)
+                                     get_bvecs_from_shells_idxs)
 from dmriqcpy.io.report import Report
 from dmriqcpy.io.utils import (add_online_arg, add_overwrite_arg,
                                assert_inputs_exist, assert_outputs_exist,
@@ -152,7 +152,7 @@ def main():
             points = points.T
         bvals = np.genfromtxt(curr_bval)
         centroids, shell_idx = identify_shells(bvals)
-        ms = build_ms_from_shell_idx(points, shell_idx)
+        ms = get_bvecs_from_shells_idxs(points, shell_idx)
         plot_proj_shell(ms, centroids, use_sym=True, use_sphere=True,
                         same_color=False, rad=0.025, opacity=0.2,
                         ofile=os.path.join("data", name.replace(" ", "_") +

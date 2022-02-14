@@ -60,11 +60,7 @@ def read_protocol(in_jsons, tags):
     dfs_for_graph: DataFrame
         DataFrame containing all valid for all subjects.
     """
-    dfs = []
-    for in_json in in_jsons:
-        data = pd.read_json(in_json, orient='index')
-        dfs.append(data.T)
-
+    dfs = [pd.read_json(in_json, orient='index').T for in_json in in_jsons]
     temp = pd.concat(dfs, ignore_index=True)
     index = [os.path.basename(item).split('.')[0] for item in in_jsons]
     dfs = []
@@ -170,6 +166,9 @@ def dwi_protocol(bvals, tol=20):
     return stats_per_subjects, stats, stats_across_subjects, shells
 
 
+# TODO: THIS FUNCTION IS LEGACY. It was pulled from Scilpy to prevent including Dipy
+#       as a dependency. Once it is decided to add Dipy to our stack and proceed with
+#       validation, this function need to change for its Dipy equivalent.
 def identify_shells(bvals, threshold=40.0, roundCentroids=False, sort=False):
     """
     Guessing the shells from the b-values. Returns the list of shells and, for
@@ -180,8 +179,6 @@ def identify_shells(bvals, threshold=40.0, roundCentroids=False, sort=False):
     threshold, or else we consider that it is on another shell. This is an
     alternative to K-means considering we don't already know the number of
     shells K.
-
-    Note. This function should be added in Dipy soon.
 
     Parameters
     ----------
@@ -237,16 +234,19 @@ def identify_shells(bvals, threshold=40.0, roundCentroids=False, sort=False):
     return centroids, shell_indices
 
 
-def build_ms_from_shell_idx(bvecs, shell_idx):
+# TODO: THIS FUNCTION IS LEGACY. It works with the function above, but hasn't been tested
+#       against the Dipy implementation. It needs to be validated if the function above is
+#       changed for Dipy.
+def get_bvecs_from_shells_idxs(bvecs, shell_idxs):
     """
-    Get bvecs from indexes
+    Get bvecs associated to each shell
 
     Parameters
     ----------
     bvecs: numpy.ndarray
-        bvecs
-    shell_idx: numpy.ndarray
-        index for each bval
+        bvecs (N, 3)
+    shell_idxs: numpy.ndarray
+        lists of indexes into bvecs for each shell (K, M_k)
 
     Return
     ------
@@ -254,12 +254,8 @@ def build_ms_from_shell_idx(bvecs, shell_idx):
         bvecs for each bval
     """
 
-    S = len(set(shell_idx))
-    if (-1 in set(shell_idx)):
-        S -= 1
+    nb_shells = len(set(shell_idxs))
+    if -1 in set(shell_idxs):
+        nb_shells -= 1
 
-    ms = []
-    for i_ms in range(S):
-        ms.append(bvecs[shell_idx == i_ms])
-
-    return ms
+    return [bvecs[shell_idxs == i_ms] for i_ms in range(nb_shells)]

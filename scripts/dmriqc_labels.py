@@ -12,7 +12,8 @@ import numpy as np
 from dmriqcpy.io.report import Report
 from dmriqcpy.io.utils import (add_online_arg, add_overwrite_arg,
                                assert_inputs_exist, assert_outputs_exist,
-                               list_files_from_paths)
+                               list_files_from_paths, add_skip_arg,
+                               add_nb_columns_arg, add_nb_threads_arg)
 from dmriqcpy.viz.screenshot import screenshot_mosaic_blend
 
 
@@ -37,22 +38,15 @@ def _build_arg_parser():
     p.add_argument('--label', nargs='+', required=True,
                    help='Folder or list of label images in Nifti format.')
 
-    p.add_argument('--skip', default=2, type=int,
-                   help='Number of images skipped to build the '
-                        'mosaic. [%(default)s]')
-
-    p.add_argument('--nb_columns', default=12, type=int,
-                   help='Number of columns for the mosaic. [%(default)s]')
-
     p.add_argument('--lut', nargs=1, default="",
                    help='Look Up Table for RGB.')
 
     p.add_argument('--compute_lut', action='store_true',
                    help='Compute Look Up Table for RGB.')
 
-    p.add_argument('--nb_threads', type=int, default=1,
-                   help='Number of threads. [%(default)s]')
-
+    add_skip_arg(p)
+    add_nb_columns_arg(p)
+    add_nb_threads_arg(p)
     add_online_arg(p)
     add_overwrite_arg(p)
 

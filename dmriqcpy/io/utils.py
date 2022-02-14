@@ -90,6 +90,21 @@ def add_online_arg(parser):
                              'connexion to grab the needed libraries.')
 
 
+def add_nb_threads_arg(parser, default=1):
+    parser.add_argument('--nb_threads', type=int, default=default,
+                        help='Number of threads. [%(default)s]')
+
+
+def add_skip_arg(parser, default=2):
+    parser.add_argument('--skip', default=default, type=int,
+                        help='Number of images skipped to build the '
+                             'mosaic. [%(default)s]')
+
+
+def add_nb_columns_arg(parser, default=12):
+    parser.add_argument('--nb_columns', default=default, type=int,
+                        help='Number of columns for the mosaic. [%(default)s]')
+
 def list_files_from_paths(paths):
     """
     Get all images from folder or list of files
