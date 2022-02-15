@@ -32,11 +32,13 @@ def analyse_qa(stats_per_subjects, stats_across_subjects, column_names):
     warning = {}
     for metric in column_names:
         warning[metric] = []
-        std = stats_across_subjects.at['std', metric]
-        mean = stats_across_subjects.at['mean', metric]
+        std = stats_across_subjects.at["std", metric]
+        mean = stats_across_subjects.at["mean", metric]
         for name in stats_per_subjects.index:
-            if stats_per_subjects.at[name, metric] > mean + 2 * std or\
-               stats_per_subjects.at[name, metric] < mean - 2 * std:
+            if (
+                stats_per_subjects.at[name, metric] > mean + 2 * std
+                or stats_per_subjects.at[name, metric] < mean - 2 * std
+            ):
                 warning[metric].append(name)
     return warning
 
@@ -56,9 +58,9 @@ def dataframe_to_html(data_frame, index=True):
         HTML table.
     """
     data_frame_html = data_frame.to_html(index=index).replace(
-        '<table border="1" '
-        'class="dataframe">',
-        '<table align="center" class="table table-striped">')
+        '<table border="1" ' 'class="dataframe">',
+        '<table align="center" class="table table-striped">',
+    )
     return data_frame_html
 
 
@@ -130,11 +132,10 @@ def compute_labels_map(lut_fname, unique_vals, compute_lut):
     else:
         with open(lut_fname) as f:
             for line in f:
-                tokens = ' '.join(line.split()).split()
-                if tokens and not tokens[0].startswith('#'):
-                    labels[np.int(tokens[0])] = np.array((tokens[2],
-                                                          tokens[3],
-                                                          tokens[4]),
-                                                          dtype=np.int8)
+                tokens = " ".join(line.split()).split()
+                if tokens and not tokens[0].startswith("#"):
+                labels[np.int(tokens[0])] = np.array(
+                    (tokens[2], tokens[3], tokens[4]), dtype=np.int8
+                )
 
     return labels

@@ -16,15 +16,17 @@ if _version_micro:
 if _version_extra:
     _ver.append(_version_extra)
 
-__version__ = '.'.join(map(str, _ver))
+__version__ = ".".join(map(str, _ver))
 
-CLASSIFIERS = ["Development Status :: 3 - Alpha",
-               "Environment :: Console",
-               "Intended Audience :: Science/Research",
-               "License :: OSI Approved :: MIT License",
-               "Operating System :: OS Independent",
-               "Programming Language :: Python",
-               "Topic :: Scientific/Engineering"]
+CLASSIFIERS = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Topic :: Scientific/Engineering",
+]
 
 # Description should be a one-liner:
 description = "Diffusion MRI Quality Check in python "
@@ -47,8 +49,16 @@ MAJOR = _version_major
 MINOR = _version_minor
 MICRO = _version_micro
 VERSION = __version__
-REQUIRES = ['numpy (>=1.18)', 'jinja2 (>=2.10.1)', 'pandas (>=0.25.1)',
-            'nibabel (>=3.0)', 'plotly (>=3.0.0)', 'vtk (>=8.1.2)',
-            'pillow (>=6.2.0)', 'fury (>=0.2.0)',
-            'matplotlib (>=2.2.0)', 'scipy (>=1.4.1)']
+REQUIRES = [
+    "numpy (>=1.18)",
+    "jinja2 (>=2.10.1)",
+    "pandas (>=0.25.1)",
+    "nibabel (>=3.0)",
+    "plotly (>=3.0.0)",
+    "vtk (>=8.1.2)",
+    "pillow (>=6.2.0)",
+    "fury (>=0.2.0)",
+    "matplotlib (>=2.2.0)",
+    "scipy (>=1.4.1)",
+]
 SCRIPTS = glob.glob("scripts/*.py")

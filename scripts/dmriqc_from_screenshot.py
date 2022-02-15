@@ -8,8 +8,12 @@ import pandas as pd
 import shutil
 
 from dmriqcpy.io.report import Report
-from dmriqcpy.io.utils import (add_online_arg, add_overwrite_arg,
-                               assert_inputs_exist, assert_outputs_exist)
+from dmriqcpy.io.utils import (
+    add_online_arg,
+    add_overwrite_arg,
+    assert_inputs_exist,
+    assert_outputs_exist,
+)
 from dmriqcpy.viz.utils import dataframe_to_html
 
 DESCRIPTION = """
@@ -18,20 +22,25 @@ Compute the screenshot report in HTML format.
 
 
 def _build_arg_parser():
-    p = argparse.ArgumentParser(description=DESCRIPTION,
-                                formatter_class=argparse.RawTextHelpFormatter)
+    p = argparse.ArgumentParser(
+        description=DESCRIPTION, formatter_class=argparse.RawTextHelpFormatter
+    )
 
-    p.add_argument('output_report',
-                   help='HTML report')
+    p.add_argument("output_report", help="HTML report")
 
-    p.add_argument('--data', nargs='+',
-                   help='Screenshot and stats (optional) folders.')
+    p.add_argument(
+        "--data",
+        nargs="+",
+        help="Screenshot and stats (optional) folders."
+    )
 
-    p.add_argument('--stats', action="store_true",
-                   help='Use included csv files.')
+    p.add_argument(
+        "--stats", action="store_true", help="Use included csv files."
+    )
 
-    p.add_argument('--sym_link', action="store_true",
-                   help='Use symlink instead of copy')
+    p.add_argument(
+        "--sym_link", action="store_true", help="Use symlink instead of copy"
+    )
 
     add_online_arg(p)
     add_overwrite_arg(p)
@@ -76,25 +85,36 @@ def main():
         for index, curr_screenshot in enumerate(screenshot_files):
             screenshot_basename = os.path.basename(curr_screenshot)
             if args.sym_link:
-                os.symlink(os.path.abspath(folder) + "/" + screenshot_basename,
-                           "data/" + screenshot_basename)
+                os.symlink(
+                    os.path.abspath(folder) + "/" + screenshot_basename,
+                    "data/" + screenshot_basename,
+                )
             else:
-                shutil.copyfile(curr_screenshot,
-                                "data/" + screenshot_basename)
+                shutil.copyfile(
+                    curr_screenshot, "data/" + screenshot_basename
+                )
             subjects_dict[screenshot_basename] = {}
-            subjects_dict[screenshot_basename]['screenshot'] =\
+            subjects_dict[screenshot_basename]['screenshot'] = (
                 "data/" + screenshot_basename
+            )
+
             if args.stats:
-                subjects_dict[screenshot_basename]['stats'] = dataframe_to_html(pd.read_csv(stats_files[index], index_col=False))
+                stats = dataframe_to_html(
+                    pd.read_csv(stats_files[index], index_col=False)
+                )
+                subjects_dict[screenshot_basename]['stats'] = stats
 
         metrics_dict[name] = subjects_dict
         types += " {0}".format(name)
 
     report = Report(args.output_report)
-    report.generate(title="Quality Assurance" + types,
-                    nb_subjects=nb_subjects, metrics_dict=metrics_dict,
-                    online=args.online)
+    report.generate(
+        title="Quality Assurance" + types,
+        nb_subjects=nb_subjects,
+        metrics_dict=metrics_dict,
+        online=args.online,
+    )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

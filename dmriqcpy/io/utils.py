@@ -17,12 +17,14 @@ def add_overwrite_arg(parser):
     parser: argparse.ArgumentParser object
     """
     parser.add_argument(
-        '-f', dest='overwrite', action='store_true',
-        help='Force overwriting of the output files.')
+        "-f",
+        dest="overwrite",
+        action="store_true",
+        help="Force overwriting of the output files.",
+    )
 
 
-def assert_inputs_exist(parser, required, optional=None,
-                        are_directories=False):
+def assert_inputs_exist(parser, required, optional=None, are_directories=False):
     """
     Assert that all inputs exist. If not, print parser's usage and exit.
 
@@ -34,11 +36,12 @@ def assert_inputs_exist(parser, required, optional=None,
         Each element will be ignored if None
     are_directories: bool
     """
+
     def check(path, are_directories):
         if not os.path.isfile(path) and not are_directories:
-            parser.error('Input file {} does not exist'.format(path))
+            parser.error("Input file {} does not exist".format(path))
         elif are_directories and not os.path.isdir(path):
-            parser.error('Input directory {} does not exist'.format(path))
+            parser.error("Input directory {} does not exist".format(path))
 
     if isinstance(required, str):
         required = [required]
@@ -66,10 +69,13 @@ def assert_outputs_exist(parser, args, required, optional=None):
     optional: string or list of paths.
         Each element will be ignored if None
     """
+
     def check(path):
         if os.path.isfile(path) and not args.overwrite:
-            parser.error('Output file {} exists. Use -f to force '
-                         'overwriting'.format(path))
+            parser.error(
+                "Output file {} exists. Use -f to force "
+                "overwriting".format(path)
+            )
 
     if isinstance(required, str):
         required = [required]
@@ -85,25 +91,39 @@ def assert_outputs_exist(parser, args, required, optional=None):
 
 
 def add_online_arg(parser):
-    parser.add_argument('--online', action='store_true',
-                        help='If set, the script will use the internet '
-                             'connexion to grab the needed libraries.')
+    parser.add_argument(
+        "--online",
+        action="store_true",
+        help="If set, the script will use the internet "
+        "connexion to grab the needed libraries.",
+    )
 
 
 def add_nb_threads_arg(parser, default=1):
-    parser.add_argument('--nb_threads', type=int, default=default,
-                        help='Number of threads. [%(default)s]')
+    parser.add_argument(
+        "--nb_threads",
+        type=int,
+        default=default,
+        help="Number of threads. [%(default)s]",
+    )
 
 
 def add_skip_arg(parser, default=2):
-    parser.add_argument('--skip', default=default, type=int,
-                        help='Number of images skipped to build the '
-                             'mosaic. [%(default)s]')
+    parser.add_argument(
+        "--skip",
+        default=default,
+        type=int,
+        help="Number of images skipped to build the " "mosaic. [%(default)s]",
+    )
 
 
 def add_nb_columns_arg(parser, default=12):
-    parser.add_argument('--nb_columns', default=default, type=int,
-                        help='Number of columns for the mosaic. [%(default)s]')
+    parser.add_argument(
+        "--nb_columns",
+        default=default,
+        type=int,
+        help="Number of columns for the mosaic. [%(default)s]",
+    )
 
 def list_files_from_paths(paths):
     """

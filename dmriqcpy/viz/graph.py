@@ -37,21 +37,21 @@ def graph_mean_median(title, column_names, summary, online=False):
     mean = Box(
         name="Mean",
         y=means,
-        boxpoints='all',
+        boxpoints="all",
         jitter=0.3,
         text=image,
         pointpos=-1.8,
-        hoverinfo="y+text"
+        hoverinfo="y+text",
     )
 
     median = Box(
         name="Median",
         y=medians,
-        boxpoints='all',
+        boxpoints="all",
         jitter=0.3,
         text=image,
         pointpos=-1.8,
-        hoverinfo="y+text"
+        hoverinfo="y+text",
     )
 
     data = [mean, median]
@@ -61,12 +61,16 @@ def graph_mean_median(title, column_names, summary, online=False):
 
     range_yaxis = [0, max_value + 2 * max_value]
 
-    fig['layout']['yaxis'].update(range=range_yaxis)
-    fig['layout'].update(title=title)
-    fig['layout'].update(width=500, height=500)
-    div = off.plot(fig, show_link=False, include_plotlyjs=include_plotlyjs,
-                   output_type='div')
-    div = div.replace("<div>", "<div style=\"display:inline-block\">")
+    fig["layout"]["yaxis"].update(range=range_yaxis)
+    fig["layout"].update(title=title)
+    fig["layout"].update(width=500, height=500)
+    div = off.plot(
+        fig,
+        show_link=False,
+        include_plotlyjs=include_plotlyjs,
+        output_type="div",
+    )
+    div = div.replace("<div>", '<div style="display:inline-block">')
     return div
 
 
@@ -103,27 +107,27 @@ def graph_mean_in_tissues(title, column_names, summary, online=False):
     wm = Box(
         name="WM",
         y=means_wm,
-        boxpoints='all',
+        boxpoints="all",
         jitter=0.3,
         text=metric,
         pointpos=-1.8,
-        hoverinfo="y+text"
+        hoverinfo="y+text",
     )
 
     gm = Box(
         name="GM",
         y=means_gm,
-        boxpoints='all',
+        boxpoints="all",
         jitter=0.3,
         text=metric,
         pointpos=-1.8,
-        hoverinfo="y+text"
+        hoverinfo="y+text",
     )
 
     csf = Box(
         name="CSF",
         y=means_csf,
-        boxpoints='all',
+        boxpoints="all",
         jitter=0.3,
         text=metric,
         pointpos=-1.8,
@@ -135,13 +139,17 @@ def graph_mean_in_tissues(title, column_names, summary, online=False):
 
     range_yaxis = [0, np.max(means_wm) + 2 * np.max(means_wm)]
 
-    fig['layout']['yaxis'].update(range=range_yaxis)
-    fig['layout'].update(title=title)
-    fig['layout'].update(width=500, height=500)
+    fig["layout"]["yaxis"].update(range=range_yaxis)
+    fig["layout"].update(title=title)
+    fig["layout"].update(width=500, height=500)
 
-    div = off.plot(fig, show_link=False, include_plotlyjs=include_plotlyjs,
-                   output_type='div')
-    div = div.replace("<div>", "<div style=\"display:inline-block\">")
+    div = off.plot(
+        fig,
+        show_link=False,
+        include_plotlyjs=include_plotlyjs,
+        output_type="div",
+    )
+    div = div.replace("<div>", '<div style="display:inline-block">')
     return div
 
 
@@ -175,32 +183,36 @@ def graph_frf_eigen(title, column_names, summary, online=False):
     e1_graph = Box(
         name="Eigen value 1",
         y=e1,
-        boxpoints='all',
+        boxpoints="all",
         jitter=0.3,
         text=metric,
         pointpos=-1.8,
-        hoverinfo="y+text"
+        hoverinfo="y+text",
     )
 
     e2_graph = Box(
         name="Eigen value 2",
         y=e2,
-        boxpoints='all',
+        boxpoints="all",
         jitter=0.3,
         text=metric,
         pointpos=-1.8,
-        hoverinfo="y+text"
+        hoverinfo="y+text",
     )
 
     data = [e1_graph, e2_graph]
 
     fig = Figure(data=data)
 
-    fig['layout'].update(title=title)
-    fig['layout'].update(width=500, height=500)
-    div = off.plot(fig, show_link=False, include_plotlyjs=include_plotlyjs,
-                   output_type='div')
-    div = div.replace("<div>", "<div style=\"display:inline-block\">")
+    fig["layout"].update(title=title)
+    fig["layout"].update(width=500, height=500)
+    div = off.plot(
+        fig,
+        show_link=False,
+        include_plotlyjs=include_plotlyjs,
+        output_type="div",
+    )
+    div = div.replace("<div>", '<div style="display:inline-block">')
     return div
 
 def graph_frf_b0(title, column_names, summary, online=False):
@@ -279,22 +291,26 @@ def graph_tractogram(title, column_names, summary, online=False):
     nb_streamlines_graph = Box(
         name="Nb streamlines",
         y=nb_streamlines,
-        boxpoints='all',
+        boxpoints="all",
         jitter=0.3,
         text=metric,
         pointpos=-1.8,
-        hoverinfo="y+text"
+        hoverinfo="y+text",
     )
 
     data = [nb_streamlines_graph]
 
     fig = Figure(data=data)
 
-    fig['layout'].update(title=title)
-    fig['layout'].update(width=500, height=500)
-    div = off.plot(fig, show_link=False, include_plotlyjs=include_plotlyjs,
-                   output_type='div')
-    div = div.replace("<div>", "<div style=\"display:inline-block\">")
+    fig["layout"].update(title=title)
+    fig["layout"].update(width=500, height=500)
+    div = off.plot(
+        fig,
+        show_link=False,
+        include_plotlyjs=include_plotlyjs,
+        output_type="div",
+    )
+    div = div.replace("<div>", '<div style="display:inline-block">')
     return div
 
 
@@ -327,22 +343,26 @@ def graph_mask_volume(title, column_names, summary, online=False):
     volume_graph = Box(
         name="Volume",
         y=volume,
-        boxpoints='all',
+        boxpoints="all",
         jitter=0.3,
         text=metric,
         pointpos=-1.8,
-        hoverinfo="y+text"
+        hoverinfo="y+text",
     )
 
     data = [volume_graph]
 
     fig = Figure(data=data)
 
-    fig['layout'].update(title=title)
-    fig['layout'].update(width=500, height=500)
-    div = off.plot(fig, show_link=False, include_plotlyjs=include_plotlyjs,
-                   output_type='div')
-    div = div.replace("<div>", "<div style=\"display:inline-block\">")
+    fig["layout"].update(title=title)
+    fig["layout"].update(width=500, height=500)
+    div = off.plot(
+        fig,
+        show_link=False,
+        include_plotlyjs=include_plotlyjs,
+        output_type="div",
+    )
+    div = div.replace("<div>", '<div style="display:inline-block">')
     return div
 
 
@@ -375,22 +395,26 @@ def graph_dwi_protocol(title, column_name, summary, online=False):
     graph = Box(
         name=column_name,
         y=data,
-        boxpoints='all',
+        boxpoints="all",
         jitter=0.3,
         text=metric,
         pointpos=-1.8,
-        hoverinfo="y+text"
+        hoverinfo="y+text",
     )
 
     data = [graph]
 
     fig = Figure(data=data)
 
-    fig['layout'].update(title=title)
-    fig['layout'].update(width=500, height=500)
-    div = off.plot(fig, show_link=False, include_plotlyjs=include_plotlyjs,
-                   output_type='div')
-    div = div.replace("<div>", "<div style=\"display:inline-block\">")
+    fig["layout"].update(title=title)
+    fig["layout"].update(width=500, height=500)
+    div = off.plot(
+        fig,
+        show_link=False,
+        include_plotlyjs=include_plotlyjs,
+        output_type="div",
+    )
+    div = div.replace("<div>", '<div style="display:inline-block">')
     return div
 
 
@@ -423,22 +447,26 @@ def graph_directions_per_shells(title, summary, online=False):
         graph = Box(
             name="b=" + str(i),
             y=data,
-            boxpoints='all',
+            boxpoints="all",
             jitter=0.3,
             text=metric,
             pointpos=-1.8,
-            hoverinfo="y+text"
+            hoverinfo="y+text",
         )
 
         data_graph.append(graph)
 
     fig = Figure(data=data_graph)
 
-    fig['layout'].update(title=title)
-    fig['layout'].update(width=700, height=500)
-    div = off.plot(fig, show_link=False, include_plotlyjs=include_plotlyjs,
-                   output_type='div')
-    div = div.replace("<div>", "<div style=\"display:inline-block\">")
+    fig["layout"].update(title=title)
+    fig["layout"].update(width=700, height=500)
+    div = off.plot(
+        fig,
+        show_link=False,
+        include_plotlyjs=include_plotlyjs,
+        output_type="div",
+    )
+    div = div.replace("<div>", '<div style="display:inline-block">')
     return div
 
 
@@ -469,19 +497,20 @@ def graph_subjects_per_shells(title, summary, online=False):
         data = [len(metric)]
 
         graph = Bar(
-            name="b=" + str(i),
-            y=data,
-            x=["b=" + str(i)],
-            hoverinfo="y"
+            name="b=" + str(i), y=data, x=["b=" + str(i)], hoverinfo="y"
         )
 
         data_graph.append(graph)
 
     fig = Figure(data=data_graph)
 
-    fig['layout'].update(title=title)
-    fig['layout'].update(width=700, height=500)
-    div = off.plot(fig, show_link=False, include_plotlyjs=include_plotlyjs,
-                   output_type='div')
-    div = div.replace("<div>", "<div style=\"display:inline-block\">")
+    fig["layout"].update(title=title)
+    fig["layout"].update(width=700, height=500)
+    div = off.plot(
+        fig,
+        show_link=False,
+        include_plotlyjs=include_plotlyjs,
+        output_type="div",
+    )
+    div = div.replace("<div>", '<div style="display:inline-block">')
     return div
