@@ -134,15 +134,11 @@ def main():
         curr_metrics, t1_warped, wm, gm, csf
     )
     warning_dict[name] = analyse_qa(summary, stats, curr_metrics[:3])
-    warning_list = np.concatenate(
-        [filenames for filenames in warning_dict[name].values()]
-    )
+    warning_list = np.concatenate([filenames for filenames in warning_dict[name].values()])
     warning_dict[name]["nb_warnings"] = len(np.unique(warning_list))
 
     graphs = []
-    graph = graph_mean_in_tissues(
-        "Mean {}".format(name), curr_metrics[:3], summary, args.online
-    )
+    graph = graph_mean_in_tissues("Mean {}".format(name), curr_metrics[:3], summary, args.online)
     graphs.append(graph)
 
     stats_html = dataframe_to_html(stats)

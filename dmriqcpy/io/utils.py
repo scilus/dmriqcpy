@@ -72,10 +72,7 @@ def assert_outputs_exist(parser, args, required, optional=None):
 
     def check(path):
         if os.path.isfile(path) and not args.overwrite:
-            parser.error(
-                "Output file {} exists. Use -f to force "
-                "overwriting".format(path)
-            )
+            parser.error("Output file {} exists. Use -f to force " "overwriting".format(path))
 
     if isinstance(required, str):
         required = [required]
@@ -94,8 +91,7 @@ def add_online_arg(parser):
     parser.add_argument(
         "--online",
         action="store_true",
-        help="If set, the script will use the internet "
-        "connexion to grab the needed libraries.",
+        help="If set, the script will use the internet " "connexion to grab the needed libraries.",
     )
 
 

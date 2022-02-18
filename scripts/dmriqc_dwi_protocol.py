@@ -40,9 +40,7 @@ def _build_arg_parser():
         description=DESCRIPTION, formatter_class=argparse.RawTextHelpFormatter
     )
 
-    p.add_argument(
-        "output_report", help="Filename of QC report (in html format)."
-    )
+    p.add_argument("output_report", help="Filename of QC report (in html format).")
 
     p.add_argument(
         "--bval", nargs="+", required=True, help="Folder or list of bval files."
@@ -139,17 +137,11 @@ def main():
                     summary[currKey[0]][metric] = curr_df[metric][nSub]
 
     if not isinstance(stats_tags_for_graph, list):
-        stats_for_graph = pd.concat(
-            [stats_for_graph, stats_tags_for_graph], axis=1, join="inner"
-        )
-        stats_all = pd.concat(
-            [stats_all, stats_tags_for_graph_all], axis=1, join="inner"
-        )
+        stats_for_graph = pd.concat([stats_for_graph, stats_tags_for_graph], axis=1, join="inner")
+        stats_all = pd.concat([stats_all, stats_tags_for_graph_all], axis=1, join="inner")
 
     warning_dict = {}
-    warning_dict[name] = analyse_qa(
-        stats_for_graph, stats_all, stats_all.columns
-    )
+    warning_dict[name] = analyse_qa(stats_for_graph, stats_all, stats_all.columns)
     warning_images = [filenames for filenames in warning_dict[name].values()]
     warning_list = np.concatenate(warning_images)
     warning_dict[name]["nb_warnings"] = len(np.unique(warning_list))
@@ -163,16 +155,10 @@ def main():
             if "complete_" not in curr_tag[0]:
                 summary_dict[curr_tag[0]] = dataframe_to_html(curr_tag[1])
 
-    graphs = []
-
-    graphs.append(
-        graph_directions_per_shells(
-            "Nbr directions per shell", shells, args.online
-        )
-    )
-    graphs.append(
-        graph_subjects_per_shells("Nbr subjects per shell", shells, args.online)
-    )
+    graphs = [
+        graph_directions_per_shells("Nbr directions per shell", shells, args.online),
+        graph_subjects_per_shells("Nbr subjects per shell", shells, args.online),
+    ]
     for c in stats_for_graph.keys():
         graph = graph_dwi_protocol(c, c, stats_for_graph, args.online)
         graphs.append(graph)
@@ -202,11 +188,10 @@ def main():
             ores=(800, 800),
         )
         subjects_dict[curr_subj]["screenshot"] = os.path.join(
-            "data", name .replace(" ",
-                                                                           "_") +
-                                                              "_" +
-                                                              curr_subj + ".png"
+            "data",
+            name.replace(" ", "_") + "_" + curr_subj + ".png"
         )
+
     metrics_dict = {}
     for subj in bval:
         curr_subj = os.path.basename(subj).split('.')[0]

@@ -151,13 +151,10 @@ def main():
 
     warning_dict = {}
     warning_dict[name] = analyse_qa(summary, stats, curr_metrics[:3])
-    warning_list = np.concatenate(
-        [filenames for filenames in warning_dict[name].values()]
-    )
+    warning_list = np.concatenate([filenames for filenames in warning_dict[name].values()])
     warning_dict[name]["nb_warnings"] = len(np.unique(warning_list))
 
-    graphs = []
-    graphs.append(graph)
+    graphs = [graph]
 
     stats_html = dataframe_to_html(stats)
     summary_dict = {}

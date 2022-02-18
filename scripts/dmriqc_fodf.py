@@ -172,9 +172,7 @@ def main():
             curr_metrics, metrics, wm, gm, csf
         )
         warning_dict[name] = analyse_qa(summary, stats, curr_metrics[:3])
-        warning_list = np.concatenate(
-            [filenames for filenames in warning_dict[name].values()]
-        )
+        warning_list = np.concatenate([filenames for filenames in warning_dict[name].values()])
         warning_dict[name]["nb_warnings"] = len(np.unique(warning_list))
 
         graph = graph_mean_in_tissues(

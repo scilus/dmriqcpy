@@ -36,9 +36,7 @@ def _build_arg_parser():
         help="Folder or list of fiber response function (frf) files (in txt format).",
     )
 
-    p.add_argument(
-        "output_report", help="Filename of QC report (in html format)."
-    )
+    p.add_argument("output_report", help="Filename of QC report (in html format).")
 
     add_online_arg(p)
     add_overwrite_arg(p)

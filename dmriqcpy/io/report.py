@@ -31,9 +31,7 @@ class Report:
             Report name in html format.
         """
         self.path = dirname(realpath(__file__))
-        self.env = Environment(
-            loader=FileSystemLoader(join(self.path, "../template"))
-        )
+        self.env = Environment(loader=FileSystemLoader(join(self.path, "../template")))
 
         self.report_name = report_name
         self.out_dir = dirname(report_name)
@@ -75,6 +73,8 @@ class Report:
             Dictionnary of warning subjects for each metric.
             warning_dict[METRIC_NAME] = { 'WANING_TYPE': ARRAY_OF_SUBJECTS,
                                           'nb_warnings': NUMBER_OF_SUBJECTS}
+        online : bool
+            If true, will fetch the js and css libraries online
         """
         if online:
             os.makedirs(join(self.out_dir, "libs/css"))
@@ -85,9 +85,7 @@ class Report:
                     join(self.out_dir, "libs/", curr_lib),
                 )
         else:
-            copytree(
-                join(self.path, "../template/libs"), join(self.out_dir, "libs")
-            )
+            copytree(join(self.path, "../template/libs"), join(self.out_dir, "libs"))
 
         with open(self.report_name, "w") as out_file:
             template = self.env.get_template("template.html")

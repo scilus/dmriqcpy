@@ -39,17 +39,11 @@ def _build_arg_parser():
 
     p.add_argument("output_report", help="HTML report")
 
-    p.add_argument(
-        "--wm", nargs="+", required=True, help="WM mask in Nifti format"
-    )
+    p.add_argument("--wm", nargs="+", required=True, help="WM mask in Nifti format")
 
-    p.add_argument(
-        "--gm", nargs="+", required=True, help="GM mask in Nifti format"
-    )
+    p.add_argument("--gm", nargs="+", required=True, help="GM mask in Nifti format")
 
-    p.add_argument(
-        "--csf", nargs="+", required=True, help="CSF mask in Nifti format"
-    )
+    p.add_argument("--csf", nargs="+", required=True, help="CSF mask in Nifti format")
 
     add_skip_arg(p)
     add_nb_columns_arg(p)
@@ -114,14 +108,10 @@ def main():
         summary, stats = stats_mask_volume(columns, metrics)
 
         warning_dict[name] = analyse_qa(summary, stats, columns)
-        warning_list = np.concatenate(
-            [filenames for filenames in warning_dict[name].values()]
-        )
+        warning_list = np.concatenate([filenames for filenames in warning_dict[name].values()])
         warning_dict[name]["nb_warnings"] = len(np.unique(warning_list))
 
-        graph = graph_mask_volume(
-            "{} mean volume".format(name), columns, summary, args.online
-        )
+        graph = graph_mask_volume("{} mean volume".format(name), columns, summary, args.online)
         graphs.append(graph)
 
         stats_html = dataframe_to_html(stats)

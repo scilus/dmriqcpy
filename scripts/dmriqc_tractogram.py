@@ -75,9 +75,7 @@ def main():
     warning_dict = {}
     summary, stats = stats_tractogram(columns, tractograms)
     warning_dict[name] = analyse_qa(summary, stats, ["Nb streamlines"])
-    warning_list = np.concatenate(
-        [filenames for filenames in warning_dict[name].values()]
-    )
+    warning_list = np.concatenate([filenames for filenames in warning_dict[name].values()])
     warning_dict[name]["nb_warnings"] = len(np.unique(warning_list))
 
     graphs = []

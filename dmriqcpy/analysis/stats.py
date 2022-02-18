@@ -60,9 +60,7 @@ def stats_mean_median(column_names, filenames):
     return stats_per_subjects, stats_across_subjects
 
 
-def stats_mean_in_tissues(
-    column_names, images, wm_images, gm_images, csf_images
-):
+def stats_mean_in_tissues(column_names, images, wm_images, gm_images, csf_images):
     """
     Compute mean value in WM, GM and CSF mask.
 

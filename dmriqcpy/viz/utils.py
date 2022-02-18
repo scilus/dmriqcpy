@@ -51,7 +51,8 @@ def dataframe_to_html(data_frame, index=True):
     ----------
     data_frame : DataFrame
         DataFrame.
-
+    index : bool
+        Print rows index labels
     Returns
     -------
     data_frame_html : string

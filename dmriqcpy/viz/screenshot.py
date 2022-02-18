@@ -190,9 +190,7 @@ def screenshot_mosaic_blend(
         for _, mosaic in enumerate(mosaic_image):
             blend.append(Image.blend(mosaic, mosaic_blend, alpha=blend_val))
         name = os.path.join(directory, output_prefix + image_name + ".gif")
-        blend[0].save(
-            name, save_all=True, append_images=blend[1:], duration=100, loop=0
-        )
+        blend[0].save(name, save_all=True, append_images=blend[1:], duration=100, loop=0)
     else:
         blend = Image.blend(mosaic_image, mosaic_blend, alpha=blend_val)
         name = os.path.join(directory, output_prefix + image_name + ".png")
@@ -249,9 +247,7 @@ def screenshot_mosaic(data, skip, pad, nb_columns, axis, cmap):
         padding += ((0, 0),)
 
     if not is_rgb:
-        data = np.interp(data, xp=[min_val, max_val], fp=[0, 255]).astype(
-            dtype=np.uint8
-        )
+        data = np.interp(data, xp=[min_val, max_val], fp=[0, 255]).astype(dtype=np.uint8)
 
     mosaic = np.zeros(shape, dtype=np.uint8)
 
@@ -262,34 +258,19 @@ def screenshot_mosaic(data, skip, pad, nb_columns, axis, cmap):
 
         curr_img = np.pad(curr_img, padding, "constant").astype(dtype=np.uint8)
         curr_shape = curr_img.shape
-        mosaic[
-            curr_shape[0] * row
-            + row * pad : row * curr_shape[0]
-            + curr_shape[0]
-            + row * pad,
-            curr_shape[1] * corner
-            + corner * pad : corner * curr_shape[1]
-            + curr_shape[1]
-            + corner * pad,
-        ] = curr_img
+        row_pad = (curr_shape[0] + pad) * row
+        col_pad = (curr_shape[1] + pad) * corner
+        mosaic[row_pad : row_pad + curr_shape[0], col_pad : col_pad + curr_shape[1]] = curr_img
     if axis and not is_4d:
-        mosaic = np.pad(mosaic, ((50, 50), (50, 50)), "constant").astype(
-            dtype=np.uint8
-        )
+        mosaic = np.pad(mosaic, ((50, 50), (50, 50)), "constant").astype(dtype=np.uint8)
         img = Image.fromarray(mosaic)
         draw = ImageDraw.Draw(img)
 
-        fnt = ImageFont.truetype(
-            "/usr/share/fonts/truetype/freefont/FreeSans.ttf", 40
-        )
+        fnt = ImageFont.truetype("/usr/share/fonts/truetype/freefont/FreeSans.ttf", 40)
         draw.text([mosaic.shape[1] / 2, 0], "A", fill=255, font=fnt)
-        draw.text(
-            [mosaic.shape[1] / 2, mosaic.shape[0] - 40], "P", fill=255, font=fnt
-        )
+        draw.text([mosaic.shape[1] / 2, mosaic.shape[0] - 40], "P", fill=255, font=fnt)
         draw.text([0, mosaic.shape[0] / 2], "L", fill=255, font=fnt)
-        draw.text(
-            [mosaic.shape[1] - 40, mosaic.shape[0] / 2], "R", fill=255, font=fnt
-        )
+        draw.text([mosaic.shape[1] - 40, mosaic.shape[0] / 2], "R", fill=255, font=fnt)
         mosaic = np.array(img, dtype=np.uint8)
 
     if cmap is not None:
@@ -308,17 +289,11 @@ def screenshot_mosaic(data, skip, pad, nb_columns, axis, cmap):
                 basewidth = 1920
                 wpercent = basewidth / float(imgs_comb.size[0])
                 hsize = int((float(imgs_comb.size[1]) * float(wpercent)))
-                imgs_comb = imgs_comb.resize(
-                    (basewidth, hsize), Image.ANTIALIAS
-                )
+                imgs_comb = imgs_comb.resize((basewidth, hsize), Image.ANTIALIAS)
 
             draw = ImageDraw.Draw(imgs_comb)
-            fnt = ImageFont.truetype(
-                "/usr/share/fonts/truetype/freefont/FreeSans.ttf", 40
-            )
-            draw.text(
-                [0, 0], str(i) + "/" + str(mosaic.shape[2]), fill=255, font=fnt
-            )
+            fnt = ImageFont.truetype("/usr/share/fonts/truetype/freefont/FreeSans.ttf", 40)
+            draw.text([0, 0], str(i) + "/" + str(mosaic.shape[2]), fill=255, font=fnt)
 
             gif.append(imgs_comb.convert("RGB"))
         return gif
@@ -367,9 +342,7 @@ def screenshot_3_axis(data, mosaic, cmap=None, is_4d=False):
         for i in range(image.shape[2]):
             three_axis = Image.fromarray(np.uint8(image[:, :, i]))
             three_axis_np = np.array(three_axis)
-            tmp.append(
-                _resize_mosaic(mosaic[:, :, i], three_axis, three_axis_np)
-            )
+            tmp.append(_resize_mosaic(mosaic[:, :, i], three_axis, three_axis_np))
         image = np.moveaxis(np.array(tmp), 0, 2)
     else:
         three_axis = Image.fromarray(np.uint8(image))
@@ -445,12 +418,8 @@ def screenshot_fa_peaks(fa, peaks, directory="."):
 
         peak_actor.GetProperty().SetLineWidth(2.5)
 
-        slice_actor.display(
-            slice_display[j][0], slice_display[j][1], slice_display[j][2]
-        )
-        peak_actor.display(
-            slice_display[j][0], slice_display[j][1], slice_display[j][2]
-        )
+        slice_actor.display(slice_display[j][0], slice_display[j][1], slice_display[j][2])
+        peak_actor.display(slice_display[j][0], slice_display[j][1], slice_display[j][2])
 
         renderer = window.Scene()
 
@@ -548,9 +517,7 @@ def screenshot_tracking(tracking, t1, directory="."):
                 break
             if slice_idx in np.array(streamline, dtype=int)[:, i]:
                 it += 1
-                idx = np.where(
-                    np.array(streamline, dtype=int)[:, i] == slice_idx
-                )[0][0]
+                idx = np.where(np.array(streamline, dtype=int)[:, i] == slice_idx)[0][0]
                 lower = idx - 2
                 if lower < 0:
                     lower = 0
@@ -566,24 +533,18 @@ def screenshot_tracking(tracking, t1, directory="."):
 
         min_val = np.min(t1_data[t1_data > 0])
         max_val = np.percentile(t1_data[t1_data > 0], 99)
-        t1_color = (
-            np.float32(t1_data - min_val)
-            / np.float32(max_val - min_val)
-            * 255.0
-        )
+        t1_color = np.float32(t1_data - min_val) / np.float32(max_val - min_val) * 255.0
         slice_actor = actor.slicer(
             t1_color, opacity=0.8, value_range=(0, 255), interpolation="nearest"
         )
         ren.add(slice_actor)
-        slice_actor.display(
-            img_center[i][0], img_center[i][1], img_center[i][2]
-        )
+        slice_actor.display(img_center[i][0], img_center[i][1], img_center[i][2])
 
         camera = ren.GetActiveCamera()
         camera.SetViewUp(viewup[i])
         center_cam = streamline_actor.GetCenter()
         camera.SetPosition(center[i])
-        camera.SetFocalPoint((center_cam))
+        camera.SetFocalPoint(center_cam)
 
         img2 = renderer_to_arr(ren, size)
         if image.size == 0:
@@ -605,9 +566,7 @@ def screenshot_tracking(tracking, t1, directory="."):
     camera = ren.GetActiveCamera()
     camera.SetViewUp(0, 0, -1)
     center = streamline_actor.GetCenter()
-    camera.SetPosition(
-        center[0], 350 + (1 - t1.header.get_zooms()[1]) * 350, center[2]
-    )
+    camera.SetPosition(center[0], 350 + (1 - t1.header.get_zooms()[1]) * 350, center[2])
     camera.SetFocalPoint(center)
     img2 = renderer_to_arr(ren, (3 * 1920, 1920))
     image = np.vstack((image, img2))
@@ -660,9 +619,7 @@ def plot_proj_shell(
     global vtkcolors
     if len(ms) > 10:
         vtkcolors = fury.colormap.distinguishable_colormap(nb_colors=len(ms))
-    radius = np.interp(
-        centroids, xp=[min(centroids), max(centroids)], fp=[0, 1]
-    )
+    radius = np.interp(centroids, xp=[min(centroids), max(centroids)], fp=[0, 1])
     ren = window.Scene()
     ren.SetBackground(1, 1, 1)
     if use_sphere:
@@ -688,14 +645,10 @@ def plot_proj_shell(
     for i, shell in enumerate(ms):
         if same_color:
             i = 0
-        pts_actor = actor.point(
-            shell * radius[i], vtkcolors[i], point_radius=rad
-        )
+        pts_actor = actor.point(shell * radius[i], vtkcolors[i], point_radius=rad)
         ren.add(pts_actor)
         if use_sym:
-            pts_actor = actor.point(
-                -shell * radius[i], vtkcolors[i], point_radius=rad
-            )
+            pts_actor = actor.point(-shell * radius[i], vtkcolors[i], point_radius=rad)
             ren.add(pts_actor)
     if ofile:
         window.snapshot(ren, fname=ofile + ".png", size=ores)

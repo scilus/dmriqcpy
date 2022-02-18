@@ -27,8 +27,6 @@ def graph_mean_median(title, column_names, summary, online=False):
     """
     include_plotlyjs = not online
 
-    means = []
-    medians = []
     np.random.seed(1)
     image = summary.index
     means = np.array(summary[column_names[0]])
@@ -96,9 +94,6 @@ def graph_mean_in_tissues(title, column_names, summary, online=False):
     """
     include_plotlyjs = not online
 
-    means_wm = []
-    means_gm = []
-    means_csf = []
     np.random.seed(1)
     metric = summary.index
     means_wm = np.array(summary[column_names[0]])
@@ -283,7 +278,6 @@ def graph_tractogram(title, column_names, summary, online=False):
     """
     include_plotlyjs = not online
 
-    nb_streamlines = []
     np.random.seed(1)
     metric = summary.index
     nb_streamlines = np.array(summary[column_names[0]])
@@ -374,7 +368,7 @@ def graph_dwi_protocol(title, column_name, summary, online=False):
     ----------
     title : string
         Title of the graph.
-    column_names : array of strings
+    column_name : array of strings
         Name of the columns in the summary DataFrame.
     summary : DataFrame
         DataFrame containing the mean stats.
@@ -496,9 +490,7 @@ def graph_subjects_per_shells(title, summary, online=False):
         metric = list(summary[i].keys())
         data = [len(metric)]
 
-        graph = Bar(
-            name="b=" + str(i), y=data, x=["b=" + str(i)], hoverinfo="y"
-        )
+        graph = Bar(name="b=" + str(i), y=data, x=["b=" + str(i)], hoverinfo="y")
 
         data_graph.append(graph)
 

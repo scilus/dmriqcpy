@@ -37,9 +37,7 @@ def _build_arg_parser():
     )
     p.add_argument("image_type", help="Type of image (e.g. B0).")
 
-    p.add_argument(
-        "output_report", help="Filename of QC report (in html format)."
-    )
+    p.add_argument("output_report", help="Filename of QC report (in html format).")
 
     p.add_argument(
         "--no_bet",
@@ -64,9 +62,7 @@ def _build_arg_parser():
     return p
 
 
-def _subj_parralel(
-    images_no_bet, images_bet_mask, name, skip, summary, nb_columns
-):
+def _subj_parralel(images_no_bet, images_bet_mask, name, skip, summary, nb_columns):
     subjects_dict = {}
     for subj_metric, mask in zip(images_no_bet, images_bet_mask):
         curr_key = os.path.basename(subj_metric).split('.')[0]
@@ -122,9 +118,7 @@ def main():
     warning_dict[name]["nb_warnings"] = len(np.unique(warning_list))
 
     graphs = []
-    graph = graph_mean_median(
-        "Mean {}".format(name), curr_metrics, summary, args.online
-    )
+    graph = graph_mean_median("Mean {}".format(name), curr_metrics, summary, args.online)
     graphs.append(graph)
 
     stats_html = dataframe_to_html(stats)
