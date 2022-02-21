@@ -6,6 +6,9 @@ https://github.com/scilus/scilpy/blob/master/scilpy/io/utils.py
 
 import glob
 import os
+import shutil
+
+import numpy as np
 
 
 def add_overwrite_arg(parser):
@@ -87,6 +90,14 @@ def assert_outputs_exist(parser, args, required, optional=None):
             check(optional_file)
 
 
+def assert_list_arguments_equal_size(parser, *args):
+    sizes = [len(arg) for arg in args]
+    if len(sizes) == 0:
+        parser.error("No input images provided.")
+    if not np.allclose(sizes, sizes[0]):
+        parser.error("Not the same number of images in input.")
+
+
 def add_online_arg(parser):
     parser.add_argument(
         "--online",
@@ -120,6 +131,17 @@ def add_nb_columns_arg(parser, default=12):
         type=int,
         help="Number of columns for the mosaic. [%(default)s]",
     )
+
+
+def clean_output_directories(outputs_data=True):
+    if outputs_data:
+        if os.path.exists("data"):
+            shutil.rmtree("data")
+        os.makedirs("data")
+
+    if os.path.exists("libs"):
+        shutil.rmtree("libs")
+
 
 def list_files_from_paths(paths):
     """

@@ -30,7 +30,6 @@ vtkcolors = [
 
 def screenshot_mosaic_wrapper(
     filename,
-    output_prefix="",
     directory=".",
     skip=1,
     pad=20,
@@ -78,6 +77,12 @@ def screenshot_mosaic_wrapper(
         mosaic in array 2D
     """
     data = nib.load(filename).get_data()
+    if len(data.dtype) > 0:
+        # Data is 4D and has been unpacked in a structured numpy array,
+        # we need to get the last dimension out for snapshotting. This
+        # is only a problem with some RGB images, for which the 4th
+        # dimension is encoded in the datatype of the array
+        data = data.view((data.dtype[0], len(data.dtype)))
     data = np.nan_to_num(data)
     unique = np.unique(data)
 
@@ -94,7 +99,7 @@ def screenshot_mosaic_wrapper(
     if return_path:
         image_name = os.path.basename(str(filename)).split(".")[0]
         if isinstance(imgs_comb, list):
-            name = os.path.join(directory, output_prefix + image_name + ".gif")
+            name = os.path.join(directory, image_name + ".gif")
             imgs_comb[0].save(
                 name,
                 save_all=True,
@@ -103,7 +108,7 @@ def screenshot_mosaic_wrapper(
                 loop=0,
             )
         else:
-            name = os.path.join(directory, output_prefix + image_name + ".png")
+            name = os.path.join(directory, image_name + ".png")
             imgs_comb.save(name)
         return name
     else:
@@ -113,7 +118,6 @@ def screenshot_mosaic_wrapper(
 def screenshot_mosaic_blend(
     image,
     image_blend,
-    output_prefix="",
     directory=".",
     blend_val=0.5,
     skip=1,
@@ -133,7 +137,7 @@ def screenshot_mosaic_blend(
         Image filename.
     image_blend : string
         Image blend filename.
-    output_prefix : string
+    image_name : string
         Image_prefix.
     directory : string
         Directory to save the mosaic.
@@ -189,11 +193,11 @@ def screenshot_mosaic_blend(
         blend = []
         for _, mosaic in enumerate(mosaic_image):
             blend.append(Image.blend(mosaic, mosaic_blend, alpha=blend_val))
-        name = os.path.join(directory, output_prefix + image_name + ".gif")
+        name = os.path.join(directory, image_name + image_name + ".gif")
         blend[0].save(name, save_all=True, append_images=blend[1:], duration=100, loop=0)
     else:
         blend = Image.blend(mosaic_image, mosaic_blend, alpha=blend_val)
-        name = os.path.join(directory, output_prefix + image_name + ".png")
+        name = os.path.join(directory, image_name + image_name + ".png")
         blend.save(name)
     return name
 

@@ -5,8 +5,8 @@ import os
 import pandas as pd
 
 """
-Some functions comes from
-https://github.com/scilus/scilpy/blob/master/scilpy/utils/bvec_bval_tools.py
+Some functions come from Scilpy v1.2.0
+https://github.com/scilus/scilpy/blob/1.2.0/scilpy/utils/bvec_bval_tools.py
 """
 
 
@@ -163,7 +163,7 @@ def dwi_protocol(bvals, tol=20):
     return stats_per_subjects, stats, stats_across_subjects, shells
 
 
-# TODO: THIS FUNCTION IS LEGACY. It was pulled from Scilpy to prevent including Dipy
+# TODO: THIS FUNCTION IS LEGACY. It was pulled from Scilpy to avoid including Dipy
 #       as a dependency. Once it is decided to add Dipy to our stack and proceed with
 #       validation, this function need to change for its Dipy equivalent.
 def identify_shells(bvals, threshold=40.0, roundCentroids=False, sort=False):

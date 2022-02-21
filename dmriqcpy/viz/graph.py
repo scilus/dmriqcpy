@@ -5,7 +5,7 @@ from plotly.graph_objs import Bar, Box, Figure
 import plotly.offline as off
 
 
-def graph_mean_median(title, column_names, summary, online=False):
+def graph_mean_median(title, column_names, summary, include_plotlyjs=False):
     """
     Compute plotly graph with mean and median stats
 
@@ -17,16 +17,16 @@ def graph_mean_median(title, column_names, summary, online=False):
         Name of the columns in the summary DataFrame.
     summary : DataFrame
         DataFrame containing the mean and median stats.
-    online: Boolean
-        If false it will include plotlyjs
+    include_plotlyjs: Boolean
+        If True, javascript and css dependencies for plotting will
+        be injected in the graph's HTML code returned. If not, they
+        have to be included manually or via a CDN.
 
     Returns
     -------
     div : html div (string)
         Graph as a HTML div.
     """
-    include_plotlyjs = not online
-
     np.random.seed(1)
     image = summary.index
     means = np.array(summary[column_names[0]])
@@ -72,7 +72,7 @@ def graph_mean_median(title, column_names, summary, online=False):
     return div
 
 
-def graph_mean_in_tissues(title, column_names, summary, online=False):
+def graph_mean_in_tissues(title, column_names, summary, include_plotlyjs=False):
     """
     Compute plotly graph with mean value in tissue masks
 
@@ -84,16 +84,16 @@ def graph_mean_in_tissues(title, column_names, summary, online=False):
         Name of the columns in the summary DataFrame.
     summary : DataFrame
         DataFrame containing the mean stats.
-    online: Boolean
-        If false it will include plotlyjs
+    include_plotlyjs: Boolean
+        If True, javascript and css dependencies for plotting will
+        be injected in the graph's HTML code returned. If not, they
+        have to be included manually or via a CDN.
 
     Returns
     -------
     div : html div (string)
         Graph as a HTML div.
     """
-    include_plotlyjs = not online
-
     np.random.seed(1)
     metric = summary.index
     means_wm = np.array(summary[column_names[0]])
@@ -148,7 +148,7 @@ def graph_mean_in_tissues(title, column_names, summary, online=False):
     return div
 
 
-def graph_frf_eigen(title, column_names, summary, online=False):
+def graph_frf_eigen(title, column_names, summary, include_plotlyjs=False):
     """
     Compute plotly graph with mean frf values
 
@@ -160,16 +160,16 @@ def graph_frf_eigen(title, column_names, summary, online=False):
         Name of the columns in the summary DataFrame.
     summary : DataFrame
         DataFrame containing the mean stats.
-    online: Boolean
-        If false it will include plotlyjs
+    include_plotlyjs: Boolean
+        If True, javascript and css dependencies for plotting will
+        be injected in the graph's HTML code returned. If not, they
+        have to be included manually or via a CDN.
 
     Returns
     -------
     div : html div (string)
         Graph as a HTML div.
     """
-    include_plotlyjs = not online
-
     np.random.seed(1)
     metric = summary.index
     e1 = np.array(summary[column_names[0]])
@@ -256,7 +256,7 @@ def graph_frf_b0(title, column_names, summary, online=False):
     return div
 
 
-def graph_tractogram(title, column_names, summary, online=False):
+def graph_tractogram(title, column_names, summary, include_plotlyjs=False):
     """
     Compute plotly graph with mean number of streamlines
 
@@ -268,16 +268,16 @@ def graph_tractogram(title, column_names, summary, online=False):
         Name of the columns in the summary DataFrame.
     summary : DataFrame
         DataFrame containing the mean stats.
-    online: Boolean
-        If false it will include plotlyjs
+    include_plotlyjs: Boolean
+        If True, javascript and css dependencies for plotting will
+        be injected in the graph's HTML code returned. If not, they
+        have to be included manually or via a CDN.
 
     Returns
     -------
     div : html div (string)
         Graph as a HTML div.
     """
-    include_plotlyjs = not online
-
     np.random.seed(1)
     metric = summary.index
     nb_streamlines = np.array(summary[column_names[0]])
@@ -308,7 +308,7 @@ def graph_tractogram(title, column_names, summary, online=False):
     return div
 
 
-def graph_mask_volume(title, column_names, summary, online=False):
+def graph_mask_volume(title, column_names, summary, include_plotlyjs=False):
     """
     Compute plotly graph with mean mask volume
 
@@ -320,16 +320,16 @@ def graph_mask_volume(title, column_names, summary, online=False):
         Name of the columns in the summary DataFrame.
     summary : DataFrame
         DataFrame containing the mean stats.
-    online: Boolean
-        If false it will include plotlyjs
+    include_plotlyjs: Boolean
+        If True, javascript and css dependencies for plotting will
+        be injected in the graph's HTML code returned. If not, they
+        have to be included manually or via a CDN.
 
     Returns
     -------
     div : html div (string)
         Graph as a HTML div.
     """
-    include_plotlyjs = not online
-
     np.random.seed(1)
     metric = summary.index
     volume = np.array(summary[column_names[0]])
@@ -360,7 +360,7 @@ def graph_mask_volume(title, column_names, summary, online=False):
     return div
 
 
-def graph_dwi_protocol(title, column_name, summary, online=False):
+def graph_dwi_protocol(title, column_name, summary, include_plotlyjs=False):
     """
     Compute plotly graph with mean mask volume
 
@@ -372,16 +372,16 @@ def graph_dwi_protocol(title, column_name, summary, online=False):
         Name of the columns in the summary DataFrame.
     summary : DataFrame
         DataFrame containing the mean stats.
-    online: Boolean
-        If false it will include plotlyjs
+    include_plotlyjs: Boolean
+        If True, javascript and css dependencies for plotting will
+        be injected in the graph's HTML code returned. If not, they
+        have to be included manually or via a CDN.
 
     Returns
     -------
     div : html div (string)
         Graph as a HTML div.
     """
-    include_plotlyjs = not online
-
     np.random.seed(1)
     metric = summary.index
     data = np.array(summary[column_name])
@@ -412,7 +412,7 @@ def graph_dwi_protocol(title, column_name, summary, online=False):
     return div
 
 
-def graph_directions_per_shells(title, summary, online=False):
+def graph_directions_per_shells(title, summary, include_plotlyjs=False):
     """
     Compute plotly graph with mean mask volume
 
@@ -422,16 +422,16 @@ def graph_directions_per_shells(title, summary, online=False):
         Title of the graph.
     summary : dict
         DataFrame containing the mean stats.
-    online: Boolean
-        If false it will include plotlyjs
+    include_plotlyjs: Boolean
+        If True, javascript and css dependencies for plotting will
+        be injected in the graph's HTML code returned. If not, they
+        have to be included manually or via a CDN.
 
     Returns
     -------
     div : html div (string)
         Graph as a HTML div.
     """
-    include_plotlyjs = not online
-
     np.random.seed(1)
     data_graph = []
     for i in sorted(summary):
@@ -464,7 +464,7 @@ def graph_directions_per_shells(title, summary, online=False):
     return div
 
 
-def graph_subjects_per_shells(title, summary, online=False):
+def graph_subjects_per_shells(title, summary, include_plotlyjs=False):
     """
     Compute plotly graph with mean mask volume
 
@@ -474,16 +474,16 @@ def graph_subjects_per_shells(title, summary, online=False):
         Title of the graph.
     summary : dict
         DataFrame containing the mean stats.
-    online: Boolean
-        If false it will include plotlyjs
+    include_plotlyjs: Boolean
+        If True, javascript and css dependencies for plotting will
+        be injected in the graph's HTML code returned. If not, they
+        have to be included manually or via a CDN.
 
     Returns
     -------
     div : html div (string)
         Graph as a HTML div.
     """
-    include_plotlyjs = not online
-
     np.random.seed(1)
     data_graph = []
     for i in sorted(summary):

@@ -6,7 +6,7 @@ import os
 import shutil
 
 import itertools
-from multiprocessing import Pool
+from functools import partial
 import numpy as np
 
 from dmriqcpy.io.report import Report
@@ -19,9 +19,10 @@ from dmriqcpy.io.utils import (
     add_skip_arg,
     add_nb_columns_arg,
     add_nb_threads_arg,
+    assert_list_arguments_equal_size,
+    clean_output_directories,
 )
-from dmriqcpy.viz.screenshot import screenshot_mosaic_blend
-
+from dmriqcpy.reporting.report import generate_metric_reports_parallel, generate_report_package
 
 DESCRIPTION = """
 Compute the labels report in HTML format.
@@ -71,27 +72,6 @@ def _build_arg_parser():
     return p
 
 
-def _subj_parralel(t1, label, name, skip, nb_columns, lut, compute_lut):
-    subjects_dict = {}
-    screenshot_path = screenshot_mosaic_blend(
-        t1,
-        label,
-        output_prefix=name,
-        directory="data",
-        blend_val=0.5,
-        skip=skip,
-        nb_columns=nb_columns,
-        lut=lut or None,
-        compute_lut=compute_lut,
-    )
-
-    key = os.path.basename(t1).split('.')[0]
-
-    subjects_dict[key] = {}
-    subjects_dict[key]["screenshot"] = screenshot_path
-    return subjects_dict
-
-
 def main():
     parser = _build_arg_parser()
     args = parser.parse_args()
@@ -111,41 +91,26 @@ def main():
 
     assert_inputs_exist(parser, all_images)
     assert_outputs_exist(parser, args, [args.output_report, "data", "libs"])
-
-    if os.path.exists("data"):
-        shutil.rmtree("data")
-    os.makedirs("data")
-
-    if os.path.exists("libs"):
-        shutil.rmtree("libs")
+    clean_output_directories()
 
     name = "Labels"
-
-    pool = Pool(args.nb_threads)
-    subjects_dict_pool = pool.starmap(
-        _subj_parralel,
-        zip(
-            t1,
-            label,
-            itertools.repeat(name),
-            itertools.repeat(args.skip),
-            itertools.repeat(args.nb_columns),
-            itertools.repeat(args.lut),
-            itertools.repeat(args.compute_lut),
-        ),
-    )
-    pool.close()
-    pool.join()
-
-    metrics_dict = {}
-    subjects_dict = {}
-    for dict_sub in subjects_dict_pool:
-        for key in dict_sub:
-            curr_key = os.path.basename(key).split('.')[0]
-            subjects_dict[curr_key] = dict_sub[curr_key]
-    metrics_dict[name] = subjects_dict
-
     nb_subjects = len(t1)
+
+    metrics_dict = {
+        name: generate_metric_reports_parallel(
+            zip(t1, label),
+            args.nb_threads,
+            nb_subjects // args.nb_threads,
+            report_package_generation_fn=partial(
+                generate_report_package,
+                skip=args.skip,
+                nb_columns=args.nb_columns,
+                lut=args.lut,
+                compute_lut=args.compute_lut
+            ),
+        )
+    }
+
     report = Report(args.output_report)
     report.generate(
         title="Quality Assurance labels",

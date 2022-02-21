@@ -2,14 +2,12 @@
 # -*- coding: utf-8 -*-
 
 import argparse
-import itertools
-from multiprocessing import Pool
+from functools import partial
 import os
 import shutil
 
 import numpy as np
 
-from dmriqcpy.analysis.stats import stats_mean_in_tissues, stats_mean_median
 from dmriqcpy.io.report import Report
 from dmriqcpy.io.utils import (
     add_online_arg,
@@ -20,10 +18,16 @@ from dmriqcpy.io.utils import (
     add_skip_arg,
     add_nb_columns_arg,
     add_nb_threads_arg,
+    assert_list_arguments_equal_size,
+    clean_output_directories,
 )
-from dmriqcpy.viz.graph import graph_mean_in_tissues, graph_mean_median
-from dmriqcpy.viz.screenshot import screenshot_mosaic_wrapper
-from dmriqcpy.viz.utils import analyse_qa, dataframe_to_html
+from dmriqcpy.reporting.report import (
+    generate_metric_reports_parallel,
+    generate_report_package,
+    get_generic_qa_stats_and_graph,
+    get_qa_stats_and_graph_in_tissues,
+)
+from dmriqcpy.viz.utils import dataframe_to_html
 
 DESCRIPTION = """
 Compute report in HTML format from images.
@@ -36,7 +40,6 @@ def _build_arg_parser():
     )
 
     p.add_argument("image_type", help="Type of image (e.g. B0 resample).")
-
     p.add_argument("output_report", help="HTML report.")
 
     p.add_argument(
@@ -80,25 +83,6 @@ def _build_arg_parser():
     return p
 
 
-def _subj_parralel(subj_metric, summary, name, skip, nb_columns, duration):
-    subjects_dict = {}
-    curr_key = os.path.basename(subj_metric).split('.')[0]
-    screenshot_path = screenshot_mosaic_wrapper(
-        subj_metric,
-        output_prefix=name,
-        directory="data",
-        skip=skip,
-        nb_columns=nb_columns,
-        duration=duration,
-    )
-
-    summary_html = dataframe_to_html(summary.loc[curr_key].to_frame())
-    subjects_dict[curr_key] = {}
-    subjects_dict[curr_key]["screenshot"] = screenshot_path
-    subjects_dict[curr_key]["stats"] = summary_html
-    return subjects_dict
-
-
 def main():
     parser = _build_arg_parser()
     args = parser.parse_args()
@@ -111,84 +95,51 @@ def main():
         wm = list_files_from_paths(args.wm)
         gm = list_files_from_paths(args.gm)
         csf = list_files_from_paths(args.csf)
-        if not len(images) == len(wm) == len(gm) == len(csf):
-            parser.error("Not the same number of images in input.")
+        assert_list_arguments_equal_size(parser, images, wm, gm, csf)
 
         with_tissues = True
         all_images = np.concatenate([images, wm, gm, csf])
 
     assert_inputs_exist(parser, all_images)
     assert_outputs_exist(parser, args, [args.output_report, "data", "libs"])
-
-    if os.path.exists("data"):
-        shutil.rmtree("data")
-    os.makedirs("data")
-
-    if os.path.exists("libs"):
-        shutil.rmtree("libs")
+    clean_output_directories()
 
     name = args.image_type
+    nb_subjects = len(images)
 
     if with_tissues:
-        curr_metrics = [
-            "Mean {} in WM".format(name),
-            "Mean {} in GM".format(name),
-            "Mean {} in CSF".format(name),
-            "Max {} in WM".format(name),
-        ]
-        summary, stats = stats_mean_in_tissues(
-            curr_metrics, images, wm, gm, csf
-        )
-        graph = graph_mean_in_tissues(
-            "Mean {}".format(name), curr_metrics[:3], summary, args.online
+        summary, stats, qa_report, qa_graph = get_qa_stats_and_graph_in_tissues(
+            images, name, wm, gm, csf, args.online
         )
     else:
-        curr_metrics = ["Mean {}".format(name), "Median {}".format(name)]
-        summary, stats = stats_mean_median(curr_metrics, images)
-        graph = graph_mean_median(
-            "Mean {}".format(name), curr_metrics, summary, args.online
+        summary, stats, qa_report, qa_graph = get_generic_qa_stats_and_graph(
+            images, name, args.online
         )
 
-    warning_dict = {}
-    warning_dict[name] = analyse_qa(summary, stats, curr_metrics[:3])
-    warning_list = np.concatenate([filenames for filenames in warning_dict[name].values()])
-    warning_dict[name]["nb_warnings"] = len(np.unique(warning_list))
+    warning_dict = {name: qa_report}
+    summary_dict = {name: dataframe_to_html(stats)}
 
-    graphs = [graph]
+    metrics_dict = {
+        name: generate_metric_reports_parallel(
+            zip(args.images),
+            args.nb_threads,
+            nb_subjects // args.nb_threads,
+            report_package_generation_fn=partial(
+                generate_report_package,
+                stats_summary=summary,
+                skip=args.skip,
+                nb_columns=args.nb_columns,
+                duration=args.duration,
+            ),
+        )
+    }
 
-    stats_html = dataframe_to_html(stats)
-    summary_dict = {}
-    summary_dict[name] = stats_html
-    pool = Pool(args.nb_threads)
-    subjects_dict_pool = pool.starmap(
-        _subj_parralel,
-        zip(
-            images,
-            itertools.repeat(summary),
-            itertools.repeat(name),
-            itertools.repeat(args.skip),
-            itertools.repeat(args.nb_columns),
-            itertools.repeat(args.duration),
-        ),
-    )
-    pool.close()
-    pool.join()
-
-    metrics_dict = {}
-    subjects_dict = {}
-    for dict_sub in subjects_dict_pool:
-        for key in dict_sub:
-            curr_key = os.path.basename(key).split('.')[0]
-            subjects_dict[curr_key] = dict_sub[curr_key]
-    metrics_dict[name] = subjects_dict
-
-    nb_subjects = len(images)
     report = Report(args.output_report)
     report.generate(
         title="Quality Assurance " + args.image_type,
         nb_subjects=nb_subjects,
         summary_dict=summary_dict,
-        graph_array=graphs,
+        graph_array=[qa_graph],
         metrics_dict=metrics_dict,
         warning_dict=warning_dict,
         online=args.online,

@@ -13,6 +13,7 @@ from dmriqcpy.io.utils import (
     add_overwrite_arg,
     assert_inputs_exist,
     assert_outputs_exist,
+    clean_output_directories,
 )
 from dmriqcpy.viz.utils import dataframe_to_html
 
@@ -31,6 +32,7 @@ def _build_arg_parser():
     p.add_argument(
         "--data",
         nargs="+",
+        required=True,
         help="Screenshot and stats (optional) folders."
     )
 
@@ -52,17 +54,11 @@ def main():
 
     assert_inputs_exist(parser, args.data, are_directories=True)
     assert_outputs_exist(parser, args, [args.output_report, "data", "libs"])
+    clean_output_directories()
 
     nb_subjects = len(os.listdir(args.data[0]))
     for folder in args.data[1:]:
         nb_subjects += len(os.listdir(folder))
-
-    if os.path.exists("data"):
-        shutil.rmtree("data")
-    os.makedirs("data")
-
-    if os.path.exists("libs"):
-        shutil.rmtree("libs")
 
     metrics_dict = {}
     types = ""
