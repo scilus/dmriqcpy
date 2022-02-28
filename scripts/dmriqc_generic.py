@@ -71,7 +71,7 @@ def _build_arg_parser():
         "--duration",
         default=100,
         type=int,
-        help="Duration of each image in GIF in milliseconds." " [%(default)s]",
+        help="Duration of each image in GIF in milliseconds. [%(default)s]",
     )
 
     add_skip_arg(p)

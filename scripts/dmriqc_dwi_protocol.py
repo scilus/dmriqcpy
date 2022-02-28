@@ -75,8 +75,8 @@ def _build_arg_parser():
         metavar="INT",
         type=int,
         default=20,
-        help="The tolerated gap between the b-values to "
-        "extract\nand the actual b-values. [%(default)s]",
+        help="The tolerated gap between the b-values to extract "
+        "and the actual b-values. [%(default)s]",
     )
 
     add_online_arg(p)
@@ -155,10 +155,6 @@ def main():
         plot_proj_shell(
             get_bvecs_from_shells_idxs(points, shell_idx),
             centroids,
-            use_sym=True,
-            use_sphere=True,
-            same_color=False,
-            rad=0.025,
             opacity=0.2,
             ofile=os.path.join(
                 "data",

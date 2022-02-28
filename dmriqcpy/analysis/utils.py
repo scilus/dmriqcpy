@@ -255,3 +255,21 @@ def get_bvecs_from_shells_idxs(bvecs, shell_idxs):
         nb_shells -= 1
 
     return [bvecs[shell_idxs == i_ms] for i_ms in range(nb_shells)]
+
+
+def get_stats_dataframes(filenames, stats, metrics_names):
+    index = [os.path.basename(f) for f in filenames]
+    stats_per_subjects = pd.DataFrame(stats, index=[index], columns=metrics_names)
+
+    stats_across_subjects = pd.DataFrame(
+        [
+            stats_per_subjects.mean(),
+            stats_per_subjects.std(),
+            stats_per_subjects.min(),
+            stats_per_subjects.max(),
+        ],
+        index=["mean", "std", "min", "max"],
+        columns=metrics_names,
+    )
+
+    return stats_per_subjects, stats_across_subjects
