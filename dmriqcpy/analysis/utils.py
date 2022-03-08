@@ -104,6 +104,8 @@ def read_protocol(in_jsons, tags):
                                          index=['mean', 'std', 'min', 'max'],
                                          columns=dfs_for_graph.columns)
 
+
+
     return dfs, dfs_for_graph, dfs_for_graph_all
 
 
@@ -127,7 +129,7 @@ def dwi_protocol(bvals, tol=20):
     values_stats = []
     column_names = ["Nbr shells", "Nbr directions"]
     shells = {}
-    index = [item.split('.')[0] for item in bvals]
+    index = [os.path.basename(item).split('.')[0] for item in bvals]
     for i, filename in enumerate(bvals):
         values = []
 
@@ -147,8 +149,8 @@ def dwi_protocol(bvals, tol=20):
                                                np.where(centroids == centroid)[
                                                    0]])
             if filename not in shells[np.int(nearest_centroid)]:
-                shells[np.int(nearest_centroid)][filename] = 0
-            shells[np.int(nearest_centroid)][filename] += nb_directions
+                shells[np.int(nearest_centroid)][index[i]] = 0
+            shells[np.int(nearest_centroid)][index[i]] += nb_directions
             values.append(nb_directions)
             columns.append("Nbr bval {}".format(centroid))
 

@@ -126,19 +126,22 @@ def main():
                 summary_dict[curr_tag[0]] = dataframe_to_html(curr_tag[1])
 
     graphs = []
+
     graphs.append(
         graph_directions_per_shells("Nbr directions per shell",
                                     shells, args.online))
+
     graphs.append(graph_subjects_per_shells("Nbr subjects per shell",
                                             shells, args.online))
-    for c in ["Nbr shells", "Nbr directions"]:
+    for c in stats_for_graph.keys():
         graph = graph_dwi_protocol(c, c, stats_for_graph, args.online)
         graphs.append(graph)
 
     subjects_dict = {}
     for bval, bvec in zip(args.bval, args.bvec):
         filename = os.path.basename(bval)
-        subjects_dict[bval] = {}
+        curr_subj = os.path.basename(bval).split('.')[0]
+        subjects_dict[curr_subj] = {}
         points = np.genfromtxt(bvec)
         if points.shape[0] == 3:
             points = points.T
@@ -149,13 +152,13 @@ def main():
                         same_color=False, rad=0.025, opacity=0.2,
                         ofile=os.path.join("data", name + filename),
                         ores=(800, 800))
-        subjects_dict[bval]['screenshot'] = os.path.join("data",
+        subjects_dict[curr_subj]['screenshot'] = os.path.join("data",
                                                          name + filename +
                                                          '.png')
     metrics_dict = {}
     for subj in args.bval:
         summary_html = dataframe_to_html(summary[subj])
-        subjects_dict[subj]['stats'] = summary_html
+        subjects_dict[curr_subj]['stats'] = summary_html
     metrics_dict[name] = subjects_dict
 
     nb_subjects = len(args.bval)
