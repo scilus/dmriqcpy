@@ -157,6 +157,7 @@ def main():
                                                          '.png')
     metrics_dict = {}
     for subj in args.bval:
+        curr_subj = os.path.basename(subj).split('.')[0]
         summary_html = dataframe_to_html(summary[subj])
         subjects_dict[curr_subj]['stats'] = summary_html
     metrics_dict[name] = subjects_dict

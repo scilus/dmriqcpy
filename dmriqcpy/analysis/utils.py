@@ -104,8 +104,6 @@ def read_protocol(in_jsons, tags):
                                          index=['mean', 'std', 'min', 'max'],
                                          columns=dfs_for_graph.columns)
 
-
-
     return dfs, dfs_for_graph, dfs_for_graph_all
 
 
