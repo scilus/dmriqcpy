@@ -41,10 +41,10 @@ def _build_arg_parser():
     p.add_argument('--metadata', nargs='+',
                    help='Json files to get the metadata.')
 
-    p.add_argument('--tags', nargs='+',
+    p.add_argument('--dicom_fields', nargs='+',
                    default=["EchoTime", "RepetitionTime", "SliceThickness",
                             "Manufacturer", "ManufacturersModelName"],
-                   help='DICOM tags used to compare information. %(default)s')
+                   help='DICOM fields used to compare information. %(default)s')
 
     p.add_argument('--tolerance', '-t',
                    metavar='INT', type=int, default=20,
@@ -76,7 +76,7 @@ def main():
         else:
             stats_tags, stats_tags_for_graph,\
                 stats_tags_for_graph_all = read_protocol(args.metadata,
-                                                         args.tags)
+                                                         args.dicom_fields)
 
     all_data = np.concatenate([args.bval,
                                args.bvec])
