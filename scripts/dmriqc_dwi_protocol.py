@@ -64,7 +64,7 @@ def main():
     if not len(args.bval) == len(args.bvec):
         parser.error("Not the same number of images in input.")
 
-    stats_tags =  []
+    stats_tags = []
     stats_tags_for_graph = []
     if args.metadata:
         if not len(args.metadata) == len(args.bval):
@@ -139,7 +139,6 @@ def main():
 
     subjects_dict = {}
     for bval, bvec in zip(args.bval, args.bvec):
-        filename = os.path.basename(bval)
         curr_subj = os.path.basename(bval).split('.')[0]
         subjects_dict[curr_subj] = {}
         points = np.genfromtxt(bvec)
@@ -150,11 +149,15 @@ def main():
         ms = build_ms_from_shell_idx(points, shell_idx)
         plot_proj_shell(ms, centroids, use_sym=True, use_sphere=True,
                         same_color=False, rad=0.025, opacity=0.2,
-                        ofile=os.path.join("data", name + filename),
+                        ofile=os.path.join("data", name.replace(" ", "_") +
+                                           "_" + curr_subj),
                         ores=(800, 800))
         subjects_dict[curr_subj]['screenshot'] = os.path.join("data",
-                                                         name + filename +
-                                                         '.png')
+                                                              name.replace(" ",
+                                                                           "_") +
+                                                              "_" +
+                                                              curr_subj +
+                                                              '.png')
     metrics_dict = {}
     for subj in args.bval:
         curr_subj = os.path.basename(subj).split('.')[0]
