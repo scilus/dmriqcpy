@@ -41,10 +41,10 @@ def _build_arg_parser():
     p.add_argument('--metadata', nargs='+',
                    help='Json files to get the metadata.')
 
-    p.add_argument('--tags', nargs='+',
+    p.add_argument('--dicom_fields', nargs='+',
                    default=["EchoTime", "RepetitionTime", "SliceThickness",
                             "Manufacturer", "ManufacturersModelName"],
-                   help='DICOM tags used to compare information. %(default)s')
+                   help='DICOM fields used to compare information. %(default)s')
 
     p.add_argument('--tolerance', '-t',
                    metavar='INT', type=int, default=20,
@@ -64,7 +64,7 @@ def main():
     if not len(args.bval) == len(args.bvec):
         parser.error("Not the same number of images in input.")
 
-    stats_tags =  []
+    stats_tags = []
     stats_tags_for_graph = []
     if args.metadata:
         if not len(args.metadata) == len(args.bval):
@@ -76,7 +76,7 @@ def main():
         else:
             stats_tags, stats_tags_for_graph,\
                 stats_tags_for_graph_all = read_protocol(args.metadata,
-                                                         args.tags)
+                                                         args.dicom_fields)
 
     all_data = np.concatenate([args.bval,
                                args.bvec])
@@ -126,19 +126,21 @@ def main():
                 summary_dict[curr_tag[0]] = dataframe_to_html(curr_tag[1])
 
     graphs = []
+
     graphs.append(
         graph_directions_per_shells("Nbr directions per shell",
                                     shells, args.online))
+
     graphs.append(graph_subjects_per_shells("Nbr subjects per shell",
                                             shells, args.online))
-    for c in ["Nbr shells", "Nbr directions"]:
+    for c in stats_for_graph.keys():
         graph = graph_dwi_protocol(c, c, stats_for_graph, args.online)
         graphs.append(graph)
 
     subjects_dict = {}
     for bval, bvec in zip(args.bval, args.bvec):
-        filename = os.path.basename(bval)
-        subjects_dict[bval] = {}
+        curr_subj = os.path.basename(bval).split('.')[0]
+        subjects_dict[curr_subj] = {}
         points = np.genfromtxt(bvec)
         if points.shape[0] == 3:
             points = points.T
@@ -147,15 +149,20 @@ def main():
         ms = build_ms_from_shell_idx(points, shell_idx)
         plot_proj_shell(ms, centroids, use_sym=True, use_sphere=True,
                         same_color=False, rad=0.025, opacity=0.2,
-                        ofile=os.path.join("data", name + filename),
+                        ofile=os.path.join("data", name.replace(" ", "_") +
+                                           "_" + curr_subj),
                         ores=(800, 800))
-        subjects_dict[bval]['screenshot'] = os.path.join("data",
-                                                         name + filename +
-                                                         '.png')
+        subjects_dict[curr_subj]['screenshot'] = os.path.join("data",
+                                                              name.replace(" ",
+                                                                           "_") +
+                                                              "_" +
+                                                              curr_subj +
+                                                              '.png')
     metrics_dict = {}
     for subj in args.bval:
+        curr_subj = os.path.basename(subj).split('.')[0]
         summary_html = dataframe_to_html(summary[subj])
-        subjects_dict[subj]['stats'] = summary_html
+        subjects_dict[curr_subj]['stats'] = summary_html
     metrics_dict[name] = subjects_dict
 
     nb_subjects = len(args.bval)
