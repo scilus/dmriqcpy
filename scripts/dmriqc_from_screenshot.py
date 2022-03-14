@@ -2,12 +2,15 @@
 # -*- coding: utf-8 -*-
 
 import argparse
+import glob
 import os
+import pandas as pd
 import shutil
 
 from dmriqcpy.io.report import Report
 from dmriqcpy.io.utils import (add_online_arg, add_overwrite_arg,
                                assert_inputs_exist, assert_outputs_exist)
+from dmriqcpy.viz.utils import dataframe_to_html
 
 DESCRIPTION = """
 Compute the screenshot report in HTML format.
@@ -21,8 +24,11 @@ def _build_arg_parser():
     p.add_argument('output_report',
                    help='HTML report')
 
-    p.add_argument('data', nargs='+',
-                   help='Screenshot folders')
+    p.add_argument('--data', nargs='+',
+                   help='Screenshot and stats (optional) folders.')
+
+    p.add_argument('--stats', action="store_true",
+                   help='Use included csv files.')
 
     p.add_argument('--sym_link', action="store_true",
                    help='Use symlink instead of copy')
@@ -54,19 +60,33 @@ def main():
     metrics_dict = {}
     types = ""
     for folder in args.data:
-        files = os.listdir(folder)
+        screenshot_files = []
+        stats_files = []
+
+        for ext in ["png","jpeg","jpg"]:
+            screenshot_files = screenshot_files + sorted(glob.glob(folder + '/*' + ext))
+        if args.stats:
+            stats_files = sorted(glob.glob(folder + '/*.csv'))
+            if len(screenshot_files) != len(stats_files):
+                parser.error("Not same number of stats and screenshots")
+
+
         name = os.path.basename(os.path.normpath(folder))
         subjects_dict = {}
-        for subj_screenshot in files:
+        for index, curr_screenshot in enumerate(screenshot_files):
+            screenshot_basename = os.path.basename(curr_screenshot)
             if args.sym_link:
-                os.symlink(os.path.abspath(folder) + "/" + subj_screenshot,
-                           "data/" + subj_screenshot)
+                os.symlink(os.path.abspath(folder) + "/" + screenshot_basename,
+                           "data/" + screenshot_basename)
             else:
-                shutil.copyfile(folder + "/" + subj_screenshot,
-                                "data/" + subj_screenshot)
-            subjects_dict[subj_screenshot] = {}
-            subjects_dict[subj_screenshot]['screenshot'] =\
-                "data/" + subj_screenshot
+                shutil.copyfile(curr_screenshot,
+                                "data/" + screenshot_basename)
+            subjects_dict[screenshot_basename] = {}
+            subjects_dict[screenshot_basename]['screenshot'] =\
+                "data/" + screenshot_basename
+            if args.stats:
+                subjects_dict[screenshot_basename]['stats'] = dataframe_to_html(pd.read_csv(stats_files[index], index_col=False))
+
         metrics_dict[name] = subjects_dict
         types += " {0}".format(name)
 

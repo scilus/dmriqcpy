@@ -69,6 +69,8 @@ def screenshot_mosaic_wrapper(filename, output_prefix="", directory=".", skip=1,
     data = np.nan_to_num(data)
     unique = np.unique(data)
 
+    output_prefix = output_prefix.replace(' ', '_') + '_'
+
     if lut is not None or compute_lut:
         lut = compute_labels_map(lut, unique, compute_lut)
         tmp = np.zeros(data.shape + (3,))
@@ -136,6 +138,8 @@ def screenshot_mosaic_blend(image, image_blend, output_prefix="", directory=".",
                                              nb_columns=nb_columns, axis=False,
                                              return_path=False, lut=lut,
                                              compute_lut=compute_lut)
+
+    output_prefix = output_prefix.replace(' ', '_') + '_'
 
     if is_mask:
         data = np.array(mosaic_blend)
