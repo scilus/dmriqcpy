@@ -28,7 +28,8 @@ vtkcolors = [window.colors.blue,
 
 def screenshot_mosaic_wrapper(filename, output_prefix="", directory=".", skip=1,
                               pad=20, nb_columns=15, axis=True, cmap=None,
-                              return_path=True, duration=100, lut=None):
+                              return_path=True, duration=100, lut=None,
+                              compute_lut=False):
     """
     Compute mosaic wrapper from an image
 
@@ -51,10 +52,11 @@ def screenshot_mosaic_wrapper(filename, output_prefix="", directory=".", skip=1,
     cmap : string
         Colormap name in matplotlib format.
     return_path : bool
-        Return path of the mosaic
+        Return path of the mosaic.
     lut : str
-        Look up table
-
+        Look up table.
+    Compute lut: bool
+        If set, will compute a look of table using compute_labels_map.
 
     Returns
     -------
@@ -65,10 +67,10 @@ def screenshot_mosaic_wrapper(filename, output_prefix="", directory=".", skip=1,
     """
     data = nib.load(filename).get_data()
     data = np.nan_to_num(data)
+    unique = np.unique(data)
 
-    if lut is not None:
-        lut = compute_labels_map(lut)
-        unique = np.unique(data)
+    if lut is not None or compute_lut:
+        lut = compute_labels_map(lut, unique, compute_lut)
         tmp = np.zeros(data.shape + (3,))
         for label in unique:
             tmp[data == label] = lut[label]
@@ -91,7 +93,8 @@ def screenshot_mosaic_wrapper(filename, output_prefix="", directory=".", skip=1,
 
 def screenshot_mosaic_blend(image, image_blend, output_prefix="", directory=".",
                             blend_val=0.5, skip=1, pad=20, nb_columns=15,
-                            cmap=None, is_mask=False, lut=None):
+                            cmap=None, is_mask=False, lut=None,
+                            compute_lut=False):
     """
     Compute a blend mosaic from an image and a mask
 
@@ -131,7 +134,8 @@ def screenshot_mosaic_blend(image, image_blend, output_prefix="", directory=".",
                                              cmap=cmap, return_path=False)
     mosaic_blend = screenshot_mosaic_wrapper(image_blend, skip=skip, pad=pad,
                                              nb_columns=nb_columns, axis=False,
-                                             return_path=False, lut=lut)
+                                             return_path=False, lut=lut,
+                                             compute_lut=compute_lut)
 
     if is_mask:
         data = np.array(mosaic_blend)
