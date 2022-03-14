@@ -82,8 +82,11 @@ def main():
     parser = _build_arg_parser()
     args = parser.parse_args()
 
-    if not len(args.t1) == len(args.label):
+    if not len(args.t1) == len(args.label) and len(args.label) != 1:
         parser.error("Not the same number of images in input.")
+
+    if len(args.label) == 1:
+        args.label = args.label * len(args.t1)
 
     all_images = np.concatenate([args.t1, args.label])
     if args.lut:
