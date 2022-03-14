@@ -69,6 +69,8 @@ def screenshot_mosaic_wrapper(filename, output_prefix="", directory=".", skip=1,
     data = np.nan_to_num(data)
     unique = np.unique(data)
 
+    output_prefix = output_prefix.replace(' ', '_') + '_'
+
     if lut is not None or compute_lut:
         lut = compute_labels_map(lut, unique, compute_lut)
         tmp = np.zeros(data.shape + (3,))
@@ -137,6 +139,8 @@ def screenshot_mosaic_blend(image, image_blend, output_prefix="", directory=".",
                                              return_path=False, lut=lut,
                                              compute_lut=compute_lut)
 
+    output_prefix = output_prefix.replace(' ', '_') + '_'
+
     if is_mask:
         data = np.array(mosaic_blend)
         data[(data == (255, 255, 255)).all(axis=-1)] = (255, 0, 0)
@@ -147,12 +151,12 @@ def screenshot_mosaic_blend(image, image_blend, output_prefix="", directory=".",
         for _, mosaic in enumerate(mosaic_image):
             blend.append(Image.blend(mosaic, mosaic_blend,
                                      alpha=blend_val))
-        name = os.path.join(directory, output_prefix + '_' + image_name + '.gif')
+        name = os.path.join(directory, output_prefix + image_name + '.gif')
         blend[0].save(name, save_all=True, append_images=blend[1:],
                       duration=100, loop=0)
     else:
         blend = Image.blend(mosaic_image, mosaic_blend, alpha=blend_val)
-        name = os.path.join(directory, output_prefix + '_' + image_name + '.png')
+        name = os.path.join(directory, output_prefix + image_name + '.png')
         blend.save(name)
     return name
 
