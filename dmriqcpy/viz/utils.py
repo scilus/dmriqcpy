@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
+import fury
+import numpy as np
 import vtk
 from vtk.util import numpy_support
-
-import numpy as np
 
 """
 Some functions comes from
@@ -117,15 +117,24 @@ def renderer_to_arr(ren, size):
     return arr
 
 
-def compute_labels_map(lut_fname):
+def compute_labels_map(lut_fname, unique_vals, compute_lut):
     labels = {}
-    with open(lut_fname) as f:
-        for line in f:
-            tokens = ' '.join(line.split()).split()
-            if tokens and not tokens[0].startswith('#'):
-                labels[np.int(tokens[0])] = np.array((tokens[2],
-                                                      tokens[3],
-                                                      tokens[4]),
-                                                     dtype=np.int8)
+    if compute_lut:
+        labels[0] = np.array((0,0,0),dtype=np.int8)
+        vtkcolors = fury.colormap.distinguishable_colormap(nb_colors=len(unique_vals))
+        for index, curr_label in enumerate(unique_vals[1:]):
+            labels[curr_label] = np.array((vtkcolors[index][0]*255,
+                                           vtkcolors[index][1]*255,
+                                           vtkcolors[index][2]*255),
+                                           dtype=np.int8)
+    else:
+        with open(lut_fname) as f:
+            for line in f:
+                tokens = ' '.join(line.split()).split()
+                if tokens and not tokens[0].startswith('#'):
+                    labels[np.int(tokens[0])] = np.array((tokens[2],
+                                                          tokens[3],
+                                                          tokens[4]),
+                                                          dtype=np.int8)
 
     return labels
