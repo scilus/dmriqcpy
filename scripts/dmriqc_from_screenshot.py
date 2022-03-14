@@ -65,10 +65,8 @@ def main():
 
         for ext in ["png","jpeg","jpg"]:
             screenshot_files = screenshot_files + sorted(glob.glob(folder + '/*' + ext))
-        print(screenshot_files)
         if args.stats:
             stats_files = sorted(glob.glob(folder + '/*.csv'))
-            print(stats_files)
             if len(screenshot_files) != len(stats_files):
                 parser.error("Not same number of stats and screenshots")
 

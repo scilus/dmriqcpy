@@ -147,12 +147,12 @@ def screenshot_mosaic_blend(image, image_blend, output_prefix="", directory=".",
         for _, mosaic in enumerate(mosaic_image):
             blend.append(Image.blend(mosaic, mosaic_blend,
                                      alpha=blend_val))
-        name = os.path.join(directory, output_prefix + image_name + '.gif')
+        name = os.path.join(directory, output_prefix + '_' + image_name + '.gif')
         blend[0].save(name, save_all=True, append_images=blend[1:],
                       duration=100, loop=0)
     else:
         blend = Image.blend(mosaic_image, mosaic_blend, alpha=blend_val)
-        name = os.path.join(directory, output_prefix + image_name + '.png')
+        name = os.path.join(directory, output_prefix + '_' + image_name + '.png')
         blend.save(name)
     return name
 
