@@ -11,7 +11,7 @@ from dmriqcpy.analysis.stats import stats_frf
 from dmriqcpy.io.report import Report
 from dmriqcpy.io.utils import (add_online_arg, add_overwrite_arg,
                                assert_inputs_exist, assert_outputs_exist,
-                               get_files_from_folder)
+                               list_files_from_paths)
 from dmriqcpy.viz.graph import graph_frf
 from dmriqcpy.viz.utils import analyse_qa, dataframe_to_html
 
@@ -42,7 +42,7 @@ def main():
     parser = _build_arg_parser()
     args = parser.parse_args()
 
-    frf = get_files_from_folder(args.frf)
+    frf = list_files_from_paths(args.frf)
 
     assert_inputs_exist(parser, frf)
     assert_outputs_exist(parser, args, [args.output_report, "libs"])

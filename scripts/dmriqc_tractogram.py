@@ -11,7 +11,7 @@ import numpy as np
 from dmriqcpy.io.report import Report
 from dmriqcpy.io.utils import (add_online_arg, add_overwrite_arg,
                                assert_inputs_exist, assert_outputs_exist,
-                               get_files_from_folder)
+                               list_files_from_paths)
 from dmriqcpy.analysis.stats import stats_tractogram
 from dmriqcpy.viz.graph import graph_tractogram
 from dmriqcpy.viz.screenshot import screenshot_tracking
@@ -47,8 +47,8 @@ def main():
     parser = _build_arg_parser()
     args = parser.parse_args()
 
-    t1 = get_files_from_folder(args.t1)
-    tractograms = get_files_from_folder(args.tractograms)
+    t1 = list_files_from_paths(args.t1)
+    tractograms = list_files_from_paths(args.tractograms)
 
     if not len(tractograms) == len(t1):
         parser.error("Not the same number of images in input.")

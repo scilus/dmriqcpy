@@ -14,7 +14,7 @@ from dmriqcpy.analysis.stats import stats_mask_volume
 from dmriqcpy.io.report import Report
 from dmriqcpy.io.utils import (add_online_arg, add_overwrite_arg,
                                assert_inputs_exist, assert_outputs_exist,
-                               get_files_from_folder)
+                               list_files_from_paths)
 from dmriqcpy.viz.graph import graph_mask_volume
 from dmriqcpy.viz.screenshot import screenshot_mosaic_wrapper
 from dmriqcpy.viz.utils import analyse_qa, dataframe_to_html
@@ -81,16 +81,16 @@ def main():
     parser = _build_arg_parser()
     args = parser.parse_args()
 
-    seeding_mask = get_files_from_folder(args.seeding_mask)
+    seeding_mask = list_files_from_paths(args.seeding_mask)
 
     if args.tracking_type == "local":
-        tracking_mask = get_files_from_folder(args.tracking_mask)
+        tracking_mask = list_files_from_paths(args.tracking_mask)
         if not len(seeding_mask) == len(tracking_mask):
             parser.error("Not the same number of images in input.")
         all_images = np.concatenate([args.seeding_mask, args.tracking_mask])
     else:
-        map_include = get_files_from_folder(args.map_include)
-        map_exclude = get_files_from_folder(args.map_exclude)
+        map_include = list_files_from_paths(args.map_include)
+        map_exclude = list_files_from_paths(args.map_exclude)
         if not len(seeding_mask) == len(map_include) ==\
                 len(map_exclude):
             parser.error("Not the same number of images in input.")

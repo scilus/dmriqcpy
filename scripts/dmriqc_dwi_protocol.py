@@ -14,7 +14,7 @@ from dmriqcpy.analysis.utils import (dwi_protocol, read_protocol,
 from dmriqcpy.io.report import Report
 from dmriqcpy.io.utils import (add_online_arg, add_overwrite_arg,
                                assert_inputs_exist, assert_outputs_exist,
-                               get_files_from_folder)
+                               list_files_from_paths)
 from dmriqcpy.viz.graph import (graph_directions_per_shells,
                                 graph_dwi_protocol,
                                 graph_subjects_per_shells)
@@ -64,9 +64,9 @@ def main():
     args = parser.parse_args()
 
     if args.metadata:
-        metadata = get_files_from_folder(args.metadata)
-    bval = get_files_from_folder(args.bval)
-    bvec = get_files_from_folder(args.bvec)
+        metadata = list_files_from_paths(args.metadata)
+    bval = list_files_from_paths(args.bval)
+    bvec = list_files_from_paths(args.bvec)
 
     if not len(bval) == len(bvec):
         parser.error("Not the same number of images in input.")

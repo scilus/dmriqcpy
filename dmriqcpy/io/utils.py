@@ -90,13 +90,13 @@ def add_online_arg(parser):
                              'connexion to grab the needed libraries.')
 
 
-def get_files_from_folder(input_img):
+def list_files_from_paths(paths):
     """
     Get all images from folder or list of files
 
     Parameters
     ----------
-    input_img: list
+    paths: list
         List of folders and images
 
     Return
@@ -105,11 +105,11 @@ def get_files_from_folder(input_img):
         List of files sorted
     """
     out_images = []
-    for curr_in in input_img:
+    for curr_path in paths:
         if os.path.isdir(curr_in):
-            curr_images = glob.glob(os.path.join(curr_in, '*'))
+            curr_images = glob.glob(os.path.join(curr_path, '*'))
         else:
-            curr_images = [curr_in]
+            curr_images = [curr_path]
 
         out_images = out_images + curr_images
 

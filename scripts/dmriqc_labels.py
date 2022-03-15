@@ -12,7 +12,7 @@ import numpy as np
 from dmriqcpy.io.report import Report
 from dmriqcpy.io.utils import (add_online_arg, add_overwrite_arg,
                                assert_inputs_exist, assert_outputs_exist,
-                               get_files_from_folder)
+                               list_files_from_paths)
 from dmriqcpy.viz.screenshot import screenshot_mosaic_blend
 
 
@@ -83,8 +83,8 @@ def main():
     parser = _build_arg_parser()
     args = parser.parse_args()
 
-    t1 = get_files_from_folder(args.t1)
-    label = get_files_from_folder(args.label)
+    t1 = list_files_from_paths(args.t1)
+    label = list_files_from_paths(args.label)
 
     if not len(t1) == len(label) and len(label) != 1:
         parser.error("Not the same number of images in input.")

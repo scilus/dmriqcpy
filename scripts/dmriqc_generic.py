@@ -13,7 +13,7 @@ from dmriqcpy.analysis.stats import stats_mean_in_tissues, stats_mean_median
 from dmriqcpy.io.report import Report
 from dmriqcpy.io.utils import (add_online_arg, add_overwrite_arg,
                                assert_inputs_exist, assert_outputs_exist,
-                               get_files_from_folder)
+                               list_files_from_paths)
 from dmriqcpy.viz.graph import graph_mean_in_tissues, graph_mean_median
 from dmriqcpy.viz.screenshot import screenshot_mosaic_wrapper
 from dmriqcpy.viz.utils import analyse_qa, dataframe_to_html
@@ -84,14 +84,14 @@ def main():
     parser = _build_arg_parser()
     args = parser.parse_args()
 
-    images = get_files_from_folder(args.images)
+    images = list_files_from_paths(args.images)
     all_images = images
 
     with_tissues = False
     if args.wm is not None and args.gm is not None and args.csf is not None:
-        wm = get_files_from_folder(args.wm)
-        gm = get_files_from_folder(args.gm)
-        csf = get_files_from_folder(args.csf)
+        wm = list_files_from_paths(args.wm)
+        gm = list_files_from_paths(args.gm)
+        csf = list_files_from_paths(args.csf)
         if not len(images) == len(wm) == len(gm) == len(csf):
             parser.error("Not the same number of images in input.")
 

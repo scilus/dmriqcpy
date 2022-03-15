@@ -13,7 +13,7 @@ from dmriqcpy.analysis.stats import stats_mean_in_tissues
 from dmriqcpy.io.report import Report
 from dmriqcpy.io.utils import (add_online_arg, add_overwrite_arg,
                                assert_inputs_exist, assert_outputs_exist,
-                               get_files_from_folder)
+                               list_files_from_paths)
 from dmriqcpy.viz.graph import graph_mean_in_tissues
 from dmriqcpy.viz.screenshot import screenshot_mosaic_wrapper
 from dmriqcpy.viz.utils import analyse_qa, dataframe_to_html
@@ -86,13 +86,13 @@ def main():
     parser = _build_arg_parser()
     args = parser.parse_args()
 
-    afd_max = get_files_from_folder(args.afd_max)
-    afd_sum = get_files_from_folder(args.afd_sum)
-    afd_total = get_files_from_folder(args.afd_total)
-    nufo = get_files_from_folder(args.nufo)
-    wm = get_files_from_folder(args.wm)
-    gm = get_files_from_folder(args.gm)
-    csf = get_files_from_folder(args.csf)
+    afd_max = list_files_from_paths(args.afd_max)
+    afd_sum = list_files_from_paths(args.afd_sum)
+    afd_total = list_files_from_paths(args.afd_total)
+    nufo = list_files_from_paths(args.nufo)
+    wm = list_files_from_paths(args.wm)
+    gm = list_files_from_paths(args.gm)
+    csf = list_files_from_paths(args.csf)
 
     if not len(afd_max) == len(afd_sum) == len(afd_total) ==\
             len(nufo) == len(wm) == len(gm) == len(csf):

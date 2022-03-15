@@ -12,7 +12,7 @@ import numpy as np
 from dmriqcpy.io.report import Report
 from dmriqcpy.io.utils import (add_online_arg, add_overwrite_arg,
                                assert_inputs_exist, assert_outputs_exist,
-                               get_files_from_folder)
+                               list_files_from_paths)
 from dmriqcpy.analysis.stats import stats_mean_median
 from dmriqcpy.viz.graph import graph_mean_median
 from dmriqcpy.viz.screenshot import screenshot_mosaic_blend
@@ -79,8 +79,8 @@ def main():
     parser = _build_arg_parser()
     args = parser.parse_args()
 
-    images_no_bet = get_files_from_folder(args.no_bet)
-    images_bet_mask = get_files_from_folder(args.bet_mask)
+    images_no_bet = list_files_from_paths(args.no_bet)
+    images_bet_mask = list_files_from_paths(args.bet_mask)
 
     if not len(images_no_bet) == len(images_bet_mask):
         parser.error("Not the same number of images in input.")

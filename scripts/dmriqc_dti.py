@@ -13,7 +13,7 @@ from dmriqcpy.analysis.stats import stats_mean_in_tissues
 from dmriqcpy.io.report import Report
 from dmriqcpy.io.utils import (add_online_arg, add_overwrite_arg,
                                assert_inputs_exist, assert_outputs_exist,
-                               get_files_from_folder)
+                               list_files_from_paths)
 from dmriqcpy.viz.graph import graph_mean_in_tissues
 from dmriqcpy.viz.screenshot import (screenshot_fa_peaks,
                                      screenshot_mosaic_wrapper)
@@ -96,15 +96,15 @@ def main():
     parser = _build_arg_parser()
     args = parser.parse_args()
 
-    fa = get_files_from_folder(args.fa)
-    md = get_files_from_folder(args.md)
-    rd = get_files_from_folder(args.rd)
-    ad = get_files_from_folder(args.ad)
-    residual = get_files_from_folder(args.residual)
-    evecs_v1 = get_files_from_folder(args.evecs_v1)
-    wm = get_files_from_folder(args.wm)
-    gm = get_files_from_folder(args.gm)
-    csf = get_files_from_folder(args.csf)
+    fa = list_files_from_paths(args.fa)
+    md = list_files_from_paths(args.md)
+    rd = list_files_from_paths(args.rd)
+    ad = list_files_from_paths(args.ad)
+    residual = list_files_from_paths(args.residual)
+    evecs_v1 = list_files_from_paths(args.evecs_v1)
+    wm = list_files_from_paths(args.wm)
+    gm = list_files_from_paths(args.gm)
+    csf = list_files_from_paths(args.csf)
 
     if not len(fa) == len(md) == len(rd) == len(ad) == \
             len(residual) == len(evecs_v1) == len(wm) == len(gm) == len(csf):

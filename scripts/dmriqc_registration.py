@@ -14,7 +14,7 @@ from dmriqcpy.analysis.stats import stats_mean_in_tissues
 from dmriqcpy.io.report import Report
 from dmriqcpy.io.utils import (add_online_arg, add_overwrite_arg,
                                assert_inputs_exist, assert_outputs_exist,
-                               get_files_from_folder)
+                               list_files_from_paths)
 from dmriqcpy.viz.graph import graph_mean_in_tissues
 from dmriqcpy.viz.screenshot import screenshot_mosaic_blend
 from dmriqcpy.viz.utils import analyse_qa, dataframe_to_html
@@ -83,11 +83,11 @@ def main():
     parser = _build_arg_parser()
     args = parser.parse_args()
 
-    t1_warped = get_files_from_folder(args.t1_warped)
-    rgb = get_files_from_folder(args.rgb)
-    wm = get_files_from_folder(args.wm)
-    gm = get_files_from_folder(args.gm)
-    csf = get_files_from_folder(args.csf)
+    t1_warped = list_files_from_paths(args.t1_warped)
+    rgb = list_files_from_paths(args.rgb)
+    wm = list_files_from_paths(args.wm)
+    gm = list_files_from_paths(args.gm)
+    csf = list_files_from_paths(args.csf)
 
     if not len(t1_warped) == len(rgb) == len(wm) ==\
             len(gm) == len(csf):
