@@ -106,7 +106,7 @@ def list_files_from_paths(paths):
     """
     out_images = []
     for curr_path in paths:
-        if os.path.isdir(curr_in):
+        if os.path.isdir(curr_path):
             curr_images = glob.glob(os.path.join(curr_path, '*'))
         else:
             curr_images = [curr_path]
