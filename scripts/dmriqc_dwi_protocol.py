@@ -68,7 +68,6 @@ def main():
 
     bval = list_files_from_paths(args.bval)
     bvec = list_files_from_paths(args.bvec)
-    print(bval)
     if not len(bval) == len(bvec):
         parser.error("Not the same number of images in input.")
 
