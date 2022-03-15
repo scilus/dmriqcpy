@@ -65,9 +65,10 @@ def main():
 
     if args.metadata:
         metadata = list_files_from_paths(args.metadata)
+
     bval = list_files_from_paths(args.bval)
     bvec = list_files_from_paths(args.bvec)
-
+    print(bval)
     if not len(bval) == len(bvec):
         parser.error("Not the same number of images in input.")
 
@@ -97,7 +98,7 @@ def main():
         shutil.rmtree("libs")
 
     name = "DWI Protocol"
-    summary, stats_for_graph, stats_all, shells = dwi_protocol(args.bval)
+    summary, stats_for_graph, stats_all, shells = dwi_protocol(bval)
 
     if stats_tags:
         for curr_column in stats_tags:
@@ -144,13 +145,13 @@ def main():
         graphs.append(graph)
 
     subjects_dict = {}
-    for bval, bvec in zip(bval, bvec):
-        curr_subj = os.path.basename(bval).split('.')[0]
+    for curr_bval, curr_bvec in zip(bval, bvec):
+        curr_subj = os.path.basename(curr_bval).split('.')[0]
         subjects_dict[curr_subj] = {}
-        points = np.genfromtxt(bvec)
+        points = np.genfromtxt(curr_bvec)
         if points.shape[0] == 3:
             points = points.T
-        bvals = np.genfromtxt(bval)
+        bvals = np.genfromtxt(curr_bval)
         centroids, shell_idx = identify_shells(bvals)
         ms = build_ms_from_shell_idx(points, shell_idx)
         plot_proj_shell(ms, centroids, use_sym=True, use_sphere=True,
