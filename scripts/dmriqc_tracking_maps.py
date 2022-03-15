@@ -13,7 +13,8 @@ import numpy as np
 from dmriqcpy.analysis.stats import stats_mask_volume
 from dmriqcpy.io.report import Report
 from dmriqcpy.io.utils import (add_online_arg, add_overwrite_arg,
-                               assert_inputs_exist, assert_outputs_exist)
+                               assert_inputs_exist, assert_outputs_exist,
+                               get_files_from_folder)
 from dmriqcpy.viz.graph import graph_mask_volume
 from dmriqcpy.viz.screenshot import screenshot_mosaic_wrapper
 from dmriqcpy.viz.utils import analyse_qa, dataframe_to_html
@@ -35,16 +36,16 @@ def _build_arg_parser():
                    help='HTML report')
 
     p.add_argument('--seeding_mask', nargs='+', required=True,
-                   help='Seeding mask in Nifti format')
+                   help='Folder or list of seeding mask in Nifti format')
 
     p.add_argument('--tracking_mask', nargs='+',
-                   help='Tracking mask in Nifti format')
+                   help='Folder or list of tracking mask in Nifti format')
 
     p.add_argument('--map_include', nargs='+',
-                   help='Map include in Nifti format')
+                   help='Folder or list of map include in Nifti format')
 
     p.add_argument('--map_exclude', nargs='+',
-                   help='Map exlude in Nifti format')
+                   help='Folder or list of map exlude in Nifti format')
 
     p.add_argument('--skip', default=2, type=int,
                    help='Number of images skipped to build the '
@@ -80,16 +81,21 @@ def main():
     parser = _build_arg_parser()
     args = parser.parse_args()
 
+    seeding_mask = get_files_from_folder(args.seeding_mask)
+    tracking_mask = get_files_from_folder(args.tracking_mask)
+    map_include = get_files_from_folder(args.map_include)
+    map_exclude = get_files_from_folder(args.map_exclude)
+
     if args.tracking_type == "local":
-        if not len(args.seeding_mask) == len(args.tracking_mask):
+        if not len(seeding_mask) == len(tracking_mask):
             parser.error("Not the same number of images in input.")
         all_images = np.concatenate([args.seeding_mask, args.tracking_mask])
     else:
-        if not len(args.seeding_mask) == len(args.map_include) ==\
-            len(args.map_exclude):
+        if not len(seeding_mask) == len(map_include) ==\
+                len(map_exclude):
             parser.error("Not the same number of images in input.")
-        all_images = np.concatenate([args.seeding_mask, args.map_include,
-                                     args.map_exclude])
+        all_images = np.concatenate([seeding_mask, map_include,
+                                     map_exclude])
 
     assert_inputs_exist(parser, all_images)
     assert_outputs_exist(parser, args, [args.output_report, "data", "libs"])
@@ -102,12 +108,12 @@ def main():
         shutil.rmtree("libs")
 
     if args.tracking_type == "local":
-        metrics_names = [[args.seeding_mask, 'Seeding mask'],
-                         [args.tracking_mask, 'Tracking mask']]
+        metrics_names = [[seeding_mask, 'Seeding mask'],
+                         [tracking_mask, 'Tracking mask']]
     else:
-        metrics_names = [[args.seeding_mask, 'Seeding mask'],
-                         [args.map_include, 'Map include'],
-                         [args.map_exclude, 'Maps exclude']]
+        metrics_names = [[seeding_mask, 'Seeding mask'],
+                         [map_include, 'Map include'],
+                         [map_exclude, 'Maps exclude']]
     metrics_dict = {}
     summary_dict = {}
     graphs = []
@@ -143,7 +149,7 @@ def main():
                 subjects_dict[key] = dict_sub[key]
         metrics_dict[name] = subjects_dict
 
-    nb_subjects = len(args.seeding_mask)
+    nb_subjects = len(seeding_mask)
     report = Report(args.output_report)
     report.generate(title="Quality Assurance tracking maps",
                     nb_subjects=nb_subjects, summary_dict=summary_dict,

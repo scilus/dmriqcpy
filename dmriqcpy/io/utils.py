@@ -4,6 +4,7 @@ Some functions comes from
 https://github.com/scilus/scilpy/blob/master/scilpy/io/utils.py
 """
 
+import glob
 import os
 
 
@@ -87,3 +88,28 @@ def add_online_arg(parser):
     parser.add_argument('--online', action='store_true',
                         help='If set, the script will use the internet '
                              'connexion to grab the needed libraries.')
+
+
+def get_files_from_folder(input_img):
+    """
+    Get all images from folder or list of files
+
+    Parameters
+    ----------
+    input_img: list
+
+    Output
+    ------
+
+    """
+    out_images = []
+    for curr_in in input_img:
+        if os.path.isdir(curr_in):
+            curr_images = sorted(glob.glob(os.path.join(curr_in,
+                                                        '*.nii.gz')))
+        else:
+            curr_images = [curr_in]
+
+        out_images = out_images + curr_images
+
+    return out_images

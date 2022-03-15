@@ -12,7 +12,8 @@ import numpy as np
 from dmriqcpy.analysis.stats import stats_mean_in_tissues, stats_mean_median
 from dmriqcpy.io.report import Report
 from dmriqcpy.io.utils import (add_online_arg, add_overwrite_arg,
-                               assert_inputs_exist, assert_outputs_exist)
+                               assert_inputs_exist, assert_outputs_exist,
+                               get_files_from_folder)
 from dmriqcpy.viz.graph import graph_mean_in_tissues, graph_mean_median
 from dmriqcpy.viz.screenshot import screenshot_mosaic_wrapper
 from dmriqcpy.viz.utils import analyse_qa, dataframe_to_html
@@ -33,16 +34,16 @@ def _build_arg_parser():
                    help='HTML report.')
 
     p.add_argument('--images', nargs='+', required=True,
-                   help='Images in Nifti format.')
+                   help='Folder or list of images in Nifti format.')
 
     p.add_argument('--wm', nargs='+',
-                   help='WM mask in Nifti format.')
+                   help='Folder or list of WM mask in Nifti format.')
 
     p.add_argument('--gm', nargs='+',
-                   help='GM mask in Nifti format')
+                   help='Folder or list of GM mask in Nifti format')
 
     p.add_argument('--csf', nargs='+',
-                   help='CSF mask in Nifti format.')
+                   help='Folder or list of CSF mask in Nifti format.')
 
     p.add_argument('--skip', default=2, type=int,
                    help='Number of images skipped to build the '
@@ -83,15 +84,18 @@ def main():
     parser = _build_arg_parser()
     args = parser.parse_args()
 
-    all_images = args.images
+    images = get_files_from_folder(args.images)
+    wm = get_files_from_folder(args.wm)
+    gm = get_files_from_folder(args.gm)
+    csf = get_files_from_folder(args.csf)
+
     with_tissues = False
-    if args.wm is not None and args.gm is not None and args.csf is not None:
-        if not len(args.images) == len(args.wm) == len(args.gm) == len(
-                args.csf):
+    if wm is not None and gm is not None and csf is not None:
+        if not len(images) == len(wm) == len(gm) == len(csf):
             parser.error("Not the same number of images in input.")
 
         with_tissues = True
-        all_images = np.concatenate([args.images, args.wm, args.gm, args.csf])
+        all_images = np.concatenate([images, wm, gm, csf])
 
     assert_inputs_exist(parser, all_images)
     assert_outputs_exist(parser, args, [args.output_report, "data", "libs"])
@@ -110,14 +114,14 @@ def main():
                         'Mean {} in GM'.format(name),
                         'Mean {} in CSF'.format(name),
                         'Max {} in WM'.format(name)]
-        summary, stats = stats_mean_in_tissues(curr_metrics, args.images,
-                                               args.wm, args.gm, args.csf)
+        summary, stats = stats_mean_in_tissues(curr_metrics, images,
+                                               wm, gm, csf)
         graph = graph_mean_in_tissues('Mean {}'.format(name), curr_metrics[:3],
                                       summary, args.online)
     else:
         curr_metrics = ['Mean {}'.format(name),
                         'Median {}'.format(name)]
-        summary, stats = stats_mean_median(curr_metrics, args.images)
+        summary, stats = stats_mean_median(curr_metrics, images)
         graph = graph_mean_median('Mean {}'.format(name), curr_metrics,
                                   summary, args.online)
 
@@ -135,7 +139,7 @@ def main():
     summary_dict[name] = stats_html
     pool = Pool(args.nb_threads)
     subjects_dict_pool = pool.starmap(_subj_parralel,
-                                      zip(args.images,
+                                      zip(images,
                                           itertools.repeat(summary),
                                           itertools.repeat(name),
                                           itertools.repeat(args.skip),
@@ -151,7 +155,7 @@ def main():
             subjects_dict[key] = dict_sub[key]
     metrics_dict[name] = subjects_dict
 
-    nb_subjects = len(args.images)
+    nb_subjects = len(images)
     report = Report(args.output_report)
     report.generate(title="Quality Assurance " + args.image_type,
                     nb_subjects=nb_subjects, summary_dict=summary_dict,

@@ -11,7 +11,8 @@ import numpy as np
 
 from dmriqcpy.io.report import Report
 from dmriqcpy.io.utils import (add_online_arg, add_overwrite_arg,
-                               assert_inputs_exist, assert_outputs_exist)
+                               assert_inputs_exist, assert_outputs_exist,
+                               get_files_from_folder)
 from dmriqcpy.viz.screenshot import screenshot_mosaic_blend
 
 
@@ -31,10 +32,10 @@ def _build_arg_parser():
                    help='HTML report.')
 
     p.add_argument('--t1', nargs='+', required=True,
-                   help='T1 images in Nifti format.')
+                   help='Folder or list of T1 images in Nifti format.')
 
     p.add_argument('--label', nargs='+', required=True,
-                   help='Label images in Nifti format.')
+                   help='Folder or list of label images in Nifti format.')
 
     p.add_argument('--skip', default=2, type=int,
                    help='Number of images skipped to build the '
@@ -82,13 +83,16 @@ def main():
     parser = _build_arg_parser()
     args = parser.parse_args()
 
-    if not len(args.t1) == len(args.label) and len(args.label) != 1:
+    t1 = get_files_from_folder(args.t1)
+    label = get_files_from_folder(args.label)
+
+    if not len(t1) == len(label) and len(label) != 1:
         parser.error("Not the same number of images in input.")
 
-    if len(args.label) == 1:
-        args.label = args.label * len(args.t1)
+    if len(label) == 1:
+        label = label * len(args.t1)
 
-    all_images = np.concatenate([args.t1, args.label])
+    all_images = np.concatenate([t1, label])
     if args.lut:
         all_images = np.concatenate(all_images, args.lut)
 
@@ -106,8 +110,8 @@ def main():
 
     pool = Pool(args.nb_threads)
     subjects_dict_pool = pool.starmap(_subj_parralel,
-                                      zip(args.t1,
-                                          args.label,
+                                      zip(t1,
+                                          label,
                                           itertools.repeat(name),
                                           itertools.repeat(args.skip),
                                           itertools.repeat(args.nb_columns),
@@ -123,7 +127,7 @@ def main():
             subjects_dict[key] = dict_sub[key]
     metrics_dict[name] = subjects_dict
 
-    nb_subjects = len(args.t1)
+    nb_subjects = len(t1)
     report = Report(args.output_report)
     report.generate(title="Quality Assurance labels",
                     nb_subjects=nb_subjects, metrics_dict=metrics_dict,
