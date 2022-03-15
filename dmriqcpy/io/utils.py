@@ -97,10 +97,12 @@ def get_files_from_folder(input_img):
     Parameters
     ----------
     input_img: list
+        List of folders and images
 
-    Output
+    Return
     ------
-
+    out_images: list
+        List of files sorted
     """
     out_images = []
     for curr_in in input_img:
