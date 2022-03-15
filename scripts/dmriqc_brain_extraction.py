@@ -85,7 +85,7 @@ def main():
     if not len(images_no_bet) == len(images_bet_mask):
         parser.error("Not the same number of images in input.")
 
-    all_images = np.concatenate(images_no_bet + images_bet_mask)
+    all_images = np.concatenate([images_no_bet, images_bet_mask])
     assert_inputs_exist(parser, all_images)
     assert_outputs_exist(parser, args, [args.output_report, "data", "libs"])
 
