@@ -83,8 +83,8 @@ def main():
 
     metrics_dict = {}
     subjects_dict = {}
-    for subj_metric, t1 in zip(tractograms, t1):
-        screenshot_path = screenshot_tracking(subj_metric, t1, "data")
+    for subj_metric, curr_t1 in zip(tractograms, t1):
+        screenshot_path = screenshot_tracking(subj_metric, curr_t1, "data")
         summary_html = dataframe_to_html(summary.loc[subj_metric])
         subjects_dict[subj_metric] = {}
         subjects_dict[subj_metric]['screenshot'] = screenshot_path
