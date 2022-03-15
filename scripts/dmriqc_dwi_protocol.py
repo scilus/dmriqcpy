@@ -13,7 +13,8 @@ from dmriqcpy.analysis.utils import (dwi_protocol, read_protocol,
                                      build_ms_from_shell_idx)
 from dmriqcpy.io.report import Report
 from dmriqcpy.io.utils import (add_online_arg, add_overwrite_arg,
-                               assert_inputs_exist, assert_outputs_exist)
+                               assert_inputs_exist, assert_outputs_exist,
+                               list_files_from_paths)
 from dmriqcpy.viz.graph import (graph_directions_per_shells,
                                 graph_dwi_protocol,
                                 graph_subjects_per_shells)
@@ -33,18 +34,19 @@ def _build_arg_parser():
                    help='Filename of QC report (in html format).')
 
     p.add_argument('--bval', nargs='+', required=True,
-                   help='List of bval files.')
+                   help='Folder or list of bval files.')
 
     p.add_argument('--bvec', nargs='+', required=True,
-                   help='List of bvec files.')
+                   help='Folder or list of bvec files.')
 
     p.add_argument('--metadata', nargs='+',
-                   help='Json files to get the metadata.')
+                   help='Folder or list of json files to get the metadata.')
 
     p.add_argument('--dicom_fields', nargs='+',
                    default=["EchoTime", "RepetitionTime", "SliceThickness",
                             "Manufacturer", "ManufacturersModelName"],
-                   help='DICOM fields used to compare information. %(default)s')
+                   help='DICOM fields used to compare information. '
+                        '%(default)s')
 
     p.add_argument('--tolerance', '-t',
                    metavar='INT', type=int, default=20,
@@ -61,25 +63,29 @@ def main():
     parser = _build_arg_parser()
     args = parser.parse_args()
 
-    if not len(args.bval) == len(args.bvec):
+    if args.metadata:
+        metadata = list_files_from_paths(args.metadata)
+
+    bval = list_files_from_paths(args.bval)
+    bvec = list_files_from_paths(args.bvec)
+    if not len(bval) == len(bvec):
         parser.error("Not the same number of images in input.")
 
     stats_tags = []
     stats_tags_for_graph = []
     if args.metadata:
-        if not len(args.metadata) == len(args.bval):
+        if not len(metadata) == len(bval):
             parser.error('Number of metadata files: {}.\n'
                          'Number of bval files: {}.\n'
                          'Not the same number of images '
-                         'in input'.format(len(args.metadata),
-                                           len(args.bval)))
+                         'in input'.format(len(metadata),
+                                           len(bval)))
         else:
             stats_tags, stats_tags_for_graph,\
-                stats_tags_for_graph_all = read_protocol(args.metadata,
+                stats_tags_for_graph_all = read_protocol(metadata,
                                                          args.dicom_fields)
 
-    all_data = np.concatenate([args.bval,
-                               args.bvec])
+    all_data = np.concatenate([bval, bvec])
     assert_inputs_exist(parser, all_data)
     assert_outputs_exist(parser, args, [args.output_report, "data", "libs"])
 
@@ -91,7 +97,7 @@ def main():
         shutil.rmtree("libs")
 
     name = "DWI Protocol"
-    summary, stats_for_graph, stats_all, shells = dwi_protocol(args.bval)
+    summary, stats_for_graph, stats_all, shells = dwi_protocol(bval)
 
     if stats_tags:
         for curr_column in stats_tags:
@@ -138,13 +144,13 @@ def main():
         graphs.append(graph)
 
     subjects_dict = {}
-    for bval, bvec in zip(args.bval, args.bvec):
-        curr_subj = os.path.basename(bval).split('.')[0]
+    for curr_bval, curr_bvec in zip(bval, bvec):
+        curr_subj = os.path.basename(curr_bval).split('.')[0]
         subjects_dict[curr_subj] = {}
-        points = np.genfromtxt(bvec)
+        points = np.genfromtxt(curr_bvec)
         if points.shape[0] == 3:
             points = points.T
-        bvals = np.genfromtxt(bval)
+        bvals = np.genfromtxt(curr_bval)
         centroids, shell_idx = identify_shells(bvals)
         ms = build_ms_from_shell_idx(points, shell_idx)
         plot_proj_shell(ms, centroids, use_sym=True, use_sphere=True,
@@ -159,13 +165,13 @@ def main():
                                                               curr_subj +
                                                               '.png')
     metrics_dict = {}
-    for subj in args.bval:
+    for subj in bval:
         curr_subj = os.path.basename(subj).split('.')[0]
         summary_html = dataframe_to_html(summary[subj])
         subjects_dict[curr_subj]['stats'] = summary_html
     metrics_dict[name] = subjects_dict
 
-    nb_subjects = len(args.bval)
+    nb_subjects = len(bval)
     report = Report(args.output_report)
     report.generate(title="Quality Assurance DWI protocol",
                     nb_subjects=nb_subjects, metrics_dict=metrics_dict,

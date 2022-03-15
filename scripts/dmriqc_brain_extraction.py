@@ -11,7 +11,8 @@ import numpy as np
 
 from dmriqcpy.io.report import Report
 from dmriqcpy.io.utils import (add_online_arg, add_overwrite_arg,
-                               assert_inputs_exist, assert_outputs_exist)
+                               assert_inputs_exist, assert_outputs_exist,
+                               list_files_from_paths)
 from dmriqcpy.analysis.stats import stats_mean_median
 from dmriqcpy.viz.graph import graph_mean_median
 from dmriqcpy.viz.screenshot import screenshot_mosaic_blend
@@ -32,11 +33,12 @@ def _build_arg_parser():
     p.add_argument('output_report',
                    help='Filename of QC report (in html format).')
 
-    p.add_argument('--images_no_bet', nargs='+', required=True,
-                   help='List of images with the skull in Nifti format.')
-
-    p.add_argument('--images_bet_mask', nargs='+', required=True,
-                   help='List of brain extraction masks in Nifti format.')
+    p.add_argument('--no_bet', nargs='+', required=True,
+                   help='A folder or a list of images with the skull in'
+                        ' Nifti format.')
+    p.add_argument('--bet_mask', nargs='+', required=True,
+                   help='Folder or a list of images of brain extraction masks'
+                        ' in Nifti format.')
 
     p.add_argument('--skip', default=2, type=int,
                    help='Number of images skipped to build the '
@@ -77,11 +79,13 @@ def main():
     parser = _build_arg_parser()
     args = parser.parse_args()
 
-    if not len(args.images_no_bet) == len(args.images_bet_mask):
+    images_no_bet = list_files_from_paths(args.no_bet)
+    images_bet_mask = list_files_from_paths(args.bet_mask)
+
+    if not len(images_no_bet) == len(images_bet_mask):
         parser.error("Not the same number of images in input.")
 
-    all_images = np.concatenate([args.images_no_bet,
-                                 args.images_bet_mask])
+    all_images = np.concatenate([images_no_bet, images_bet_mask])
     assert_inputs_exist(parser, all_images)
     assert_outputs_exist(parser, args, [args.output_report, "data", "libs"])
 
@@ -92,7 +96,7 @@ def main():
     if os.path.exists("libs"):
         shutil.rmtree("libs")
 
-    metrics = args.images_no_bet
+    metrics = images_no_bet
     name = args.image_type
     curr_metrics = ['Mean {}'.format(name),
                     'Median {}'.format(name)]
@@ -116,8 +120,8 @@ def main():
 
     pool = Pool(args.nb_threads)
     subjects_dict_pool = pool.starmap(_subj_parralel,
-        zip(np.array_split(np.array(args.images_no_bet), args.nb_threads),
-            np.array_split(np.array(args.images_bet_mask), args.nb_threads),
+        zip(np.array_split(np.array(images_no_bet), args.nb_threads),
+            np.array_split(np.array(images_bet_mask), args.nb_threads),
             itertools.repeat(name), itertools.repeat(args.skip),
             itertools.repeat(summary), itertools.repeat(args.nb_columns)))
 
@@ -131,7 +135,7 @@ def main():
             subjects_dict[key] = dict_sub[key]
     metrics_dict[name] = subjects_dict
 
-    nb_subjects = len(args.images_no_bet)
+    nb_subjects = len(images_no_bet)
     report = Report(args.output_report)
     report.generate(title="Quality Assurance BET " + args.image_type,
                     nb_subjects=nb_subjects, summary_dict=summary_dict,

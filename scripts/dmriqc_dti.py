@@ -12,7 +12,8 @@ import numpy as np
 from dmriqcpy.analysis.stats import stats_mean_in_tissues
 from dmriqcpy.io.report import Report
 from dmriqcpy.io.utils import (add_online_arg, add_overwrite_arg,
-                               assert_inputs_exist, assert_outputs_exist)
+                               assert_inputs_exist, assert_outputs_exist,
+                               list_files_from_paths)
 from dmriqcpy.viz.graph import graph_mean_in_tissues
 from dmriqcpy.viz.screenshot import (screenshot_fa_peaks,
                                      screenshot_mosaic_wrapper)
@@ -31,31 +32,31 @@ def _build_arg_parser():
                    help='HTML report')
 
     p.add_argument('--fa', nargs='+', required=True,
-                   help='FA images in Nifti format')
+                   help='Folder or FA images in Nifti format.')
 
     p.add_argument('--md', nargs='+', required=True,
-                   help='MD images in Nifti format')
+                   help='Folder of MD images in Nifti format.')
 
     p.add_argument('--rd', nargs='+', required=True,
-                   help='RD images in Nifti format')
+                   help='Folder or RD images in Nifti format.')
 
     p.add_argument('--ad', nargs='+', required=True,
-                   help='AD images in Nifti format')
+                   help='Folder or AD images in Nifti format.')
 
     p.add_argument('--residual', nargs='+', required=True,
-                   help='Residual images in Nifti format')
+                   help='Folder or residual images in Nifti format.')
 
     p.add_argument('--evecs_v1', nargs='+', required=True,
-                   help='Evecs v1 images in Nifti format')
+                   help='Folder or evecs v1 images in Nifti format.')
 
     p.add_argument('--wm', nargs='+', required=True,
-                   help='WM mask in Nifti format')
+                   help='Folder or WM mask in Nifti format.')
 
     p.add_argument('--gm', nargs='+', required=True,
-                   help='GM mask in Nifti format')
+                   help='Folder or GM mask in Nifti format.')
 
     p.add_argument('--csf', nargs='+', required=True,
-                   help='CSF mask in Nifti format')
+                   help='Folder or CSF mask in Nifti format.')
 
     p.add_argument('--skip', default=2, type=int,
                    help='Number of images skipped to build the '
@@ -95,14 +96,22 @@ def main():
     parser = _build_arg_parser()
     args = parser.parse_args()
 
-    if not len(args.fa) == len(args.md) == len(args.rd) == len(args.ad) == \
-           len(args.residual) == len(args.evecs_v1) == len(args.wm) == \
-           len(args.gm) == len(args.csf):
+    fa = list_files_from_paths(args.fa)
+    md = list_files_from_paths(args.md)
+    rd = list_files_from_paths(args.rd)
+    ad = list_files_from_paths(args.ad)
+    residual = list_files_from_paths(args.residual)
+    evecs_v1 = list_files_from_paths(args.evecs_v1)
+    wm = list_files_from_paths(args.wm)
+    gm = list_files_from_paths(args.gm)
+    csf = list_files_from_paths(args.csf)
+
+    if not len(fa) == len(md) == len(rd) == len(ad) == \
+            len(residual) == len(evecs_v1) == len(wm) == len(gm) == len(csf):
         parser.error("Not the same number of images in input.")
 
-    all_images = np.concatenate([args.fa, args.md, args.rd, args.ad,
-                                 args.residual, args.evecs_v1, args.wm,
-                                 args.gm, args.csf])
+    all_images = np.concatenate([fa, md, rd, ad, residual, evecs_v1, wm,
+                                 gm, csf])
     assert_inputs_exist(parser, all_images)
     assert_outputs_exist(parser, args, [args.output_report, "data", "libs"])
 
@@ -113,8 +122,8 @@ def main():
     if os.path.exists("libs"):
         shutil.rmtree("libs")
 
-    metrics_names = [[args.fa, 'FA'], [args.md, 'MD'], [args.rd, 'RD'],
-                     [args.ad, 'AD'], [args.residual, "Residual"]]
+    metrics_names = [[fa, 'FA'], [md, 'MD'], [rd, 'RD'],
+                     [ad, 'AD'], [residual, "Residual"]]
     metrics_dict = {}
     summary_dict = {}
     graphs = []
@@ -126,8 +135,8 @@ def main():
                         'Mean {} in CSF'.format(name),
                         'Max {} in WM'.format(name)]
 
-        summary, stats = stats_mean_in_tissues(curr_metrics, metrics, args.wm,
-                                               args.gm, args.csf)
+        summary, stats = stats_mean_in_tissues(curr_metrics, metrics, wm,
+                                               gm, csf)
 
         warning_dict[name] = analyse_qa(summary, stats, curr_metrics[:3])
         warning_list = np.concatenate(
@@ -160,14 +169,14 @@ def main():
 
     subjects_dict = {}
     name = "Peaks"
-    for fa, evecs in zip(args.fa, args.evecs_v1):
+    for fa, evecs in zip(fa, evecs_v1):
         screenshot_path = screenshot_fa_peaks(fa, evecs, "data")
 
         subjects_dict[evecs] = {}
         subjects_dict[evecs]['screenshot'] = screenshot_path
     metrics_dict[name] = subjects_dict
 
-    nb_subjects = len(args.fa)
+    nb_subjects = len(fa)
     report = Report(args.output_report)
     report.generate(title="Quality Assurance DTI metrics",
                     nb_subjects=nb_subjects, summary_dict=summary_dict,

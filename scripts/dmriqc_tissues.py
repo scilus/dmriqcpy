@@ -13,7 +13,8 @@ import numpy as np
 from dmriqcpy.analysis.stats import stats_mask_volume
 from dmriqcpy.io.report import Report
 from dmriqcpy.io.utils import (add_online_arg, add_overwrite_arg,
-                               assert_inputs_exist, assert_outputs_exist)
+                               assert_inputs_exist, assert_outputs_exist,
+                               list_files_from_paths)
 from dmriqcpy.viz.graph import graph_mask_volume
 from dmriqcpy.viz.screenshot import screenshot_mosaic_wrapper
 from dmriqcpy.viz.utils import analyse_qa, dataframe_to_html
@@ -74,10 +75,14 @@ def main():
     parser = _build_arg_parser()
     args = parser.parse_args()
 
-    if not len(args.wm) == len(args.gm) == len(args.csf):
+    wm = list_files_from_paths(args.wm)
+    gm = list_files_from_paths(args.gm)
+    csf = list_files_from_paths(args.csf)
+
+    if not len(wm) == len(gm) == len(csf):
         parser.error("Not the same number of images in input.")
 
-    all_images = np.concatenate([args.wm, args.gm, args.csf])
+    all_images = np.concatenate([wm, gm, csf])
     assert_inputs_exist(parser, all_images)
     assert_outputs_exist(parser, args, [args.output_report, "data", "libs"])
 
@@ -88,9 +93,9 @@ def main():
     if os.path.exists("libs"):
         shutil.rmtree("libs")
 
-    metrics_names = [[args.wm, 'WM mask'],
-                     [args.gm, 'GM mask'],
-                     [args.csf, 'CSF mask']]
+    metrics_names = [[wm, 'WM mask'],
+                     [gm, 'GM mask'],
+                     [csf, 'CSF mask']]
     metrics_dict = {}
     summary_dict = {}
     graphs = []
@@ -126,7 +131,7 @@ def main():
                 subjects_dict[key] = dict_sub[key]
         metrics_dict[name] = subjects_dict
 
-    nb_subjects = len(args.wm)
+    nb_subjects = len(wm)
     report = Report(args.output_report)
     report.generate(title="Quality Assurance tissue segmentation",
                     nb_subjects=nb_subjects, summary_dict=summary_dict,
