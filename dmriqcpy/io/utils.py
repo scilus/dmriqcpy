@@ -105,11 +105,10 @@ def get_files_from_folder(input_img):
     out_images = []
     for curr_in in input_img:
         if os.path.isdir(curr_in):
-            curr_images = sorted(glob.glob(os.path.join(curr_in,
-                                                        '*.nii.gz')))
+            curr_images = glob.glob(os.path.join(curr_in, '*.nii.gz'))
         else:
             curr_images = [curr_in]
 
         out_images = out_images + curr_images
 
-    return out_images
+    return sorted(out_images)
