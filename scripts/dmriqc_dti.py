@@ -169,11 +169,11 @@ def main():
 
     subjects_dict = {}
     name = "Peaks"
-    for fa, evecs in zip(fa, evecs_v1):
-        screenshot_path = screenshot_fa_peaks(fa, evecs, "data")
+    for curr_fa, curr_evecs in zip(fa, evecs_v1):
+        screenshot_path = screenshot_fa_peaks(curr_fa, curr_evecs, "data")
 
-        subjects_dict[evecs] = {}
-        subjects_dict[evecs]['screenshot'] = screenshot_path
+        subjects_dict[curr_evecs] = {}
+        subjects_dict[curr_evecs]['screenshot'] = screenshot_path
     metrics_dict[name] = subjects_dict
 
     nb_subjects = len(fa)
