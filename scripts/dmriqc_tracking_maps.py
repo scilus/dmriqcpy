@@ -82,15 +82,15 @@ def main():
     args = parser.parse_args()
 
     seeding_mask = get_files_from_folder(args.seeding_mask)
-    tracking_mask = get_files_from_folder(args.tracking_mask)
-    map_include = get_files_from_folder(args.map_include)
-    map_exclude = get_files_from_folder(args.map_exclude)
 
     if args.tracking_type == "local":
+        tracking_mask = get_files_from_folder(args.tracking_mask)
         if not len(seeding_mask) == len(tracking_mask):
             parser.error("Not the same number of images in input.")
         all_images = np.concatenate([args.seeding_mask, args.tracking_mask])
     else:
+        map_include = get_files_from_folder(args.map_include)
+        map_exclude = get_files_from_folder(args.map_exclude)
         if not len(seeding_mask) == len(map_include) ==\
                 len(map_exclude):
             parser.error("Not the same number of images in input.")

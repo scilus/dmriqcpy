@@ -85,12 +85,13 @@ def main():
     args = parser.parse_args()
 
     images = get_files_from_folder(args.images)
-    wm = get_files_from_folder(args.wm)
-    gm = get_files_from_folder(args.gm)
-    csf = get_files_from_folder(args.csf)
+    all_images = images
 
     with_tissues = False
-    if wm is not None and gm is not None and csf is not None:
+    if args.wm is not None and args.gm is not None and args.csf is not None:
+        wm = get_files_from_folder(args.wm)
+        gm = get_files_from_folder(args.gm)
+        csf = get_files_from_folder(args.csf)
         if not len(images) == len(wm) == len(gm) == len(csf):
             parser.error("Not the same number of images in input.")
 

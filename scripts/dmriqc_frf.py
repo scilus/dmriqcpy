@@ -25,7 +25,7 @@ def _build_arg_parser():
     p = argparse.ArgumentParser(description=DESCRIPTION,
                                 formatter_class=argparse.RawTextHelpFormatter)
 
-    p.add_argument('frf', nargs='+', required=True,
+    p.add_argument('frf', nargs='+',
                    help='Folder or list of fiber response function (frf) '
                         'files (in txt format).')
 
