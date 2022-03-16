@@ -43,7 +43,7 @@ def stats_mean_median(column_names, filenames):
         values.append(
             [mean, median])
 
-    stats_per_subjects = pd.DataFrame(values, index=[sub_filenames],
+    stats_per_subjects = pd.DataFrame(values, index=sub_filenames,
                                       columns=column_names)
 
     stats_across_subjects = pd.DataFrame([stats_per_subjects.mean(),
