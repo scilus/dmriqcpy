@@ -66,16 +66,17 @@ def _build_arg_parser():
 
 def _subj_parralel(t1_metric, rgb_metric, summary, name, skip, nb_columns):
     subjects_dict = {}
+    curr_key = os.path.basename(t1_metric).split('.')[0]
     screenshot_path = screenshot_mosaic_blend(t1_metric, rgb_metric,
                                               output_prefix=name,
                                               directory="data",
                                               blend_val=0.5,
                                               skip=skip, nb_columns=nb_columns)
 
-    summary_html = dataframe_to_html(summary.loc[t1_metric])
-    subjects_dict[t1_metric] = {}
-    subjects_dict[t1_metric]['screenshot'] = screenshot_path
-    subjects_dict[t1_metric]['stats'] = summary_html
+    summary_html = dataframe_to_html(summary.loc[curr_key])
+    subjects_dict[curr_key] = {}
+    subjects_dict[curr_key]['screenshot'] = screenshot_path
+    subjects_dict[curr_key]['stats'] = summary_html
     return subjects_dict
 
 
@@ -141,7 +142,8 @@ def main():
     subjects_dict = {}
     for dict_sub in subjects_dict_pool:
         for key in dict_sub:
-            subjects_dict[key] = dict_sub[key]
+            curr_key = os.path.basename(key).split('.')[0]
+            subjects_dict[curr_key] = dict_sub[curr_key]
     metrics_dict[name] = subjects_dict
 
     nb_subjects = len(t1_warped)

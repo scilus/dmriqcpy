@@ -30,7 +30,7 @@ def graph_mean_median(title, column_names, summary, online=False):
     means = []
     medians = []
     np.random.seed(1)
-    image = np.concatenate(summary.index)
+    image = summary.index
     means = np.array(summary[column_names[0]])
     medians = np.array(summary[column_names[1]])
 
@@ -96,7 +96,7 @@ def graph_mean_in_tissues(title, column_names, summary, online=False):
     means_gm = []
     means_csf = []
     np.random.seed(1)
-    metric = np.concatenate(summary.index)
+    metric = summary.index
     means_wm = np.array(summary[column_names[0]])
     means_gm = np.array(summary[column_names[1]])
     means_csf = np.array(summary[column_names[2]])
@@ -273,7 +273,7 @@ def graph_tractogram(title, column_names, summary, online=False):
 
     nb_streamlines = []
     np.random.seed(1)
-    metric = np.concatenate(summary.index)
+    metric = summary.index
     nb_streamlines = np.array(summary[column_names[0]])
 
     nb_streamlines_graph = Box(
@@ -321,7 +321,7 @@ def graph_mask_volume(title, column_names, summary, online=False):
     include_plotlyjs = not online
 
     np.random.seed(1)
-    metric = np.concatenate(summary.index)
+    metric = summary.index
     volume = np.array(summary[column_names[0]])
 
     volume_graph = Box(

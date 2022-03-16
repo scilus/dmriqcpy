@@ -60,6 +60,7 @@ def _subj_parralel(images_no_bet, images_bet_mask, name, skip,
                    summary, nb_columns):
     subjects_dict = {}
     for subj_metric, mask in zip(images_no_bet, images_bet_mask):
+        curr_key = os.path.basename(subj_metric).split('.')[0]
         screenshot_path = screenshot_mosaic_blend(subj_metric, mask,
                                                   output_prefix=name,
                                                   directory="data",
@@ -68,10 +69,10 @@ def _subj_parralel(images_no_bet, images_bet_mask, name, skip,
                                                   nb_columns=nb_columns,
                                                   is_mask=True)
 
-        summary_html = dataframe_to_html(summary.loc[subj_metric])
-        subjects_dict[subj_metric] = {}
-        subjects_dict[subj_metric]['screenshot'] = screenshot_path
-        subjects_dict[subj_metric]['stats'] = summary_html
+        summary_html = dataframe_to_html(summary.loc[curr_key])
+        subjects_dict[curr_key] = {}
+        subjects_dict[curr_key]['screenshot'] = screenshot_path
+        subjects_dict[curr_key]['stats'] = summary_html
     return subjects_dict
 
 

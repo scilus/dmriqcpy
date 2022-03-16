@@ -76,6 +76,7 @@ def _build_arg_parser():
 
 def _subj_parralel(subj_metric, summary, name, skip, nb_columns):
     subjects_dict = {}
+    curr_key = os.path.basename(subj_metric).split('.')[0]
     cmap = None
     if name == "Residual":
         cmap = "hot"
@@ -85,10 +86,10 @@ def _subj_parralel(subj_metric, summary, name, skip, nb_columns):
                                                 nb_columns=nb_columns,
                                                 cmap=cmap)
 
-    summary_html = dataframe_to_html(summary.loc[subj_metric])
-    subjects_dict[subj_metric] = {}
-    subjects_dict[subj_metric]['screenshot'] = screenshot_path
-    subjects_dict[subj_metric]['stats'] = summary_html
+    summary_html = dataframe_to_html(summary.loc[curr_key])
+    subjects_dict[curr_key] = {}
+    subjects_dict[curr_key]['screenshot'] = screenshot_path
+    subjects_dict[curr_key]['stats'] = summary_html
     return subjects_dict
 
 
@@ -157,7 +158,7 @@ def main():
                                               itertools.repeat(name),
                                               itertools.repeat(args.skip),
                                               itertools.repeat(
-                                                  args.nb_columns)))
+                                                 args.nb_columns)))
 
         pool.close()
         pool.join()
@@ -170,10 +171,11 @@ def main():
     subjects_dict = {}
     name = "Peaks"
     for curr_fa, curr_evecs in zip(fa, evecs_v1):
+        evecs_filename = os.path.basename(curr_evecs).split('.')[0]
         screenshot_path = screenshot_fa_peaks(curr_fa, curr_evecs, "data")
 
-        subjects_dict[curr_evecs] = {}
-        subjects_dict[curr_evecs]['screenshot'] = screenshot_path
+        subjects_dict[evecs_filename] = {}
+        subjects_dict[evecs_filename]['screenshot'] = screenshot_path
     metrics_dict[name] = subjects_dict
 
     nb_subjects = len(fa)
