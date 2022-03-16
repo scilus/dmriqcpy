@@ -30,7 +30,7 @@ def graph_mean_median(title, column_names, summary, online=False):
     means = []
     medians = []
     np.random.seed(1)
-    image = np.concatenate(summary.index)
+    image = summary.index
     means = np.array(summary[column_names[0]])
     medians = np.array(summary[column_names[1]])
 
@@ -96,7 +96,7 @@ def graph_mean_in_tissues(title, column_names, summary, online=False):
     means_gm = []
     means_csf = []
     np.random.seed(1)
-    metric = np.concatenate(summary.index)
+    metric = summary.index
     means_wm = np.array(summary[column_names[0]])
     means_gm = np.array(summary[column_names[1]])
     means_csf = np.array(summary[column_names[2]])
@@ -145,7 +145,7 @@ def graph_mean_in_tissues(title, column_names, summary, online=False):
     return div
 
 
-def graph_frf(title, column_names, summary, online=False):
+def graph_frf_eigen(title, column_names, summary, online=False):
     """
     Compute plotly graph with mean frf values
 
@@ -168,7 +168,7 @@ def graph_frf(title, column_names, summary, online=False):
     include_plotlyjs = not online
 
     np.random.seed(1)
-    metric = np.concatenate(summary.index)
+    metric = summary.index
     e1 = np.array(summary[column_names[0]])
     e2 = np.array(summary[column_names[1]])
 
@@ -193,6 +193,51 @@ def graph_frf(title, column_names, summary, online=False):
     )
 
     data = [e1_graph, e2_graph]
+
+    fig = Figure(data=data)
+
+    fig['layout'].update(title=title)
+    fig['layout'].update(width=500, height=500)
+    div = off.plot(fig, show_link=False, include_plotlyjs=include_plotlyjs,
+                   output_type='div')
+    div = div.replace("<div>", "<div style=\"display:inline-block\">")
+    return div
+
+def graph_frf_b0(title, column_names, summary, online=False):
+    """
+    Compute plotly graph with mean b0 values
+
+    Parameters
+    ----------
+    title : string
+        Title of the graph.
+    column_names : array of strings
+        Name of the columns in the summary DataFrame.
+    summary : DataFrame
+        DataFrame containing the mean stats.
+    online: Boolean
+        If false it will include plotlyjs
+
+    Returns
+    -------
+    div : html div (string)
+        Graph as a HTML div.
+    """
+    include_plotlyjs = not online
+
+    np.random.seed(1)
+    metric = summary.index
+    e1_graph = Box(
+        name="Mean B0",
+        y=np.array(summary[column_names[2]]),
+        boxpoints='all',
+        jitter=0.3,
+        text=metric,
+        pointpos=-1.8,
+        hoverinfo="y+text"
+    )
+
+    data = [e1_graph]
 
     fig = Figure(data=data)
 
@@ -228,7 +273,7 @@ def graph_tractogram(title, column_names, summary, online=False):
 
     nb_streamlines = []
     np.random.seed(1)
-    metric = np.concatenate(summary.index)
+    metric = summary.index
     nb_streamlines = np.array(summary[column_names[0]])
 
     nb_streamlines_graph = Box(
@@ -276,7 +321,7 @@ def graph_mask_volume(title, column_names, summary, online=False):
     include_plotlyjs = not online
 
     np.random.seed(1)
-    metric = np.concatenate(summary.index)
+    metric = summary.index
     volume = np.array(summary[column_names[0]])
 
     volume_graph = Box(

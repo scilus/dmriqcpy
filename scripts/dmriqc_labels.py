@@ -72,7 +72,7 @@ def _subj_parralel(t1, label, name, skip, nb_columns, lut, compute_lut):
                                               lut=lut,
                                               compute_lut=compute_lut)
 
-    key = os.path.basename(t1)
+    key = os.path.basename(t1).split('.')[0]
 
     subjects_dict[key] = {}
     subjects_dict[key]['screenshot'] = screenshot_path
@@ -124,7 +124,8 @@ def main():
     subjects_dict = {}
     for dict_sub in subjects_dict_pool:
         for key in dict_sub:
-            subjects_dict[key] = dict_sub[key]
+            curr_key = os.path.basename(key).split('.')[0]
+            subjects_dict[curr_key] = dict_sub[curr_key]
     metrics_dict[name] = subjects_dict
 
     nb_subjects = len(t1)

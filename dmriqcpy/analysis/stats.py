@@ -2,6 +2,7 @@
 
 import nibabel as nib
 import numpy as np
+import os
 import pandas as pd
 
 
@@ -26,6 +27,8 @@ def stats_mean_median(column_names, filenames):
     """
     values = []
     import time
+    sub_filenames = [os.path.basename(curr_subj).split('.')[0] for curr_subj in filenames]
+
     for filename in filenames:
         data = nib.load(filename).get_data()
         shape = data.shape
@@ -40,7 +43,7 @@ def stats_mean_median(column_names, filenames):
         values.append(
             [mean, median])
 
-    stats_per_subjects = pd.DataFrame(values, index=[filenames],
+    stats_per_subjects = pd.DataFrame(values, index=sub_filenames,
                                       columns=column_names)
 
     stats_across_subjects = pd.DataFrame([stats_per_subjects.mean(),
@@ -79,6 +82,8 @@ def stats_mean_in_tissues(column_names, images, wm_images, gm_images,
         DataFrame containing mean, std, min and max of mean across subjects.
     """
     values = []
+    sub_images = [os.path.basename(curr_subj).split('.')[0] for curr_subj in images]
+
     for i in range(len(images)):
         data = nib.load(images[i]).get_data()
         wm = nib.load(wm_images[i]).get_data()
@@ -93,7 +98,7 @@ def stats_mean_in_tissues(column_names, images, wm_images, gm_images,
         values.append(
             [data_wm, data_gm, data_csf, data_max])
 
-    stats_per_subjects = pd.DataFrame(values, index=[images],
+    stats_per_subjects = pd.DataFrame(values, index=sub_images,
                                       columns=column_names)
 
     stats_across_subjects = pd.DataFrame([stats_per_subjects.mean(),
@@ -127,10 +132,10 @@ def stats_frf(column_names, filenames):
     values = []
     for filename in filenames:
         frf = np.loadtxt(filename)
-
         values.append([frf[0], frf[1], frf[3]])
 
-    stats_per_subjects = pd.DataFrame(values, index=[filenames],
+    sub_filenames = [os.path.basename(curr_subj).split('.')[0] for curr_subj in filenames]
+    stats_per_subjects = pd.DataFrame(values,index=sub_filenames,
                                       columns=column_names)
 
     stats_across_subjects = pd.DataFrame([stats_per_subjects.mean(),
@@ -162,13 +167,14 @@ def stats_tractogram(column_names, tractograms):
         DataFrame containing mean, std, min and max of mean across subjects.
     """
     values = []
+    sub_tractograms = [os.path.basename(curr_subj).split('.')[0] for curr_subj in tractograms]
     for tractogram_file in tractograms:
         tractogram = nib.streamlines.load(tractogram_file, lazy_load=True)
 
         values.append(
             [tractogram.header['nb_streamlines']])
 
-    stats_per_subjects = pd.DataFrame(values, index=[tractograms],
+    stats_per_subjects = pd.DataFrame(values, index=sub_tractograms,
                                       columns=column_names)
 
     stats_across_subjects = pd.DataFrame([stats_per_subjects.mean(),
@@ -200,6 +206,8 @@ def stats_mask_volume(column_names, images):
         DataFrame containing mean, std, min and max of mean across subjects.
     """
     values = []
+    sub_images = [os.path.basename(curr_subj).split('.')[0] for curr_subj in images]
+
     for image in images:
         img = nib.load(image)
         data = img.get_data()
@@ -208,7 +216,7 @@ def stats_mask_volume(column_names, images):
 
         values.append([volume])
 
-    stats_per_subjects = pd.DataFrame(values, index=[images],
+    stats_per_subjects = pd.DataFrame(values, index=sub_images,
                                       columns=column_names)
 
     stats_across_subjects = pd.DataFrame([stats_per_subjects.mean(),
