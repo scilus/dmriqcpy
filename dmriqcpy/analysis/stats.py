@@ -2,6 +2,7 @@
 
 import nibabel as nib
 import numpy as np
+import os
 import pandas as pd
 
 
@@ -127,10 +128,10 @@ def stats_frf(column_names, filenames):
     values = []
     for filename in filenames:
         frf = np.loadtxt(filename)
-
         values.append([frf[0], frf[1], frf[3]])
 
-    stats_per_subjects = pd.DataFrame(values, index=[filenames],
+    sub_filenames = [os.path.basename(curr_subj).split('.')[0] for curr_subj in filenames]
+    stats_per_subjects = pd.DataFrame(values,index=sub_filenames,
                                       columns=column_names)
 
     stats_across_subjects = pd.DataFrame([stats_per_subjects.mean(),

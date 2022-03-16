@@ -12,7 +12,7 @@ from dmriqcpy.io.report import Report
 from dmriqcpy.io.utils import (add_online_arg, add_overwrite_arg,
                                assert_inputs_exist, assert_outputs_exist,
                                list_files_from_paths)
-from dmriqcpy.viz.graph import graph_frf
+from dmriqcpy.viz.graph import graph_frf_eigen, graph_frf_b0
 from dmriqcpy.viz.utils import analyse_qa, dataframe_to_html
 
 
@@ -57,11 +57,13 @@ def main():
     summary, stats = stats_frf(metrics_names, frf)
     warning_dict[name] = analyse_qa(summary, stats, metrics_names)
     warning_list = np.concatenate([filenames for filenames in warning_dict[name].values()])
-    warning_dict[name]['nb_warnings'] = len(np.unique(warning_list))
+    warning_dict[name]['nb_warnings'] = len(set(warning_list))
 
     graphs = []
-    graph = graph_frf("FRF", metrics_names, summary, args.online)
-    graphs.append(graph)
+    graphs.append(graph_frf_eigen("EigenValues", metrics_names, summary,
+                                  args.online))
+    graphs.append(graph_frf_b0("Mean B0", metrics_names, summary, args.online))
+
 
     summary_dict = {}
     stats_html = dataframe_to_html(stats)
@@ -70,9 +72,10 @@ def main():
     metrics_dict = {}
     subjects_dict = {}
     for subj_metric in frf:
-        summary_html = dataframe_to_html(summary.loc[subj_metric])
-        subjects_dict[subj_metric] = {}
-        subjects_dict[subj_metric]['stats'] = summary_html
+        curr_subj = os.path.basename(subj_metric).split('.')[0]
+        summary_html = dataframe_to_html(summary.loc[curr_subj].to_frame())
+        subjects_dict[curr_subj] = {}
+        subjects_dict[curr_subj]['stats'] = summary_html
     metrics_dict[name] = subjects_dict
 
     nb_subjects = len(frf)
