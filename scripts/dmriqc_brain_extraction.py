@@ -69,7 +69,7 @@ def _subj_parralel(images_no_bet, images_bet_mask, name, skip,
                                                   nb_columns=nb_columns,
                                                   is_mask=True)
 
-        summary_html = dataframe_to_html(summary.loc[curr_key])
+        summary_html = dataframe_to_html(summary.loc[curr_key].to_frame())
         subjects_dict[curr_key] = {}
         subjects_dict[curr_key]['screenshot'] = screenshot_path
         subjects_dict[curr_key]['stats'] = summary_html

@@ -65,7 +65,7 @@ def _subj_parralel(subj_metric, summary, name, skip, nb_columns):
                                                 directory="data", skip=skip,
                                                 nb_columns=nb_columns)
 
-    summary_html = dataframe_to_html(summary.loc[curr_key])
+    summary_html = dataframe_to_html(summary.loc[curr_key].to_frame())
     subjects_dict[curr_key] = {}
     subjects_dict[curr_key]['screenshot'] = screenshot_path
     subjects_dict[curr_key]['stats'] = summary_html
