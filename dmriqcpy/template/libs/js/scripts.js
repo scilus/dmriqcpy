@@ -389,6 +389,7 @@ $(document).ready(function () {
             var subj_id = tab.getElementsByClassName("tab")[dict_metrics[currentMetric]].id;
             update_status(document.getElementById(subj_id + "_pass"));
             qc_saved = false;
+            nextPrev(1);
         }
         else if (e.key == "2") {
             var tab = document.getElementById(currentMetric);
