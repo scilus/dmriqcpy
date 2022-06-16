@@ -3,8 +3,6 @@
 
 import argparse
 from functools import partial
-import os
-import shutil
 
 import numpy as np
 
@@ -12,14 +10,14 @@ from dmriqcpy.io.report import Report
 from dmriqcpy.io.utils import (
     add_online_arg,
     add_overwrite_arg,
-    assert_inputs_exist,
-    assert_outputs_exist,
-    list_files_from_paths,
-    add_skip_arg,
     add_nb_columns_arg,
     add_nb_threads_arg,
+    add_skip_arg,
+    assert_inputs_exist,
     assert_list_arguments_equal_size,
+    assert_outputs_exist,
     clean_output_directories,
+    list_files_from_paths,
 )
 from dmriqcpy.reporting.report import (
     generate_metric_reports_parallel,
@@ -40,7 +38,7 @@ def _build_arg_parser():
     )
 
     p.add_argument("image_type", help="Type of image (e.g. B0 resample).")
-    p.add_argument("output_report", help="HTML report.")
+    p.add_argument("output_report", help="Filename of QC report (in html format).")
 
     p.add_argument(
         "--images",
@@ -108,11 +106,11 @@ def main():
     nb_subjects = len(images)
 
     if with_tissues:
-        summary, stats, qa_report, qa_graph = get_qa_stats_and_graph_in_tissues(
+        summary, stats, qa_report, qa_graphs = get_qa_stats_and_graph_in_tissues(
             images, name, wm, gm, csf, args.online
         )
     else:
-        summary, stats, qa_report, qa_graph = get_generic_qa_stats_and_graph(
+        summary, stats, qa_report, qa_graphs = get_generic_qa_stats_and_graph(
             images, name, args.online
         )
 
@@ -121,7 +119,7 @@ def main():
 
     metrics_dict = {
         name: generate_metric_reports_parallel(
-            zip(args.images),
+            zip(images),
             args.nb_threads,
             nb_subjects // args.nb_threads,
             report_package_generation_fn=partial(
@@ -139,7 +137,7 @@ def main():
         title="Quality Assurance " + args.image_type,
         nb_subjects=nb_subjects,
         summary_dict=summary_dict,
-        graph_array=[qa_graph],
+        graph_array=qa_graphs,
         metrics_dict=metrics_dict,
         warning_dict=warning_dict,
         online=args.online,

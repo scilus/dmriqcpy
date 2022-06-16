@@ -2,20 +2,18 @@
 # -*- coding: utf-8 -*-
 
 import argparse
-import os
-import shutil
 from functools import partial
 
 import numpy as np
 
 from dmriqcpy.io.report import Report
 from dmriqcpy.io.utils import (
+    add_nb_threads_arg,
     add_online_arg,
     add_overwrite_arg,
     assert_inputs_exist,
-    assert_outputs_exist,
     assert_list_arguments_equal_size,
-    add_nb_threads_arg,
+    assert_outputs_exist,
     clean_output_directories,
     list_files_from_paths,
 )
@@ -37,14 +35,14 @@ def _build_arg_parser():
         description=DESCRIPTION, formatter_class=argparse.RawTextHelpFormatter
     )
 
-    p.add_argument("output_report", help="HTML report")
+    p.add_argument("output_report", help="Filename of QC report (in html format).")
     p.add_argument(
         "--tractograms",
         nargs="+",
         required=True,
-        help="Tractograms in format supported by Nibabel",
+        help="Tractograms in format supported by Nibabel.",
     )
-    p.add_argument("--t1", nargs="+", required=True, help="Folder or list of T1 images in Nifti format")
+    p.add_argument("--t1", nargs="+", required=True, help="Folder or list of T1 images in Nifti format.")
 
     add_online_arg(p)
     add_nb_threads_arg(p)
@@ -69,7 +67,7 @@ def main():
     name = "Tracking"
     nb_subjects = len(tractograms)
 
-    summary, stats, qa_report, qa_graph = get_tractogram_qa_stats_and_graph(
+    summary, stats, qa_report, qa_graphs = get_tractogram_qa_stats_and_graph(
         tractograms, args.online
     )
 
@@ -94,7 +92,7 @@ def main():
         title="Quality Assurance tractograms",
         nb_subjects=nb_subjects,
         summary_dict=summary_dict,
-        graph_array=[qa_graph],
+        graph_array=qa_graphs,
         metrics_dict=metrics_dict,
         warning_dict=warning_dict,
         online=args.online,

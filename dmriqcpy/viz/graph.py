@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-
 import numpy as np
 from plotly.graph_objs import Bar, Box, Figure
 import plotly.offline as off
+
+from dmriqcpy.viz.utils import graph_to_html
 
 
 def graph_mean_median(title, column_names, summary, include_plotlyjs=False):
@@ -41,7 +42,6 @@ def graph_mean_median(title, column_names, summary, include_plotlyjs=False):
         pointpos=-1.8,
         hoverinfo="y+text",
     )
-
     median = Box(
         name="Median",
         y=medians,
@@ -52,24 +52,12 @@ def graph_mean_median(title, column_names, summary, include_plotlyjs=False):
         hoverinfo="y+text",
     )
 
-    data = [mean, median]
-
-    fig = Figure(data=data)
-    max_value = max(np.max(means), np.max(medians))
-
-    range_yaxis = [0, max_value + 2 * max_value]
-
-    fig["layout"]["yaxis"].update(range=range_yaxis)
-    fig["layout"].update(title=title)
-    fig["layout"].update(width=500, height=500)
-    div = off.plot(
-        fig,
-        show_link=False,
+    return graph_to_html(
+        [mean, median],
+        title,
+        [0, 3.0 * max(np.max(means), np.max(medians))],
         include_plotlyjs=include_plotlyjs,
-        output_type="div",
     )
-    div = div.replace("<div>", '<div style="display:inline-block">')
-    return div
 
 
 def graph_mean_in_tissues(title, column_names, summary, include_plotlyjs=False):
@@ -99,6 +87,7 @@ def graph_mean_in_tissues(title, column_names, summary, include_plotlyjs=False):
     means_wm = np.array(summary[column_names[0]])
     means_gm = np.array(summary[column_names[1]])
     means_csf = np.array(summary[column_names[2]])
+
     wm = Box(
         name="WM",
         y=means_wm,
@@ -108,7 +97,6 @@ def graph_mean_in_tissues(title, column_names, summary, include_plotlyjs=False):
         pointpos=-1.8,
         hoverinfo="y+text",
     )
-
     gm = Box(
         name="GM",
         y=means_gm,
@@ -118,7 +106,6 @@ def graph_mean_in_tissues(title, column_names, summary, include_plotlyjs=False):
         pointpos=-1.8,
         hoverinfo="y+text",
     )
-
     csf = Box(
         name="CSF",
         y=means_csf,
@@ -128,24 +115,13 @@ def graph_mean_in_tissues(title, column_names, summary, include_plotlyjs=False):
         pointpos=-1.8,
         hoverinfo="y+text",
     )
-    data = [wm, gm, csf]
 
-    fig = Figure(data=data)
-
-    range_yaxis = [0, np.max(means_wm) + 2 * np.max(means_wm)]
-
-    fig["layout"]["yaxis"].update(range=range_yaxis)
-    fig["layout"].update(title=title)
-    fig["layout"].update(width=500, height=500)
-
-    div = off.plot(
-        fig,
-        show_link=False,
+    return graph_to_html(
+        [wm, gm, csf],
+        title,
+        [0, 3.0 * np.max(means_wm)],
         include_plotlyjs=include_plotlyjs,
-        output_type="div",
     )
-    div = div.replace("<div>", '<div style="display:inline-block">')
-    return div
 
 
 def graph_frf_eigen(title, column_names, summary, include_plotlyjs=False):
@@ -184,7 +160,6 @@ def graph_frf_eigen(title, column_names, summary, include_plotlyjs=False):
         pointpos=-1.8,
         hoverinfo="y+text",
     )
-
     e2_graph = Box(
         name="Eigen value 2",
         y=e2,
@@ -195,22 +170,12 @@ def graph_frf_eigen(title, column_names, summary, include_plotlyjs=False):
         hoverinfo="y+text",
     )
 
-    data = [e1_graph, e2_graph]
-
-    fig = Figure(data=data)
-
-    fig["layout"].update(title=title)
-    fig["layout"].update(width=500, height=500)
-    div = off.plot(
-        fig,
-        show_link=False,
-        include_plotlyjs=include_plotlyjs,
-        output_type="div",
+    return graph_to_html(
+        [e1_graph, e2_graph], title, include_plotlyjs=include_plotlyjs
     )
-    div = div.replace("<div>", '<div style="display:inline-block">')
-    return div
 
-def graph_frf_b0(title, column_names, summary, online=False):
+
+def graph_frf_b0(title, column_names, summary, include_plotlyjs=False):
     """
     Compute plotly graph with mean b0 values
 
@@ -222,38 +187,30 @@ def graph_frf_b0(title, column_names, summary, online=False):
         Name of the columns in the summary DataFrame.
     summary : DataFrame
         DataFrame containing the mean stats.
-    online: Boolean
-        If false it will include plotlyjs
+    include_plotlyjs: Boolean
+        If True, javascript and css dependencies for plotting will
+        be injected in the graph's HTML code returned. If not, they
+        have to be included manually or via a CDN.
 
     Returns
     -------
     div : html div (string)
         Graph as a HTML div.
     """
-    include_plotlyjs = not online
-
     np.random.seed(1)
     metric = summary.index
-    e1_graph = Box(
+
+    mean_b0 = Box(
         name="Mean B0",
         y=np.array(summary[column_names[2]]),
-        boxpoints='all',
+        boxpoints="all",
         jitter=0.3,
         text=metric,
         pointpos=-1.8,
-        hoverinfo="y+text"
+        hoverinfo="y+text",
     )
 
-    data = [e1_graph]
-
-    fig = Figure(data=data)
-
-    fig['layout'].update(title=title)
-    fig['layout'].update(width=500, height=500)
-    div = off.plot(fig, show_link=False, include_plotlyjs=include_plotlyjs,
-                   output_type='div')
-    div = div.replace("<div>", "<div style=\"display:inline-block\">")
-    return div
+    return graph_to_html([mean_b0], title, include_plotlyjs=include_plotlyjs)
 
 
 def graph_tractogram(title, column_names, summary, include_plotlyjs=False):
@@ -292,20 +249,9 @@ def graph_tractogram(title, column_names, summary, include_plotlyjs=False):
         hoverinfo="y+text",
     )
 
-    data = [nb_streamlines_graph]
-
-    fig = Figure(data=data)
-
-    fig["layout"].update(title=title)
-    fig["layout"].update(width=500, height=500)
-    div = off.plot(
-        fig,
-        show_link=False,
-        include_plotlyjs=include_plotlyjs,
-        output_type="div",
+    return graph_to_html(
+        [nb_streamlines_graph], title, include_plotlyjs=include_plotlyjs
     )
-    div = div.replace("<div>", '<div style="display:inline-block">')
-    return div
 
 
 def graph_mask_volume(title, column_names, summary, include_plotlyjs=False):
@@ -344,20 +290,9 @@ def graph_mask_volume(title, column_names, summary, include_plotlyjs=False):
         hoverinfo="y+text",
     )
 
-    data = [volume_graph]
-
-    fig = Figure(data=data)
-
-    fig["layout"].update(title=title)
-    fig["layout"].update(width=500, height=500)
-    div = off.plot(
-        fig,
-        show_link=False,
-        include_plotlyjs=include_plotlyjs,
-        output_type="div",
+    return graph_to_html(
+        [volume_graph], title, include_plotlyjs=include_plotlyjs
     )
-    div = div.replace("<div>", '<div style="display:inline-block">')
-    return div
 
 
 def graph_dwi_protocol(title, column_name, summary, include_plotlyjs=False):
@@ -396,20 +331,7 @@ def graph_dwi_protocol(title, column_name, summary, include_plotlyjs=False):
         hoverinfo="y+text",
     )
 
-    data = [graph]
-
-    fig = Figure(data=data)
-
-    fig["layout"].update(title=title)
-    fig["layout"].update(width=500, height=500)
-    div = off.plot(
-        fig,
-        show_link=False,
-        include_plotlyjs=include_plotlyjs,
-        output_type="div",
-    )
-    div = div.replace("<div>", '<div style="display:inline-block">')
-    return div
+    return graph_to_html([graph], title, include_plotlyjs=include_plotlyjs)
 
 
 def graph_directions_per_shells(title, summary, include_plotlyjs=False):
@@ -434,12 +356,13 @@ def graph_directions_per_shells(title, summary, include_plotlyjs=False):
     """
     np.random.seed(1)
     data_graph = []
+
     for i in sorted(summary):
         metric = list(summary[i].keys())
         data = list(summary[i].values())
 
         graph = Box(
-            name="b=" + str(i),
+            name="b={}".format(i),
             y=data,
             boxpoints="all",
             jitter=0.3,
@@ -450,18 +373,9 @@ def graph_directions_per_shells(title, summary, include_plotlyjs=False):
 
         data_graph.append(graph)
 
-    fig = Figure(data=data_graph)
-
-    fig["layout"].update(title=title)
-    fig["layout"].update(width=700, height=500)
-    div = off.plot(
-        fig,
-        show_link=False,
-        include_plotlyjs=include_plotlyjs,
-        output_type="div",
+    return graph_to_html(
+        data_graph, title, width=700, include_plotlyjs=include_plotlyjs
     )
-    div = div.replace("<div>", '<div style="display:inline-block">')
-    return div
 
 
 def graph_subjects_per_shells(title, summary, include_plotlyjs=False):
@@ -486,23 +400,20 @@ def graph_subjects_per_shells(title, summary, include_plotlyjs=False):
     """
     np.random.seed(1)
     data_graph = []
+
     for i in sorted(summary):
         metric = list(summary[i].keys())
         data = [len(metric)]
 
-        graph = Bar(name="b=" + str(i), y=data, x=["b=" + str(i)], hoverinfo="y")
+        graph = Bar(
+            name="b={}".format(i),
+            y=data,
+            x=["b={}".format(i)],
+            hoverinfo="y",
+        )
 
         data_graph.append(graph)
 
-    fig = Figure(data=data_graph)
-
-    fig["layout"].update(title=title)
-    fig["layout"].update(width=700, height=500)
-    div = off.plot(
-        fig,
-        show_link=False,
-        include_plotlyjs=include_plotlyjs,
-        output_type="div",
+    return graph_to_html(
+        data_graph, title, width=700, include_plotlyjs=include_plotlyjs
     )
-    div = div.replace("<div>", '<div style="display:inline-block">')
-    return div

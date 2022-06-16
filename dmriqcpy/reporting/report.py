@@ -1,45 +1,64 @@
+# -*- coding: utf-8 -*-
 import os
+from collections.abc import Iterable
 from functools import partial
 from multiprocessing import Pool
 
 import numpy as np
 
 from dmriqcpy.analysis.stats import (
-    stats_mean_in_tissues,
-    stats_mask_volume,
-    stats_mean_median,
     stats_frf,
+    stats_mask_volume,
+    stats_mean_in_tissues,
+    stats_mean_median,
     stats_tractogram,
 )
 from dmriqcpy.viz.graph import (
-    graph_mean_in_tissues,
+    graph_frf_b0,
+    graph_frf_eigen,
     graph_mask_volume,
+    graph_mean_in_tissues,
     graph_mean_median,
-    graph_frf,
     graph_tractogram,
 )
 from dmriqcpy.viz.screenshot import (
-    screenshot_mosaic_wrapper,
     screenshot_mosaic_blend,
+    screenshot_mosaic_wrapper,
     screenshot_tracking,
 )
-from dmriqcpy.viz.utils import dataframe_to_html, analyse_qa
+from dmriqcpy.viz.utils import analyse_qa, dataframe_to_html
 
 
 def get_qa_report(summary, stats, qa_labels):
     qa_report = analyse_qa(summary, stats, qa_labels)
-    files_flagged_warning = np.concatenate([filenames for filenames in qa_report.values()])
+    files_flagged_warning = np.concatenate(
+        [filenames for filenames in qa_report.values()]
+    )
     qa_report["nb_warnings"] = len(np.unique(files_flagged_warning))
     return qa_report
 
 
 def _get_stats_and_graphs(
-    metrics, stats_fn, stats_labels, graph_fn, graph_title, qa_labels=None, include_plotlyjs=False
+    metrics,
+    stats_fn,
+    stats_labels,
+    graph_fn,
+    graph_title,
+    qa_labels=None,
+    include_plotlyjs=False,
 ):
     qa_labels = qa_labels or stats_labels
     summary, stats = stats_fn(stats_labels, metrics)
     qa_report = get_qa_report(summary, stats, qa_labels)
-    return summary, stats, qa_report, graph_fn(graph_title, qa_labels, summary, include_plotlyjs)
+    graphs = [
+        fn(title, qa_labels, summary, include_plotlyjs)
+        for fn, title in zip(
+            graph_fn if isinstance(graph_fn, Iterable) else [graph_fn],
+            graph_title if isinstance(graph_title, Iterable) else [graph_title],
+        )
+    ]
+
+    return summary, stats, qa_report, graphs
 
 
 def get_tractogram_qa_stats_and_graph(tractograms, report_is_online):
@@ -58,8 +77,8 @@ def get_frf_qa_stats_and_graph(frfs, report_is_online):
         frfs,
         stats_frf,
         ["Mean Eigen value 1", "Mean Eigen value 2", "Mean B0"],
-        graph_frf,
-        "FRF",
+        [graph_frf_eigen, graph_frf_b0],
+        ["EigenValues", "Mean B0"],
         include_plotlyjs=not report_is_online,
     )
 
@@ -75,7 +94,9 @@ def get_mask_qa_stats_and_graph(masks, name, report_is_online):
     )
 
 
-def get_qa_stats_and_graph_in_tissues(metric, name, wm_masks, gm_masks, csf_masks, report_is_online):
+def get_qa_stats_and_graph_in_tissues(
+    metric, name, wm_masks, gm_masks, csf_masks, report_is_online
+):
     stats_labels = [
         "Mean {} in WM".format(name),
         "Mean {} in GM".format(name),
@@ -85,7 +106,10 @@ def get_qa_stats_and_graph_in_tissues(metric, name, wm_masks, gm_masks, csf_mask
     return _get_stats_and_graphs(
         metric,
         partial(
-            stats_mean_in_tissues, wm_images=wm_masks, gm_images=gm_masks, csf_images=csf_masks
+            stats_mean_in_tissues,
+            wm_images=wm_masks,
+            gm_images=gm_masks,
+            csf_images=csf_masks,
         ),
         stats_labels,
         graph_mean_in_tissues,
@@ -121,7 +145,9 @@ def generate_report_package(
     metric_is_tracking=False,
 ):
     if metric_is_tracking:
-        screenshot_path = screenshot_tracking(metric_image_path, blend_image_path, "data")
+        screenshot_path = screenshot_tracking(
+            metric_image_path, blend_image_path, "data"
+        )
     elif blend_image_path:
         screenshot_path = screenshot_mosaic_blend(
             metric_image_path,
@@ -148,9 +174,12 @@ def generate_report_package(
         )
 
     subject_data = {"screenshot": screenshot_path}
-    subj_metric_name = os.path.basename(metric_image_path)
+    subj_metric_name = os.path.basename(metric_image_path).split(".")[0]
+
     if stats_summary is not None:
-        subject_data["stats"] = dataframe_to_html(stats_summary.loc[subj_metric_name])
+        subject_data["stats"] = dataframe_to_html(
+            stats_summary.loc[subj_metric_name].to_frame()
+        )
 
     return subj_metric_name, subject_data
 

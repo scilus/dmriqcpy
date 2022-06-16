@@ -27,7 +27,7 @@ def _build_arg_parser():
         description=DESCRIPTION, formatter_class=argparse.RawTextHelpFormatter
     )
 
-    p.add_argument("output_report", help="HTML report")
+    p.add_argument("output_report", help="Filename of QC report (in html format).")
 
     p.add_argument(
         "--data",
@@ -40,7 +40,7 @@ def _build_arg_parser():
         "--stats", action="store_true", help="Use included csv files."
     )
 
-    p.add_argument("--sym_link", action="store_true", help="Use symlink instead of copy")
+    p.add_argument("--sym_link", action="store_true", help="Use symlink instead of copy.")
 
     add_online_arg(p)
     add_overwrite_arg(p)
@@ -66,13 +66,12 @@ def main():
         screenshot_files = []
         stats_files = []
 
-        for ext in ["png","jpeg","jpg"]:
+        for ext in ["png", "jpeg", "jpg"]:
             screenshot_files = screenshot_files + sorted(glob.glob(folder + '/*' + ext))
         if args.stats:
             stats_files = sorted(glob.glob(folder + '/*.csv'))
             if len(screenshot_files) != len(stats_files):
                 parser.error("Not same number of stats and screenshots")
-
 
         name = os.path.basename(os.path.normpath(folder))
         subjects_dict = {}

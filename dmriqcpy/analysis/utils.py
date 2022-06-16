@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import logging
-import numpy as np
 import os
+
+import numpy as np
 import pandas as pd
 
 """
@@ -14,6 +15,7 @@ def get_nearest_bval(bvals, curr_bval, tol=20):
     """
     Get nearest bval in a list of bvals
     If not in the list, return the current bval
+
     Parameters
     ----------
     bvals: array
@@ -28,10 +30,10 @@ def get_nearest_bval(bvals, curr_bval, tol=20):
     -------
     bval: float
         Return the nearest bval or the current one.
-
-
     """
-    indices = np.where(np.logical_and(bvals <= curr_bval + tol, bvals >= curr_bval - tol))[0]
+    indices = np.where(
+        np.logical_and(bvals <= curr_bval + tol, bvals >= curr_bval - tol)
+    )[0]
     if len(indices) > 0:
         bval = bvals[indices[0]]
     else:
@@ -81,7 +83,9 @@ def read_protocol(in_jsons, tags):
                 t.index = index
                 tdf = pd.DataFrame(t)
 
-                if isinstance(temp[tag][0], int) or isinstance(temp[tag][0], float):
+                if isinstance(temp[tag][0], int) or isinstance(
+                    temp[tag][0], float
+                ):
                     tmp_dfs_for_graph.append(tdf)
 
                 dfs.append(("complete_" + tag, tdf))
@@ -140,7 +144,9 @@ def dwi_protocol(bvals, tol=20):
             if np.int(nearest_centroid) not in shells:
                 shells[np.int(nearest_centroid)] = {}
             nb_directions = len(
-                shells_indices[shells_indices == np.where(centroids == centroid)[0]]
+                shells_indices[
+                    shells_indices == np.where(centroids == centroid)[0]
+                ]
             )
             if filename not in shells[np.int(nearest_centroid)]:
                 shells[np.int(nearest_centroid)][index[i]] = 0
@@ -150,7 +156,9 @@ def dwi_protocol(bvals, tol=20):
 
         values_stats.append([len(centroids) - 1, len(shells_indices)])
 
-        stats_per_subjects[filename] = pd.DataFrame([values], index=[index[i]], columns=columns)
+        stats_per_subjects[filename] = pd.DataFrame(
+            [values], index=[index[i]], columns=columns
+        )
 
     stats = pd.DataFrame(values_stats, index=index, columns=column_names)
 
@@ -163,9 +171,6 @@ def dwi_protocol(bvals, tol=20):
     return stats_per_subjects, stats, stats_across_subjects, shells
 
 
-# TODO: THIS FUNCTION IS LEGACY. It was pulled from Scilpy to avoid including Dipy
-#       as a dependency. Once it is decided to add Dipy to our stack and proceed with
-#       validation, this function need to change for its Dipy equivalent.
 def identify_shells(bvals, threshold=40.0, roundCentroids=False, sort=False):
     """
     Guessing the shells from the b-values. Returns the list of shells and, for
@@ -211,7 +216,9 @@ def identify_shells(bvals, threshold=40.0, roundCentroids=False, sort=False):
     centroids = np.array(bval_centroids)
 
     # Identifying shells
-    bvals_for_diffs = np.tile(bvals.reshape(bvals.shape[0], 1), (1, centroids.shape[0]))
+    bvals_for_diffs = np.tile(
+        bvals.reshape(bvals.shape[0], 1), (1, centroids.shape[0])
+    )
 
     shell_indices = np.argmin(np.abs(bvals_for_diffs - centroids), axis=1)
 
@@ -230,9 +237,6 @@ def identify_shells(bvals, threshold=40.0, roundCentroids=False, sort=False):
     return centroids, shell_indices
 
 
-# TODO: THIS FUNCTION IS LEGACY. It works with the function above, but hasn't been tested
-#       against the Dipy implementation. It needs to be validated if the function above is
-#       changed for Dipy.
 def get_bvecs_from_shells_idxs(bvecs, shell_idxs):
     """
     Get bvecs associated to each shell
@@ -258,9 +262,32 @@ def get_bvecs_from_shells_idxs(bvecs, shell_idxs):
 
 
 def get_stats_dataframes(filenames, stats, metrics_names):
-    index = [os.path.basename(f) for f in filenames]
-    stats_per_subjects = pd.DataFrame(stats, index=[index], columns=metrics_names)
+    """
+    Create a DataFrame from a list of statistics estimated on a list of
+    subjects, as well as a DataFrame of summary statistics (Mean, std,
+    min, max) across subjects.
 
+    Parameters
+    ----------
+    filenames: array of strings
+        Array of filenames used to compute the statistics.
+    stats: array
+        Array of statistics for each filename.
+    metrics_names: array of strings
+        Names of the metrics (statistics) available in stats.
+    Return
+    ------
+    stats_per_subjects: DataFrame
+        DataFrame of statistics per subject.
+    stats_across_subjects: DataFrame
+        DataFrame of statistics across subjects (Mean, std, min, max).
+    """
+
+    stats_per_subjects = pd.DataFrame(
+        stats,
+        index=[os.path.basename(f).split(".")[0] for f in filenames],
+        columns=metrics_names,
+    )
     stats_across_subjects = pd.DataFrame(
         [
             stats_per_subjects.mean(),

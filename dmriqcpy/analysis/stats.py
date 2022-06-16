@@ -27,8 +27,6 @@ def stats_mean_median(column_names, filenames):
         across subjects.
     """
     values = []
-    import time
-    sub_filenames = [os.path.basename(curr_subj).split('.')[0] for curr_subj in filenames]
 
     for filename in filenames:
         data = nib.load(filename).get_data()
@@ -46,7 +44,9 @@ def stats_mean_median(column_names, filenames):
     return get_stats_dataframes(filenames, values, column_names)
 
 
-def stats_mean_in_tissues(column_names, images, wm_images, gm_images, csf_images):
+def stats_mean_in_tissues(
+    column_names, images, wm_images, gm_images, csf_images
+):
     """
     Compute mean value in WM, GM and CSF mask.
 
@@ -71,7 +71,6 @@ def stats_mean_in_tissues(column_names, images, wm_images, gm_images, csf_images
         DataFrame containing mean, std, min and max of mean across subjects.
     """
     values = []
-    sub_images = [os.path.basename(curr_subj).split('.')[0] for curr_subj in images]
 
     for i in range(len(images)):
         data = nib.load(images[i]).get_data()
@@ -108,6 +107,7 @@ def stats_frf(column_names, filenames):
         DataFrame containing mean, std, min and max of mean across subjects.
     """
     values = []
+
     for filename in filenames:
         frf = np.loadtxt(filename)
         values.append([frf[0], frf[1], frf[3]])
@@ -134,7 +134,7 @@ def stats_tractogram(column_names, tractograms):
         DataFrame containing mean, std, min and max of mean across subjects.
     """
     values = []
-    sub_tractograms = [os.path.basename(curr_subj).split('.')[0] for curr_subj in tractograms]
+
     for tractogram_file in tractograms:
         tractogram = nib.streamlines.load(tractogram_file, lazy_load=True)
         values.append([tractogram.header["nb_streamlines"]])
@@ -161,7 +161,6 @@ def stats_mask_volume(column_names, images):
         DataFrame containing mean, std, min and max of mean across subjects.
     """
     values = []
-    sub_images = [os.path.basename(curr_subj).split('.')[0] for curr_subj in images]
 
     for image in images:
         img = nib.load(image)

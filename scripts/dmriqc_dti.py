@@ -4,7 +4,6 @@
 import argparse
 from functools import partial
 import os
-import shutil
 
 import numpy as np
 
@@ -12,14 +11,14 @@ from dmriqcpy.io.report import Report
 from dmriqcpy.io.utils import (
     add_online_arg,
     add_overwrite_arg,
-    assert_inputs_exist,
-    assert_outputs_exist,
-    list_files_from_paths,
-    add_skip_arg,
     add_nb_columns_arg,
     add_nb_threads_arg,
+    add_skip_arg,
+    assert_inputs_exist,
     assert_list_arguments_equal_size,
+    assert_outputs_exist,
     clean_output_directories,
+    list_files_from_paths,
 )
 from dmriqcpy.reporting.report import (
     generate_report_package,
@@ -28,6 +27,7 @@ from dmriqcpy.reporting.report import (
 )
 from dmriqcpy.viz.screenshot import screenshot_fa_peaks
 from dmriqcpy.viz.utils import dataframe_to_html
+
 
 DESCRIPTION = """
 Compute the DTI report in HTML format.
@@ -39,47 +39,47 @@ def _build_arg_parser():
         description=DESCRIPTION, formatter_class=argparse.RawTextHelpFormatter
     )
 
-    p.add_argument("output_report", help="HTML report")
+    p.add_argument("output_report", help="Filename of QC report (in html format).")
 
     p.add_argument(
-        "--fa", nargs="+", required=True, help="Folder or list of FA images in Nifti format"
+        "--fa", nargs="+", required=True, help="Folder or list of FA images in Nifti format."
     )
 
     p.add_argument(
-        "--md", nargs="+", required=True, help="Folder or list of MD images in Nifti format"
+        "--md", nargs="+", required=True, help="Folder or list of MD images in Nifti format."
     )
 
     p.add_argument(
-        "--rd", nargs="+", required=True, help="Folder or list of RD images in Nifti format"
+        "--rd", nargs="+", required=True, help="Folder or list of RD images in Nifti format."
     )
 
     p.add_argument(
-        "--ad", nargs="+", required=True, help="Folder or list of AD images in Nifti format"
+        "--ad", nargs="+", required=True, help="Folder or list of AD images in Nifti format."
     )
 
     p.add_argument(
         "--residual",
         nargs="+",
         required=True,
-        help="Folder or list of residual images in Nifti format",
+        help="Folder or list of residual images in Nifti format.",
     )
     p.add_argument(
         "--evecs_v1",
         nargs="+",
         required=True,
-        help="Folder or list of evecs v1 images in Nifti format",
+        help="Folder or list of evecs v1 images in Nifti format.",
     )
 
     p.add_argument(
-        "--wm", nargs="+", required=True, help="Folder or list of WM mask in Nifti format"
+        "--wm", nargs="+", required=True, help="Folder or list of WM mask in Nifti format."
     )
 
     p.add_argument(
-        "--gm", nargs="+", required=True, help="Folder or list of GM mask in Nifti format"
+        "--gm", nargs="+", required=True, help="Folder or list of GM mask in Nifti format."
     )
 
     p.add_argument(
-        "--csf", nargs="+", required=True, help="Folder or list of CSF mask in Nifti format"
+        "--csf", nargs="+", required=True, help="Folder or list of CSF mask in Nifti format."
     )
 
     add_skip_arg(p)
@@ -95,16 +95,18 @@ def main():
     parser = _build_arg_parser()
     args = parser.parse_args()
 
-    images = [
-        list_files_from_paths(args.fa)
-        list_files_from_paths(args.md)
-        list_files_from_paths(args.rd)
-        list_files_from_paths(args.ad)
-        list_files_from_paths(args.residual)
-        list_files_from_paths(args.evecs_v1)
-        list_files_from_paths(args.wm)
-        list_files_from_paths(args.gm)
-        list_files_from_paths(args.csf)
+    (
+        fa, md, rd, ad, residual, evecs_v1, wm, gm, csf
+    ) = images = [
+        list_files_from_paths(args.fa),
+        list_files_from_paths(args.md),
+        list_files_from_paths(args.rd),
+        list_files_from_paths(args.ad),
+        list_files_from_paths(args.residual),
+        list_files_from_paths(args.evecs_v1),
+        list_files_from_paths(args.wm),
+        list_files_from_paths(args.gm),
+        list_files_from_paths(args.csf),
     ]
 
     assert_list_arguments_equal_size(parser, *images)
@@ -118,18 +120,18 @@ def main():
     graphs = []
     warning_dict = {}
     for metrics, name in [
-        [args.fa, "FA"],
-        [args.md, "MD"],
-        [args.rd, "RD"],
-        [args.ad, "AD"],
-        [args.residual, "Residual"],
+        [fa, "FA"],
+        [md, "MD"],
+        [rd, "RD"],
+        [ad, "AD"],
+        [residual, "Residual"],
     ]:
-        summary, stats, qa_report, qa_graph = get_generic_qa_stats_and_graph(
+        summary, stats, qa_report, qa_graphs = get_generic_qa_stats_and_graph(
             metrics, name, args.online
         )
         warning_dict[name] = qa_report
         summary_dict[name] = dataframe_to_html(stats)
-        graphs.append(qa_graph)
+        graphs.extend(qa_graphs)
 
         cmap = "hot" if name == "Residual" else None
         metrics_dict[name] = generate_metric_reports_parallel(
@@ -149,7 +151,7 @@ def main():
         os.path.basename(evecs).split('.')[0]: {
             "screenshot": screenshot_fa_peaks(fa, evecs, "data")
         }
-        for fa, evecs in zip(args.fa, args.evecs_v1)
+        for fa, evecs in zip(fa, evecs_v1)
     }
 
     nb_subjects = len(fa)

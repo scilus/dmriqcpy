@@ -3,16 +3,15 @@
 
 import argparse
 import os
-import shutil
 
 import numpy as np
 import pandas as pd
 
 from dmriqcpy.analysis.utils import (
     dwi_protocol,
-    read_protocol,
-    identify_shells,
     get_bvecs_from_shells_idxs,
+    identify_shells,
+    read_protocol,
 )
 from dmriqcpy.io.report import Report
 from dmriqcpy.io.utils import (
@@ -32,6 +31,7 @@ from dmriqcpy.viz.graph import (
 )
 from dmriqcpy.viz.screenshot import plot_proj_shell
 from dmriqcpy.viz.utils import dataframe_to_html
+
 
 DESCRIPTION = """
 Compute DWI protocol report.
@@ -93,11 +93,16 @@ def main():
     bvec = list_files_from_paths(args.bvec)
     files_to_validate = [bval, bvec]
 
+    metadata = None
     if args.metadata:
         metadata = list_files_from_paths(args.metadata)
         files_to_validate.append(metadata)
 
     assert_list_arguments_equal_size(parser, *files_to_validate)
+    all_data = np.concatenate([bval, bvec])
+    assert_inputs_exist(parser, all_data)
+    assert_outputs_exist(parser, args, [args.output_report, "data", "libs"])
+    clean_output_directories()
 
     stats_tags = []
     stats_tags_for_graph = []
@@ -109,11 +114,6 @@ def main():
             stats_tags_for_graph_all,
         ) = read_protocol(metadata, args.dicom_fields)
 
-    all_data = np.concatenate([bval, bvec])
-    assert_inputs_exist(parser, all_data)
-    assert_outputs_exist(parser, args, [args.output_report, "data", "libs"])
-    clean_output_directories()
-
     name = "DWI Protocol"
     summary, stats_for_graph, stats_all, shells = dwi_protocol(bval)
 
@@ -122,8 +122,8 @@ def main():
             if "complete_" in tag:
                 metric = curr_df.columns[0]
                 for nSub in curr_df.index:
-                    currKey = [nKey for nKey in summary.keys() if nSub in nKey]
-                    summary[currKey[0]][metric] = curr_df[metric][nSub]
+                    curr_key = [nKey for nKey in summary.keys() if nSub in nKey]
+                    summary[curr_key[0]][metric] = curr_df[metric][nSub]
 
     if not isinstance(stats_tags_for_graph, list):
         stats_for_graph = pd.concat([stats_for_graph, stats_tags_for_graph], axis=1, join="inner")

@@ -2,10 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import argparse
-import os
-import shutil
-
-import itertools
 from functools import partial
 
 import numpy as np
@@ -14,14 +10,14 @@ from dmriqcpy.io.report import Report
 from dmriqcpy.io.utils import (
     add_online_arg,
     add_overwrite_arg,
-    assert_inputs_exist,
-    assert_outputs_exist,
-    list_files_from_paths,
-    add_skip_arg,
     add_nb_columns_arg,
     add_nb_threads_arg,
+    add_skip_arg,
+    assert_inputs_exist,
     assert_list_arguments_equal_size,
+    assert_outputs_exist,
     clean_output_directories,
+    list_files_from_paths,
 )
 from dmriqcpy.reporting.report import (
     generate_metric_reports_parallel,
@@ -41,28 +37,28 @@ def _build_arg_parser():
         description=DESCRIPTION, formatter_class=argparse.RawTextHelpFormatter
     )
 
-    p.add_argument("output_report", help="HTML report")
+    p.add_argument("output_report", help="Filename of QC report (in html format).")
     p.add_argument(
         "--t1_warped",
         nargs="+",
         required=True,
-        help="Folder or list of T1 registered images in Nifti format",
+        help="Folder or list of T1 registered images in Nifti format.",
     )
 
     p.add_argument(
-        "--rgb", nargs="+", required=True, help="Folder or list of RGB images in Nifti format"
+        "--rgb", nargs="+", required=True, help="Folder or list of RGB images in Nifti format."
     )
 
     p.add_argument(
-        "--wm", nargs="+", required=True, help="Folder or list of WM mask in Nifti format"
+        "--wm", nargs="+", required=True, help="Folder or list of WM mask in Nifti format."
     )
 
     p.add_argument(
-        "--gm", nargs="+", required=True, help="Folder or list of GM mask in Nifti format"
+        "--gm", nargs="+", required=True, help="Folder or list of GM mask in Nifti format."
     )
 
     p.add_argument(
-        "--csf", nargs="+", required=True, help="Folder or list of CSF mask in Nifti format"
+        "--csf", nargs="+", required=True, help="Folder or list of CSF mask in Nifti format."
     )
 
     add_skip_arg(p)
@@ -93,7 +89,7 @@ def main():
     name = "Register T1"
     nb_subjects = len(t1_warped)
 
-    summary, stats, qa_report, qa_graph = get_qa_stats_and_graph_in_tissues(
+    summary, stats, qa_report, qa_graphs = get_qa_stats_and_graph_in_tissues(
         t1_warped, name, wm, gm, csf, args.online
     )
 
@@ -119,7 +115,7 @@ def main():
         title="Quality Assurance registration",
         nb_subjects=nb_subjects,
         summary_dict=summary_dict,
-        graph_array=[qa_graph],
+        graph_array=qa_graphs,
         metrics_dict=metrics_dict,
         warning_dict=warning_dict,
         online=args.online,

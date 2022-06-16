@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Some functions comes from
-https://github.com/scilus/scilpy/blob/master/scilpy/io/utils.py
-"""
-
 import glob
 import os
 import shutil
@@ -11,20 +6,10 @@ import shutil
 import numpy as np
 
 
-def add_overwrite_arg(parser):
-    """
-    Add overwrite option to the parser.
-
-    Parameters
-    ----------
-    parser: argparse.ArgumentParser object
-    """
-    parser.add_argument(
-        "-f",
-        dest="overwrite",
-        action="store_true",
-        help="Force overwriting of the output files.",
-    )
+"""
+Some functions comes from
+https://github.com/scilus/scilpy/blob/master/scilpy/io/utils.py
+"""
 
 
 def assert_inputs_exist(parser, required, optional=None, are_directories=False):
@@ -75,7 +60,11 @@ def assert_outputs_exist(parser, args, required, optional=None):
 
     def check(path):
         if os.path.isfile(path) and not args.overwrite:
-            parser.error("Output file {} exists. Use -f to force overwriting".format(path))
+            parser.error(
+                "Output file {} exists. Use -f to force overwriting".format(
+                    path
+                )
+            )
 
     if isinstance(required, str):
         required = [required]
@@ -96,6 +85,22 @@ def assert_list_arguments_equal_size(parser, *args):
         parser.error("No input images provided.")
     if not np.allclose(sizes, sizes[0]):
         parser.error("Not the same number of images in input.")
+
+
+def add_overwrite_arg(parser):
+    """
+    Add overwrite option to the parser.
+
+    Parameters
+    ----------
+    parser: argparse.ArgumentParser object
+    """
+    parser.add_argument(
+        "-f",
+        dest="overwrite",
+        action="store_true",
+        help="Force overwriting of the output files.",
+    )
 
 
 def add_online_arg(parser):
@@ -161,7 +166,7 @@ def list_files_from_paths(paths):
     out_images = []
     for curr_path in paths:
         if os.path.isdir(curr_path):
-            curr_images = glob.glob(os.path.join(curr_path, '*'))
+            curr_images = glob.glob(os.path.join(curr_path, "*"))
         else:
             curr_images = [curr_path]
 

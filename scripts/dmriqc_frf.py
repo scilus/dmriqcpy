@@ -54,7 +54,7 @@ def main():
     name = "FRF"
     nb_subjects = len(frf)
 
-    summary, stats, qa_report, qa_graph = get_frf_qa_stats_and_graph(frf, args.online)
+    summary, stats, qa_report, qa_graphs = get_frf_qa_stats_and_graph(frf, args.online)
     warning_dict = {name: qa_report}
     summary_dict = {name: dataframe_to_html(stats)}
 
@@ -70,7 +70,7 @@ def main():
         title="Quality Assurance FRF",
         nb_subjects=nb_subjects,
         summary_dict=summary_dict,
-        graph_array=[qa_graph],
+        graph_array=qa_graphs,
         metrics_dict=metrics_dict,
         warning_dict=warning_dict,
         online=args.online,

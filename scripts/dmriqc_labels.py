@@ -2,27 +2,27 @@
 # -*- coding: utf-8 -*-
 
 import argparse
-import os
-import shutil
-
-import itertools
 from functools import partial
+
 import numpy as np
 
 from dmriqcpy.io.report import Report
 from dmriqcpy.io.utils import (
     add_online_arg,
     add_overwrite_arg,
-    assert_inputs_exist,
-    assert_outputs_exist,
-    list_files_from_paths,
-    add_skip_arg,
     add_nb_columns_arg,
     add_nb_threads_arg,
-    assert_list_arguments_equal_size,
+    add_skip_arg,
+    assert_inputs_exist,
+    assert_outputs_exist,
     clean_output_directories,
+    list_files_from_paths,
 )
-from dmriqcpy.reporting.report import generate_metric_reports_parallel, generate_report_package
+from dmriqcpy.reporting.report import (
+    generate_metric_reports_parallel,
+    generate_report_package,
+)
+
 
 DESCRIPTION = """
 Compute the labels report in HTML format.
@@ -37,7 +37,7 @@ def _build_arg_parser():
         description=DESCRIPTION, formatter_class=argparse.RawTextHelpFormatter
     )
 
-    p.add_argument("output_report", help="HTML report.")
+    p.add_argument("output_report", help="Filename of QC report (in html format).")
 
     p.add_argument(
         "--t1",
@@ -83,7 +83,7 @@ def main():
         parser.error("Not the same number of images in input.")
 
     if len(label) == 1:
-        label = label * len(args.t1)
+        label = label * len(t1)
 
     all_images = np.concatenate([t1, label])
     if args.lut:

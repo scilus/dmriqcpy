@@ -2,25 +2,22 @@
 # -*- coding: utf-8 -*-
 
 import argparse
-import os
-import shutil
-
-import itertools
 from functools import partial
+
 import numpy as np
 
 from dmriqcpy.io.report import Report
 from dmriqcpy.io.utils import (
     add_online_arg,
     add_overwrite_arg,
-    assert_inputs_exist,
-    assert_outputs_exist,
-    list_files_from_paths,
-    add_skip_arg,
     add_nb_columns_arg,
     add_nb_threads_arg,
+    add_skip_arg,
+    assert_inputs_exist,
     assert_list_arguments_equal_size,
+    assert_outputs_exist,
     clean_output_directories,
+    list_files_from_paths,
 )
 from dmriqcpy.reporting.report import (
     generate_metric_reports_parallel,
@@ -78,7 +75,7 @@ def main():
     clean_output_directories()
 
     metrics, name = images_no_bet, args.image_type
-    nb_subjects = len(args.images_no_bet)
+    nb_subjects = len(images_no_bet)
 
     summary, stats, qa_report, qa_graphs = get_generic_qa_stats_and_graph(
         metrics, name, args.online
@@ -106,7 +103,7 @@ def main():
         title="Quality Assurance BET " + args.image_type,
         nb_subjects=nb_subjects,
         summary_dict=summary_dict,
-        graph_array=[qa_graphs],
+        graph_array=qa_graphs,
         metrics_dict=metrics_dict,
         warning_dict=warning_dict,
         online=args.online,

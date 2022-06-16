@@ -2,24 +2,22 @@
 # -*- coding: utf-8 -*-
 
 import argparse
-import os
-import shutil
-
 from functools import partial
+
 import numpy as np
 
 from dmriqcpy.io.report import Report
 from dmriqcpy.io.utils import (
     add_online_arg,
     add_overwrite_arg,
-    assert_inputs_exist,
-    assert_outputs_exist,
-    list_files_from_paths,
-    add_skip_arg,
     add_nb_columns_arg,
     add_nb_threads_arg,
+    add_skip_arg,
+    assert_inputs_exist,
     assert_list_arguments_equal_size,
+    assert_outputs_exist,
     clean_output_directories,
+    list_files_from_paths,
 )
 from dmriqcpy.reporting.report import (
     generate_report_package,
@@ -39,25 +37,25 @@ def _build_arg_parser():
         description=DESCRIPTION, formatter_class=argparse.RawTextHelpFormatter
     )
 
-    p.add_argument("tracking_type", choices=["pft", "local"], help="Tracking type")
-    p.add_argument("output_report", help="HTML report")
+    p.add_argument("tracking_type", choices=["pft", "local"], help="Tracking type.")
+    p.add_argument("output_report", help="Filename of QC report (in html format).")
     p.add_argument(
         "--seeding_mask",
         nargs="+",
         required=True,
-        help="Folder or list of seeding mask in Nifti format",
+        help="Folder or list of seeding mask in Nifti format.",
     )
 
     p.add_argument(
-        "--tracking_mask", nargs="+", help="Folder or list of tracking mask in Nifti format"
+        "--tracking_mask", nargs="+", help="Folder or list of tracking mask in Nifti format."
     )
 
     p.add_argument(
-        "--map_include", nargs="+", help="Folder or list of map include in Nifti format"
+        "--map_include", nargs="+", help="Folder or list of map include in Nifti format."
     )
 
     p.add_argument(
-        "--map_exclude", nargs="+", help="Folder or list of map exlude in Nifti format"
+        "--map_exclude", nargs="+", help="Folder or list of map exlude in Nifti format."
     )
 
     add_skip_arg(p)
@@ -79,6 +77,10 @@ def main():
         tracking_mask = list_files_from_paths(args.tracking_mask)
         assert_list_arguments_equal_size(parser, seeding_mask, tracking_mask)
         all_images = np.concatenate([seeding_mask, tracking_mask])
+        metrics_names = [
+            [seeding_mask, "Seeding mask"],
+            [tracking_mask, "Tracking mask"],
+        ]
     else:
         map_include = list_files_from_paths(args.map_include)
         map_exclude = list_files_from_paths(args.map_exclude)
@@ -88,35 +90,28 @@ def main():
         all_images = np.concatenate(
             [seeding_mask, map_include, map_exclude]
         )
-
-    assert_inputs_exist(parser, all_images)
-    assert_outputs_exist(parser, args, [args.output_report, "data", "libs"])
-    clean_output_directories()
-
-    if args.tracking_type == "local":
-        metrics_names = [
-            [seeding_mask, "Seeding mask"],
-            [tracking_mask, "Tracking mask"],
-        ]
-    else:
         metrics_names = [
             [seeding_mask, "Seeding mask"],
             [map_include, "Map include"],
             [map_exclude, "Maps exclude"],
         ]
 
+    assert_inputs_exist(parser, all_images)
+    assert_outputs_exist(parser, args, [args.output_report, "data", "libs"])
+    clean_output_directories()
+
     metrics_dict = {}
     summary_dict = {}
     graphs = []
     warning_dict = {}
     for metrics, name in metrics_names:
-        summary, stats, qa_report, qa_graph = get_mask_qa_stats_and_graph(
+        summary, stats, qa_report, qa_graphs = get_mask_qa_stats_and_graph(
             metrics, name, args.online
         )
 
         warning_dict[name] = qa_report
         summary_dict[name] = dataframe_to_html(stats)
-        graphs.append(qa_graph)
+        graphs.extend(qa_graphs)
 
         metrics_dict[name] = generate_metric_reports_parallel(
             zip(metrics),

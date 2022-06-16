@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import argparse
-import os
-import shutil
 
 from functools import partial
 import numpy as np
@@ -12,14 +10,14 @@ from dmriqcpy.io.report import Report
 from dmriqcpy.io.utils import (
     add_online_arg,
     add_overwrite_arg,
-    assert_inputs_exist,
-    assert_outputs_exist,
-    list_files_from_paths,
-    add_skip_arg,
     add_nb_columns_arg,
     add_nb_threads_arg,
+    add_skip_arg,
+    assert_inputs_exist,
     assert_list_arguments_equal_size,
+    assert_outputs_exist,
     clean_output_directories,
+    list_files_from_paths,
 )
 from dmriqcpy.reporting.report import (
     generate_metric_reports_parallel,
@@ -39,42 +37,42 @@ def _build_arg_parser():
         description=DESCRIPTION, formatter_class=argparse.RawTextHelpFormatter
     )
 
-    p.add_argument("output_report", help="HTML report")
+    p.add_argument("output_report", help="Filename of QC report (in html format).")
     p.add_argument(
         "--afd_max",
         nargs="+",
         required=True,
-        help="Folder or list of AFD max images in Nifti format",
+        help="Folder or list of AFD max images in Nifti format.",
     )
     p.add_argument(
         "--afd_sum",
         nargs="+",
         required=True,
-        help="Folder or list of AFD sum images in Nifti format",
+        help="Folder or list of AFD sum images in Nifti format.",
     )
     p.add_argument(
         "--afd_total",
         nargs="+",
         required=True,
-        help="Folder or list of AFD total images in Nifti format",
+        help="Folder or list of AFD total images in Nifti format.",
     )
     p.add_argument(
         "--nufo",
         nargs="+",
         required=True,
-        help="Folder or list of NUFO max images in Nifti format",
+        help="Folder or list of NUFO max images in Nifti format.",
     )
 
     p.add_argument(
-        "--wm", nargs="+", required=True, help="Folder or list of WM mask in Nifti format"
+        "--wm", nargs="+", required=True, help="Folder or list of WM mask in Nifti format."
     )
 
     p.add_argument(
-        "--gm", nargs="+", required=True, help="Folder or list of GM mask in Nifti format"
+        "--gm", nargs="+", required=True, help="Folder or list of GM mask in Nifti format."
     )
 
     p.add_argument(
-        "--csf", nargs="+", required=True, help="Folder or list of CSF mask in Nifti format"
+        "--csf", nargs="+", required=True, help="Folder or list of CSF mask in Nifti format."
     )
 
     add_skip_arg(p)
@@ -124,12 +122,12 @@ def main():
         [afd_total, "AFD_total"],
         [nufo, "NUFO"],
     ]:
-        summary, stats, qa_report, qa_graph = get_qa_stats_and_graph_in_tissues(
+        summary, stats, qa_report, qa_graphs = get_qa_stats_and_graph_in_tissues(
             metrics, name, wm, gm, csf, args.online
         )
         warning_dict[name] = qa_report
         summary_dict[name] = dataframe_to_html(stats)
-        graphs.append(qa_graph)
+        graphs.extend(qa_graphs)
 
         metrics_dict[name] = generate_metric_reports_parallel(
             zip(metrics),

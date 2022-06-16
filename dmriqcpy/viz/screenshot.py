@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
-
 import os
 from tempfile import mkstemp
 
-from PIL import Image, ImageDraw, ImageFont
 from dipy.data import get_sphere
+from dipy.io.streamline import load_tractogram
 import fury
 from fury import actor, window
 from matplotlib.cm import get_cmap
 import nibabel as nib
 import numpy as np
+from PIL import Image, ImageDraw, ImageFont
 
 from dmriqcpy.viz.utils import compute_labels_map, renderer_to_arr
-from dipy.io.streamline import load_tractogram
+
 
 vtkcolors = [
     window.colors.blue,
@@ -30,6 +30,7 @@ vtkcolors = [
 
 def screenshot_mosaic_wrapper(
     filename,
+    output_prefix="",
     directory=".",
     skip=1,
     pad=20,
@@ -55,7 +56,7 @@ def screenshot_mosaic_wrapper(
     skip : int
         Number of images to skip between 2 images in the mosaic.
     pad : int
-        Padding value between each images.
+        Padding value between each image.
     nb_columns : int
         Number of columns.
     axis : bool
@@ -64,9 +65,11 @@ def screenshot_mosaic_wrapper(
         Colormap name in matplotlib format.
     return_path : bool
         Return path of the mosaic.
+    duration : int
+        Number of frames of the generated GIF
     lut : str
         Look up table.
-    Compute lut: bool
+    compute_lut: bool
         If set, will compute a look of table using compute_labels_map.
 
     Returns
@@ -83,10 +86,10 @@ def screenshot_mosaic_wrapper(
         # is only a problem with some RGB images, for which the 4th
         # dimension is encoded in the datatype of the array
         data = data.view((data.dtype[0], len(data.dtype)))
+
     data = np.nan_to_num(data)
     unique = np.unique(data)
-
-    output_prefix = output_prefix.replace(' ', '_') + '_'
+    output_prefix = output_prefix.replace(" ", "_") + "_"
 
     if lut is not None or compute_lut:
         lut = compute_labels_map(lut, unique, compute_lut)
@@ -99,7 +102,7 @@ def screenshot_mosaic_wrapper(
     if return_path:
         image_name = os.path.basename(str(filename)).split(".")[0]
         if isinstance(imgs_comb, list):
-            name = os.path.join(directory, image_name + ".gif")
+            name = os.path.join(directory, output_prefix + image_name + ".gif")
             imgs_comb[0].save(
                 name,
                 save_all=True,
@@ -108,8 +111,9 @@ def screenshot_mosaic_wrapper(
                 loop=0,
             )
         else:
-            name = os.path.join(directory, image_name + ".png")
+            name = os.path.join(directory, output_prefix + image_name + ".png")
             imgs_comb.save(name)
+
         return name
     else:
         return imgs_comb
@@ -118,6 +122,7 @@ def screenshot_mosaic_wrapper(
 def screenshot_mosaic_blend(
     image,
     image_blend,
+    output_prefix="",
     directory=".",
     blend_val=0.5,
     skip=1,
@@ -137,7 +142,7 @@ def screenshot_mosaic_blend(
         Image filename.
     image_blend : string
         Image blend filename.
-    image_name : string
+    output_prefix : string
         Image_prefix.
     directory : string
         Directory to save the mosaic.
@@ -155,7 +160,8 @@ def screenshot_mosaic_blend(
         Image blend is a mask.
     lut : str
         Look up table
-
+    compute_lut: bool
+        If set, will compute a look of table using compute_labels_map.
 
     Returns
     -------
@@ -179,26 +185,30 @@ def screenshot_mosaic_blend(
         axis=False,
         return_path=False,
         lut=lut,
-        compute_lut=compute_lut
+        compute_lut=compute_lut,
     )
 
-    output_prefix = output_prefix.replace(' ', '_') + '_'
+    output_prefix = output_prefix.replace(" ", "_") + "_"
 
     if is_mask:
         data = np.array(mosaic_blend)
         data[(data == (255, 255, 255)).all(axis=-1)] = (255, 0, 0)
         mosaic_blend = Image.fromarray(data, mode="RGB")
+
     image_name = os.path.basename(str(image)).split(".")[0]
     if isinstance(mosaic_image, list):
         blend = []
         for _, mosaic in enumerate(mosaic_image):
             blend.append(Image.blend(mosaic, mosaic_blend, alpha=blend_val))
-        name = os.path.join(directory, image_name + image_name + ".gif")
-        blend[0].save(name, save_all=True, append_images=blend[1:], duration=100, loop=0)
+        name = os.path.join(directory, output_prefix + image_name + ".gif")
+        blend[0].save(
+            name, save_all=True, append_images=blend[1:], duration=100, loop=0
+        )
     else:
         blend = Image.blend(mosaic_image, mosaic_blend, alpha=blend_val)
-        name = os.path.join(directory, image_name + image_name + ".png")
+        name = os.path.join(directory, output_prefix + image_name + ".png")
         blend.save(name)
+
     return name
 
 
@@ -237,24 +247,28 @@ def screenshot_mosaic(data, skip, pad, nb_columns, axis, cmap):
     if max_val - min_val < 20 and max_val.is_integer():
         min_val = data.min()
         max_val = np.percentile(data[data > 0], 99.99)
+
     shape = (
-        (data[:, :, 0].shape[1] + pad) * nb_rows + pad * nb_rows,
-        (data[:, :, 0].shape[0] + pad) * nb_columns + nb_columns * pad,
+        (data[:, :, 0].shape[1] + 2 * pad) * nb_rows,
+        (data[:, :, 0].shape[0] + 2 * pad) * nb_columns,
     )
     padding = ((int(pad / 2), int(pad / 2)), (int(pad / 2), int(pad / 2)))
+
     is_rgb = False
     if is_4d:
         time = data.shape[3]
         if time == 3:
             is_rgb = True
+
         shape += (time,)
         padding += ((0, 0),)
 
     if not is_rgb:
-        data = np.interp(data, xp=[min_val, max_val], fp=[0, 255]).astype(dtype=np.uint8)
+        data = np.interp(data, xp=[min_val, max_val], fp=[0, 255]).astype(
+            dtype=np.uint8
+        )
 
     mosaic = np.zeros(shape, dtype=np.uint8)
-
     for i, idx in enumerate(range_row):
         corner = i % nb_columns
         row = int(i / nb_columns)
@@ -264,17 +278,30 @@ def screenshot_mosaic(data, skip, pad, nb_columns, axis, cmap):
         curr_shape = curr_img.shape
         row_pad = (curr_shape[0] + pad) * row
         col_pad = (curr_shape[1] + pad) * corner
-        mosaic[row_pad : row_pad + curr_shape[0], col_pad : col_pad + curr_shape[1]] = curr_img
+        mosaic[
+            row_pad : row_pad + curr_shape[0], col_pad : col_pad + curr_shape[1]
+        ] = curr_img
+
     if axis and not is_4d:
-        mosaic = np.pad(mosaic, ((50, 50), (50, 50)), "constant").astype(dtype=np.uint8)
+        mosaic = np.pad(mosaic, ((50, 50), (50, 50)), "constant").astype(
+            dtype=np.uint8
+        )
+
         img = Image.fromarray(mosaic)
         draw = ImageDraw.Draw(img)
+        fnt = ImageFont.truetype(
+            "/usr/share/fonts/truetype/freefont/FreeSans.ttf", 40
+        )
 
-        fnt = ImageFont.truetype("/usr/share/fonts/truetype/freefont/FreeSans.ttf", 40)
         draw.text([mosaic.shape[1] / 2, 0], "A", fill=255, font=fnt)
-        draw.text([mosaic.shape[1] / 2, mosaic.shape[0] - 40], "P", fill=255, font=fnt)
+        draw.text(
+            [mosaic.shape[1] / 2, mosaic.shape[0] - 40], "P", fill=255, font=fnt
+        )
         draw.text([0, mosaic.shape[0] / 2], "L", fill=255, font=fnt)
-        draw.text([mosaic.shape[1] - 40, mosaic.shape[0] / 2], "R", fill=255, font=fnt)
+        draw.text(
+            [mosaic.shape[1] - 40, mosaic.shape[0] / 2], "R", fill=255, font=fnt
+        )
+
         mosaic = np.array(img, dtype=np.uint8)
 
     if cmap is not None:
@@ -284,33 +311,42 @@ def screenshot_mosaic(data, skip, pad, nb_columns, axis, cmap):
     tmp = screenshot_3_axis(data, mosaic, cmap, is_4d)
     mosaic = np.vstack((tmp, mosaic))
     del data
+
     if is_4d and mosaic.shape[2] != 3:
         gif = []
         for i in range(mosaic.shape[2]):
             img_t = np.uint8(np.clip(mosaic[:, :, i], 0, 255))
             imgs_comb = Image.fromarray(img_t)
+
             if mosaic[:, :, i].shape[1] > 1920:
-                basewidth = 1920
-                wpercent = basewidth / float(imgs_comb.size[0])
-                hsize = int((float(imgs_comb.size[1]) * float(wpercent)))
-                imgs_comb = imgs_comb.resize((basewidth, hsize), Image.ANTIALIAS)
+                base_width = 1920
+                w_percent = base_width / float(imgs_comb.size[0])
+                hsize = int((float(imgs_comb.size[1]) * float(w_percent)))
+                imgs_comb = imgs_comb.resize(
+                    (base_width, hsize), Image.ANTIALIAS
+                )
 
             draw = ImageDraw.Draw(imgs_comb)
-            fnt = ImageFont.truetype("/usr/share/fonts/truetype/freefont/FreeSans.ttf", 40)
-            draw.text([0, 0], str(i) + "/" + str(mosaic.shape[2]), fill=255, font=fnt)
+            fnt = ImageFont.truetype(
+                "/usr/share/fonts/truetype/freefont/FreeSans.ttf", 40
+            )
 
+            draw.text(
+                [0, 0], str(i) + "/" + str(mosaic.shape[2]), fill=255, font=fnt
+            )
             gif.append(imgs_comb.convert("RGB"))
+
         return gif
 
     img = np.uint8(np.clip(mosaic, 0, 255))
     imgs_comb = Image.fromarray(img)
     if mosaic[:, :].shape[1] > 1920:
-        basewidth = 1920
-        wpercent = basewidth / float(imgs_comb.size[0])
-        hsize = int((float(imgs_comb.size[1]) * float(wpercent)))
-        imgs_comb = imgs_comb.resize((basewidth, hsize), Image.ANTIALIAS)
-    imgs_comb = imgs_comb.convert("RGB")
-    return imgs_comb
+        base_width = 1920
+        w_percent = base_width / float(imgs_comb.size[0])
+        hsize = int((float(imgs_comb.size[1]) * float(w_percent)))
+        imgs_comb = imgs_comb.resize((base_width, hsize), Image.ANTIALIAS)
+
+    return imgs_comb.convert("RGB")
 
 
 def screenshot_3_axis(data, mosaic, cmap=None, is_4d=False):
@@ -332,29 +368,33 @@ def screenshot_3_axis(data, mosaic, cmap=None, is_4d=False):
         top = np.floor(pad_h / 2)
         bottom = pad_h - top
         padding = ((top, bottom), (left, right))
+
         if is_4d:
             padding += ((0, 0),)
+
         img2 = np.pad(img, np.array(padding, dtype=int), "constant")
         img2 = np.rot90(img2)
-        if image.size == 0:
-            image = img2
-        else:
-            image = np.hstack((image, img2))
+        image = img2 if image.size == 0 else np.hstack((image, img2))
 
     if is_4d:
         tmp = []
         for i in range(image.shape[2]):
             three_axis = Image.fromarray(np.uint8(image[:, :, i]))
             three_axis_np = np.array(three_axis)
-            tmp.append(_resize_mosaic(mosaic[:, :, i], three_axis, three_axis_np))
+            tmp.append(
+                _resize_mosaic(mosaic[:, :, i], three_axis, three_axis_np)
+            )
+
         image = np.moveaxis(np.array(tmp), 0, 2)
     else:
         three_axis = Image.fromarray(np.uint8(image))
         three_axis_np = np.array(three_axis)
         image = _resize_mosaic(mosaic, three_axis, three_axis_np)
+
     if cmap is not None:
         colormap = get_cmap(cmap)
         image = np.array(colormap(image / 255.0) * 255).astype(dtype=np.uint8)
+
     return np.array(image, dtype=np.uint8)
 
 
@@ -404,9 +444,7 @@ def screenshot_fa_peaks(fa, peaks, directory="."):
 
     evecs = np.zeros(data.shape + (1, 3))
     evecs[:, :, :, 0, :] = evecs_data[...]
-
     middle = [data.shape[0] // 2 + 4, data.shape[1] // 2, data.shape[2] // 2]
-
     slice_display = [
         (middle[0], None, None),
         (None, middle[1], None),
@@ -421,18 +459,20 @@ def screenshot_fa_peaks(fa, peaks, directory="."):
         peak_actor = actor.peak_slicer(evecs, colors=None)
 
         peak_actor.GetProperty().SetLineWidth(2.5)
-
-        slice_actor.display(slice_display[j][0], slice_display[j][1], slice_display[j][2])
-        peak_actor.display(slice_display[j][0], slice_display[j][1], slice_display[j][2])
+        slice_actor.display(
+            slice_display[j][0], slice_display[j][1], slice_display[j][2]
+        )
+        peak_actor.display(
+            slice_display[j][0], slice_display[j][1], slice_display[j][2]
+        )
 
         renderer = window.Scene()
-
         renderer.add(slice_actor)
         renderer.add(peak_actor)
 
-        center = slice_actor.GetCenter()
         pos = None
         viewup = None
+        center = slice_actor.GetCenter()
         if slice_name == "sagittal":
             pos = (center[0] - 350, center[1], center[2])
             viewup = (0, 0, -1)
@@ -445,15 +485,11 @@ def screenshot_fa_peaks(fa, peaks, directory="."):
 
         camera = renderer.GetActiveCamera()
         camera.SetViewUp(viewup)
-
         camera.SetPosition(pos)
         camera.SetFocalPoint(center)
 
         img = renderer_to_arr(renderer, (1080, 1080))
-        if len(concat) == 0:
-            concat = img
-        else:
-            concat = np.hstack((concat, img))
+        concat = img if len(concat) == 0 else np.hstack((concat, img))
 
     imgs_comb = Image.fromarray(concat)
     imgs_comb.save(name)
@@ -492,19 +528,19 @@ def screenshot_tracking(tracking, t1, directory="."):
     ]
     center = [
         (
-            img_center[0][0] - 350 - (1 - t1.header.get_zooms()[0]) * 350,
+            img_center[0][0] - (2 - t1.header.get_zooms()[0]) * 350,
             img_center[1][1],
             img_center[2][2],
         ),
         (
             img_center[0][0],
-            img_center[1][1] + 350 + (1 - t1.header.get_zooms()[1]) * 350,
+            img_center[1][1] + (2 - t1.header.get_zooms()[1]) * 350,
             img_center[2][2],
         ),
         (
             img_center[0][0],
             img_center[1][1],
-            img_center[2][2] + 350 + (1 - t1.header.get_zooms()[2]) * 350,
+            img_center[2][2] + (2 - t1.header.get_zooms()[2]) * 350,
         ),
     ]
     viewup = [(0, 0, -1), (0, 0, -1), (0, -1, 0)]
@@ -519,30 +555,36 @@ def screenshot_tracking(tracking, t1, directory="."):
         for streamline in sft.streamlines:
             if it > 10000:
                 break
+
             if slice_idx in np.array(streamline, dtype=int)[:, i]:
                 it += 1
-                idx = np.where(np.array(streamline, dtype=int)[:, i] == slice_idx)[0][0]
-                lower = idx - 2
-                if lower < 0:
-                    lower = 0
-                upper = idx + 2
-                if upper > len(streamline) - 1:
-                    upper = len(streamline) - 1
+                idx = np.where(
+                    np.array(streamline, dtype=int)[:, i] == slice_idx
+                )[0][0]
+
+                lower = max(idx - 2, 0)
+                upper = min(idx + 2, len(streamline) - 1)
                 streamlines.append(streamline[lower:upper])
-
-        ren = window.Scene()
-
-        streamline_actor = actor.line(streamlines, linewidth=0.2)
-        ren.add(streamline_actor)
 
         min_val = np.min(t1_data[t1_data > 0])
         max_val = np.percentile(t1_data[t1_data > 0], 99)
-        t1_color = np.float32(t1_data - min_val) / np.float32(max_val - min_val) * 255.0
+        t1_color = (
+            np.float32(t1_data - min_val)
+            / np.float32(max_val - min_val)
+            * 255.0
+        )
+
+        streamline_actor = actor.line(streamlines, linewidth=0.2)
         slice_actor = actor.slicer(
             t1_color, opacity=0.8, value_range=(0, 255), interpolation="nearest"
         )
+        slice_actor.display(
+            img_center[i][0], img_center[i][1], img_center[i][2]
+        )
+
+        ren = window.Scene()
+        ren.add(streamline_actor)
         ren.add(slice_actor)
-        slice_actor.display(img_center[i][0], img_center[i][1], img_center[i][2])
 
         camera = ren.GetActiveCamera()
         camera.SetViewUp(viewup[i])
@@ -551,27 +593,29 @@ def screenshot_tracking(tracking, t1, directory="."):
         camera.SetFocalPoint(center_cam)
 
         img2 = renderer_to_arr(ren, size)
-        if image.size == 0:
-            image = img2
-        else:
-            image = np.hstack((image, img2))
+        image = img2 if image.size == 0 else np.hstack((image, img2))
 
-    streamlines = []
-    it = 0
+    streamlines, it = [], 0
     for streamline in sft.streamlines:
         if it > 10000:
             break
+
         it += 1
         streamlines.append(streamline)
 
-    ren = window.Scene()
     streamline_actor = actor.line(streamlines, linewidth=0.2)
+    center = streamline_actor.GetCenter()
+
+    ren = window.Scene()
     ren.add(streamline_actor)
+
     camera = ren.GetActiveCamera()
     camera.SetViewUp(0, 0, -1)
-    center = streamline_actor.GetCenter()
-    camera.SetPosition(center[0], 350 + (1 - t1.header.get_zooms()[1]) * 350, center[2])
+    camera.SetPosition(
+        center[0], 350 + (1 - t1.header.get_zooms()[1]) * 350, center[2]
+    )
     camera.SetFocalPoint(center)
+
     img2 = renderer_to_arr(ren, (3 * 1920, 1920))
     image = np.vstack((image, img2))
 
@@ -621,9 +665,14 @@ def plot_proj_shell(
     ------
     """
     global vtkcolors
+
     if len(ms) > 10:
         vtkcolors = fury.colormap.distinguishable_colormap(nb_colors=len(ms))
-    radius = np.interp(centroids, xp=[min(centroids), max(centroids)], fp=[0, 1])
+
+    radius = np.interp(
+        centroids, xp=[min(centroids), max(centroids)], fp=[0, 1]
+    )
+
     ren = window.Scene()
     ren.SetBackground(1, 1, 1)
     if use_sphere:
@@ -634,6 +683,7 @@ def plot_proj_shell(
         odfs[:] = 1
         odfs[..., 0] = 1
         affine = np.eye(4)
+
         for i, shell in enumerate(ms):
             sphere_actor = actor.odf_slicer(
                 odfs,
@@ -649,10 +699,17 @@ def plot_proj_shell(
     for i, shell in enumerate(ms):
         if same_color:
             i = 0
-        pts_actor = actor.point(shell * radius[i], vtkcolors[i], point_radius=rad)
+
+        pts_actor = actor.point(
+            shell * radius[i], vtkcolors[i], point_radius=rad
+        )
         ren.add(pts_actor)
+
         if use_sym:
-            pts_actor = actor.point(-shell * radius[i], vtkcolors[i], point_radius=rad)
+            pts_actor = actor.point(
+                -shell * radius[i], vtkcolors[i], point_radius=rad
+            )
             ren.add(pts_actor)
+
     if ofile:
         window.snapshot(ren, fname=ofile + ".png", size=ores)
