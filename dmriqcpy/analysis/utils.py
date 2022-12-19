@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 import logging
-import numpy as np
 import os
+
+import numpy as np
 import pandas as pd
 
 """
-Some functions comes from
-https://github.com/scilus/scilpy/blob/master/scilpy/utils/bvec_bval_tools.py
+Some functions come from Scilpy v1.2.0
+https://github.com/scilus/scilpy/blob/1.2.0/scilpy/utils/bvec_bval_tools.py
 """
 
 
@@ -14,6 +15,7 @@ def get_nearest_bval(bvals, curr_bval, tol=20):
     """
     Get nearest bval in a list of bvals
     If not in the list, return the current bval
+
     Parameters
     ----------
     bvals: array
@@ -28,11 +30,10 @@ def get_nearest_bval(bvals, curr_bval, tol=20):
     -------
     bval: float
         Return the nearest bval or the current one.
-
-
     """
-    indices = np.where(np.logical_and(bvals <= curr_bval + tol,
-                                      bvals >= curr_bval - tol))[0]
+    indices = np.where(
+        np.logical_and(bvals <= curr_bval + tol, bvals >= curr_bval - tol)
+    )[0]
     if len(indices) > 0:
         bval = bvals[indices[0]]
     else:
@@ -46,7 +47,7 @@ def read_protocol(in_jsons, tags):
 
     Parameters
     ----------
-    in_json : List
+    in_jsons : List
         List of jsons files
     tags: List
         List of tags to check
@@ -60,13 +61,9 @@ def read_protocol(in_jsons, tags):
     dfs_for_graph: DataFrame
         DataFrame containing all valid for all subjects.
     """
-    dfs = []
-    for in_json in in_jsons:
-        data = pd.read_json(in_json, orient='index')
-        dfs.append(data.T)
-
+    dfs = [pd.read_json(in_json, orient="index").T for in_json in in_jsons]
     temp = pd.concat(dfs, ignore_index=True)
-    index = [os.path.basename(item).split('.')[0] for item in in_jsons]
+    index = [os.path.basename(item).split(".")[0] for item in in_jsons]
     dfs = []
     tmp_dfs_for_graph = []
     dfs_for_graph_all = []
@@ -79,30 +76,34 @@ def read_protocol(in_jsons, tags):
                 tdf = tdf.rename(columns={tag: "Number of subjects"})
                 tdf.reset_index(inplace=True)
                 tdf = tdf.rename(columns={tag: "Value(s)"})
-                tdf = tdf.sort_values(by=['Value(s)'],
-                                      ascending=False)
+                tdf = tdf.sort_values(by=["Value(s)"], ascending=False)
                 dfs.append((tag, tdf))
 
                 t = temp[tag]
                 t.index = index
                 tdf = pd.DataFrame(t)
 
-                if isinstance(temp[tag][0], int) or\
-                   isinstance(temp[tag][0], float):
+                if isinstance(temp[tag][0], int) or isinstance(
+                    temp[tag][0], float
+                ):
                     tmp_dfs_for_graph.append(tdf)
 
-                dfs.append(('complete_' + tag, tdf))
+                dfs.append(("complete_" + tag, tdf))
         else:
             logging.warning("{} does not exist in the metadata.".format(tag))
 
     if tmp_dfs_for_graph:
         dfs_for_graph = pd.concat(tmp_dfs_for_graph, axis=1, join="inner")
-        dfs_for_graph_all = pd.DataFrame([dfs_for_graph.mean(),
-                                         dfs_for_graph.std(),
-                                         dfs_for_graph.min(),
-                                         dfs_for_graph.max()],
-                                         index=['mean', 'std', 'min', 'max'],
-                                         columns=dfs_for_graph.columns)
+        dfs_for_graph_all = pd.DataFrame(
+            [
+                dfs_for_graph.mean(),
+                dfs_for_graph.std(),
+                dfs_for_graph.min(),
+                dfs_for_graph.max(),
+            ],
+            index=["mean", "std", "min", "max"],
+            columns=dfs_for_graph.columns,
+        )
 
     return dfs, dfs_for_graph, dfs_for_graph_all
 
@@ -127,7 +128,7 @@ def dwi_protocol(bvals, tol=20):
     values_stats = []
     column_names = ["Nbr shells", "Nbr directions"]
     shells = {}
-    index = [os.path.basename(item).split('.')[0] for item in bvals]
+    index = [os.path.basename(item).split(".")[0] for item in bvals]
     for i, filename in enumerate(bvals):
         values = []
 
@@ -135,17 +136,18 @@ def dwi_protocol(bvals, tol=20):
 
         centroids, shells_indices = identify_shells(bval, threshold=tol)
         s_centroids = sorted(centroids)
-        values.append(', '.join(str(x) for x in s_centroids))
+        values.append(", ".join(str(x) for x in s_centroids))
         values.append(len(shells_indices))
-        columns = ["bvals"]
-        columns.append("Nbr directions")
+        columns = ["bvals", "Nbr directions"]
         for centroid in s_centroids:
             nearest_centroid = get_nearest_bval(list(shells.keys()), centroid)
             if np.int(nearest_centroid) not in shells:
                 shells[np.int(nearest_centroid)] = {}
-            nb_directions = len(shells_indices[shells_indices ==
-                                               np.where(centroids == centroid)[
-                                                   0]])
+            nb_directions = len(
+                shells_indices[
+                    shells_indices == np.where(centroids == centroid)[0]
+                ]
+            )
             if filename not in shells[np.int(nearest_centroid)]:
                 shells[np.int(nearest_centroid)][index[i]] = 0
             shells[np.int(nearest_centroid)][index[i]] += nb_directions
@@ -154,18 +156,17 @@ def dwi_protocol(bvals, tol=20):
 
         values_stats.append([len(centroids) - 1, len(shells_indices)])
 
-        stats_per_subjects[filename] = pd.DataFrame([values], index=[index[i]],
-                                                    columns=columns)
+        stats_per_subjects[filename] = pd.DataFrame(
+            [values], index=[index[i]], columns=columns
+        )
 
-    stats = pd.DataFrame(values_stats, index=index,
-                         columns=column_names)
+    stats = pd.DataFrame(values_stats, index=index, columns=column_names)
 
-    stats_across_subjects = pd.DataFrame([stats.mean(),
-                                         stats.std(),
-                                         stats.min(),
-                                         stats.max()],
-                                         index=['mean', 'std', 'min', 'max'],
-                                         columns=column_names)
+    stats_across_subjects = pd.DataFrame(
+        [stats.mean(), stats.std(), stats.min(), stats.max()],
+        index=["mean", "std", "min", "max"],
+        columns=column_names,
+    )
 
     return stats_per_subjects, stats, stats_across_subjects, shells
 
@@ -180,8 +181,6 @@ def identify_shells(bvals, threshold=40.0, roundCentroids=False, sort=False):
     threshold, or else we consider that it is on another shell. This is an
     alternative to K-means considering we don't already know the number of
     shells K.
-
-    Note. This function should be added in Dipy soon.
 
     Parameters
     ----------
@@ -204,7 +203,7 @@ def identify_shells(bvals, threshold=40.0, roundCentroids=False, sort=False):
         For each bval, the associated centroid K.
     """
     if len(bvals) == 0:
-        raise ValueError('Empty b-values.')
+        raise ValueError("Empty b-values.")
 
     # Finding centroids
     bval_centroids = [bvals[0]]
@@ -217,8 +216,9 @@ def identify_shells(bvals, threshold=40.0, roundCentroids=False, sort=False):
     centroids = np.array(bval_centroids)
 
     # Identifying shells
-    bvals_for_diffs = np.tile(bvals.reshape(bvals.shape[0], 1),
-                              (1, centroids.shape[0]))
+    bvals_for_diffs = np.tile(
+        bvals.reshape(bvals.shape[0], 1), (1, centroids.shape[0])
+    )
 
     shell_indices = np.argmin(np.abs(bvals_for_diffs - centroids), axis=1)
 
@@ -237,16 +237,16 @@ def identify_shells(bvals, threshold=40.0, roundCentroids=False, sort=False):
     return centroids, shell_indices
 
 
-def build_ms_from_shell_idx(bvecs, shell_idx):
+def get_bvecs_from_shells_idxs(bvecs, shell_idxs):
     """
-    Get bvecs from indexes
+    Get bvecs associated to each shell
 
     Parameters
     ----------
     bvecs: numpy.ndarray
-        bvecs
-    shell_idx: numpy.ndarray
-        index for each bval
+        bvecs (N, 3)
+    shell_idxs: numpy.ndarray
+        lists of indexes into bvecs for each shell (K, M_k)
 
     Return
     ------
@@ -254,12 +254,49 @@ def build_ms_from_shell_idx(bvecs, shell_idx):
         bvecs for each bval
     """
 
-    S = len(set(shell_idx))
-    if (-1 in set(shell_idx)):
-        S -= 1
+    nb_shells = len(set(shell_idxs))
+    if -1 in set(shell_idxs):
+        nb_shells -= 1
 
-    ms = []
-    for i_ms in range(S):
-        ms.append(bvecs[shell_idx == i_ms])
+    return [bvecs[shell_idxs == i_ms] for i_ms in range(nb_shells)]
 
-    return ms
+
+def get_stats_dataframes(filenames, stats, metrics_names):
+    """
+    Create a DataFrame from a list of statistics estimated on a list of
+    subjects, as well as a DataFrame of summary statistics (Mean, std,
+    min, max) across subjects.
+
+    Parameters
+    ----------
+    filenames: array of strings
+        Array of filenames used to compute the statistics.
+    stats: array
+        Array of statistics for each filename.
+    metrics_names: array of strings
+        Names of the metrics (statistics) available in stats.
+    Return
+    ------
+    stats_per_subjects: DataFrame
+        DataFrame of statistics per subject.
+    stats_across_subjects: DataFrame
+        DataFrame of statistics across subjects (Mean, std, min, max).
+    """
+
+    stats_per_subjects = pd.DataFrame(
+        stats,
+        index=[os.path.basename(f).split(".")[0] for f in filenames],
+        columns=metrics_names,
+    )
+    stats_across_subjects = pd.DataFrame(
+        [
+            stats_per_subjects.mean(),
+            stats_per_subjects.std(),
+            stats_per_subjects.min(),
+            stats_per_subjects.max(),
+        ],
+        index=["mean", "std", "min", "max"],
+        columns=metrics_names,
+    )
+
+    return stats_per_subjects, stats_across_subjects
