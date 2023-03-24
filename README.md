@@ -8,7 +8,7 @@ To install dmriqcpy, run the following command:
 pip install git+https://github.com/scilus/dmriqcpy.git
 ```
 
-dmriqcpy is also available within [scilus-flows](https://hub.docker.com/repository/docker/scilus/scilus-flows/general)
+dmriqcpy is also available within the [scilus container](https://hub.docker.com/repository/docker/scilus/scilus/general)
 
 If you use this tool for your research, **please cite the following**
 
