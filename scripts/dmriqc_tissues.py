@@ -42,6 +42,9 @@ def _build_arg_parser():
     p.add_argument('--csf', nargs='+', required=True,
                    help='CSF mask in Nifti format')
 
+    p.add_argument('--background', nargs='+', 
+                   help='Background image in Nifti format.')
+
     p.add_argument('--skip', default=2, type=int,
                    help='Number of images skipped to build the '
                         'mosaic. [%(default)s]')
