@@ -26,7 +26,6 @@ def stats_mean_median(column_names, filenames):
         across subjects.
     """
     values = []
-    import time
     sub_filenames = [os.path.basename(curr_subj).split('.')[0] for curr_subj in filenames]
 
     for filename in filenames:
@@ -135,7 +134,7 @@ def stats_frf(column_names, filenames):
         values.append([frf[0], frf[1], frf[3]])
 
     sub_filenames = [os.path.basename(curr_subj).split('.')[0] for curr_subj in filenames]
-    stats_per_subjects = pd.DataFrame(values,index=sub_filenames,
+    stats_per_subjects = pd.DataFrame(values, index=sub_filenames,
                                       columns=column_names)
 
     stats_across_subjects = pd.DataFrame([stats_per_subjects.mean(),
