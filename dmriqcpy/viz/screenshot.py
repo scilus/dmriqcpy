@@ -257,7 +257,7 @@ def screenshot_mosaic(data, skip, pad, nb_columns, axis, cmap):
                 wpercent = (basewidth / float(imgs_comb.size[0]))
                 hsize = int((float(imgs_comb.size[1]) * float(wpercent)))
                 imgs_comb = imgs_comb.resize((basewidth, hsize),
-                                             Image.ANTIALIAS)
+                                             Image.LANCZOS)
 
             draw = ImageDraw.Draw(imgs_comb)
             fnt = ImageFont.truetype(
@@ -274,7 +274,7 @@ def screenshot_mosaic(data, skip, pad, nb_columns, axis, cmap):
         basewidth = 1920
         wpercent = (basewidth / float(imgs_comb.size[0]))
         hsize = int((float(imgs_comb.size[1]) * float(wpercent)))
-        imgs_comb = imgs_comb.resize((basewidth, hsize), Image.ANTIALIAS)
+        imgs_comb = imgs_comb.resize((basewidth, hsize), Image.LANCZOS)
     imgs_comb = imgs_comb.convert("RGB")
     return imgs_comb
 
