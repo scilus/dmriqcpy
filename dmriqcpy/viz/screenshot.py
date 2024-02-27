@@ -26,10 +26,10 @@ vtkcolors = [window.colors.blue,
              window.colors.grey]
 
 
-def screenshot_mosaic_wrapper(filename, output_prefix="", directory=".", skip=1,
-                              pad=20, nb_columns=15, axis=True, cmap=None,
-                              return_path=True, duration=100, lut=None,
-                              compute_lut=False):
+def screenshot_mosaic_wrapper(filename, output_prefix="", directory=".",
+                              skip=1, pad=20, nb_columns=15, axis=True,
+                              cmap=None, return_path=True, duration=100,
+                              lut=None, compute_lut=False):
     """
     Compute mosaic wrapper from an image
 
@@ -65,7 +65,7 @@ def screenshot_mosaic_wrapper(filename, output_prefix="", directory=".", skip=1,
     imgs_comb : array 2D
         mosaic in array 2D
     """
-    data = nib.load(filename).get_data()
+    data = nib.load(filename).get_fdata()
     data = np.nan_to_num(data)
     unique = np.unique(data)
 
@@ -93,9 +93,9 @@ def screenshot_mosaic_wrapper(filename, output_prefix="", directory=".", skip=1,
         return imgs_comb
 
 
-def screenshot_mosaic_blend(image, image_blend, output_prefix="", directory=".",
-                            blend_val=0.5, skip=1, pad=20, nb_columns=15,
-                            cmap=None, is_mask=False, lut=None,
+def screenshot_mosaic_blend(image, image_blend, output_prefix="",
+                            directory=".", blend_val=0.5, skip=1, pad=20,
+                            nb_columns=15, cmap=None, is_mask=False, lut=None,
                             compute_lut=False):
     """
     Compute a blend mosaic from an image and a mask
@@ -222,8 +222,8 @@ def screenshot_mosaic(data, skip, pad, nb_columns, axis, cmap):
         curr_shape = curr_img.shape
         mosaic[curr_shape[0] * row + row * pad:
                row * curr_shape[0] + curr_shape[0] + row * pad,
-        curr_shape[1] * corner + corner * pad:
-        corner * curr_shape[1] + curr_shape[1] + corner * pad] = curr_img
+               curr_shape[1] * corner + corner * pad:
+               corner * curr_shape[1] + curr_shape[1] + corner * pad] = curr_img
     if axis and not is_4d:
         mosaic = np.pad(mosaic, ((50, 50), (50, 50)), 'constant').astype(
             dtype=np.uint8)
@@ -257,7 +257,7 @@ def screenshot_mosaic(data, skip, pad, nb_columns, axis, cmap):
                 wpercent = (basewidth / float(imgs_comb.size[0]))
                 hsize = int((float(imgs_comb.size[1]) * float(wpercent)))
                 imgs_comb = imgs_comb.resize((basewidth, hsize),
-                                             Image.ANTIALIAS)
+                                             Image.LANCZOS)
 
             draw = ImageDraw.Draw(imgs_comb)
             fnt = ImageFont.truetype(
@@ -274,7 +274,7 @@ def screenshot_mosaic(data, skip, pad, nb_columns, axis, cmap):
         basewidth = 1920
         wpercent = (basewidth / float(imgs_comb.size[0]))
         hsize = int((float(imgs_comb.size[1]) * float(wpercent)))
-        imgs_comb = imgs_comb.resize((basewidth, hsize), Image.ANTIALIAS)
+        imgs_comb = imgs_comb.resize((basewidth, hsize), Image.LANCZOS)
     imgs_comb = imgs_comb.convert("RGB")
     return imgs_comb
 
@@ -284,8 +284,7 @@ def screenshot_3_axis(data, mosaic, cmap=None, is_4d=False):
               data.shape[2] // 2]
     slice_display = [data[middle[0], :, :], data[:, middle[1], :],
                      data[:, :, middle[2]]]
-
-    size = max(data.shape)
+    size = max(data.shape[0:3])
     image = np.array([])
     for j in range(len(slice_display)):
         img = slice_display[j]
@@ -333,7 +332,7 @@ def _resize_mosaic(mosaic, three_axis, three_axis_np):
     tmp = np.zeros((three_axis_np.shape[0], mosaic.shape[1]))
     diff = np.abs(np.subtract(tmp.shape, three_axis_np.shape))
     tmp[diff[0]: three_axis_np.shape[0] + diff[0],
-    np.int(diff[1] / 2): three_axis_np.shape[1] + np.int(
+        np.int(diff[1] / 2): three_axis_np.shape[1] + np.int(
         diff[1] / 2)] = three_axis_np
 
     return tmp
@@ -358,8 +357,8 @@ def screenshot_fa_peaks(fa, peaks, directory='.'):
         Path of the mosaic
     """
     slice_name = ['sagittal', 'coronal', 'axial']
-    data = nib.load(fa).get_data()
-    evecs_data = nib.load(peaks).get_data()
+    data = nib.load(fa).get_fdata()
+    evecs_data = nib.load(peaks).get_fdata()
 
     evecs = np.zeros(data.shape + (1, 3))
     evecs[:, :, :, 0, :] = evecs_data[...]
@@ -441,7 +440,7 @@ def screenshot_tracking(tracking, t1, directory="."):
     sft = load_tractogram(tracking, 'same')
     sft.to_vox()
     t1 = nib.load(t1)
-    t1_data = t1.get_data()
+    t1_data = t1.get_fdata()
 
     slice_name = ['sagittal', 'coronal', 'axial']
     img_center = [(int(t1_data.shape[0] / 2) + 5, None, None),
@@ -464,8 +463,7 @@ def screenshot_tracking(tracking, t1, directory="."):
                 break
             if slice_idx in np.array(streamline, dtype=int)[:, i]:
                 it += 1
-                idx = np.where(np.array(streamline, dtype=int)[:, i] == \
-                               slice_idx)[0][0]
+                idx = np.where(np.array(streamline, dtype=int)[:, i] == slice_idx)[0][0]
                 lower = idx - 2
                 if lower < 0:
                     lower = 0
@@ -481,8 +479,7 @@ def screenshot_tracking(tracking, t1, directory="."):
 
         min_val = np.min(t1_data[t1_data > 0])
         max_val = np.percentile(t1_data[t1_data > 0], 99)
-        t1_color = np.float32(t1_data - min_val) \
-                   / np.float32(max_val - min_val) * 255.0
+        t1_color = np.float32(t1_data - min_val) / np.float32(max_val - min_val) * 255.0
         slice_actor = actor.slicer(t1_color, opacity=0.8, value_range=(0, 255),
                                    interpolation='nearest')
         ren.add(slice_actor)

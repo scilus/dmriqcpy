@@ -26,11 +26,10 @@ def stats_mean_median(column_names, filenames):
         across subjects.
     """
     values = []
-    import time
     sub_filenames = [os.path.basename(curr_subj).split('.')[0] for curr_subj in filenames]
 
     for filename in filenames:
-        data = nib.load(filename).get_data()
+        data = nib.load(filename).get_fdata()
         shape = data.shape
 
         if len(shape) > 3:
@@ -85,10 +84,10 @@ def stats_mean_in_tissues(column_names, images, wm_images, gm_images,
     sub_images = [os.path.basename(curr_subj).split('.')[0] for curr_subj in images]
 
     for i in range(len(images)):
-        data = nib.load(images[i]).get_data()
-        wm = nib.load(wm_images[i]).get_data()
-        gm = nib.load(gm_images[i]).get_data()
-        csf = nib.load(csf_images[i]).get_data()
+        data = nib.load(images[i]).get_fdata()
+        wm = nib.load(wm_images[i]).get_fdata()
+        gm = nib.load(gm_images[i]).get_fdata()
+        csf = nib.load(csf_images[i]).get_fdata()
 
         data_wm = np.mean(data[wm > 0])
         data_gm = np.mean(data[gm > 0])
@@ -135,7 +134,7 @@ def stats_frf(column_names, filenames):
         values.append([frf[0], frf[1], frf[3]])
 
     sub_filenames = [os.path.basename(curr_subj).split('.')[0] for curr_subj in filenames]
-    stats_per_subjects = pd.DataFrame(values,index=sub_filenames,
+    stats_per_subjects = pd.DataFrame(values, index=sub_filenames,
                                       columns=column_names)
 
     stats_across_subjects = pd.DataFrame([stats_per_subjects.mean(),
@@ -210,7 +209,7 @@ def stats_mask_volume(column_names, images):
 
     for image in images:
         img = nib.load(image)
-        data = img.get_data()
+        data = img.get_fdata()
         voxel_volume = np.prod(img.header['pixdim'][1:4])
         volume = np.count_nonzero(data) * voxel_volume
 
