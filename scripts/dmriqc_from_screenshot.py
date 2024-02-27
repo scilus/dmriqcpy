@@ -63,7 +63,7 @@ def main():
         screenshot_files = []
         stats_files = []
 
-        for ext in ["png","jpeg","jpg"]:
+        for ext in ["png","jpeg","jpg","gif"]:
             screenshot_files = screenshot_files + sorted(glob.glob(folder + '/*' + ext))
         if args.stats:
             stats_files = sorted(glob.glob(folder + '/*.csv'))

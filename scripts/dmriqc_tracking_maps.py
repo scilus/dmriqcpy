@@ -16,7 +16,8 @@ from dmriqcpy.io.utils import (add_online_arg, add_overwrite_arg,
                                assert_inputs_exist, assert_outputs_exist,
                                list_files_from_paths)
 from dmriqcpy.viz.graph import graph_mask_volume
-from dmriqcpy.viz.screenshot import screenshot_mosaic_wrapper
+from dmriqcpy.viz.screenshot import (screenshot_mosaic_wrapper,
+                                     screenshot_mosaic_blend)
 from dmriqcpy.viz.utils import analyse_qa, dataframe_to_html
 
 
@@ -47,6 +48,9 @@ def _build_arg_parser():
     p.add_argument('--map_exclude', nargs='+',
                    help='Folder or list of map exlude in Nifti format')
 
+    p.add_argument('--background', nargs='+',
+                   help='Folder or list of background images in Nifti format')
+
     p.add_argument('--skip', default=2, type=int,
                    help='Number of images skipped to build the '
                         'mosaic. [%(default)s]')
@@ -63,13 +67,23 @@ def _build_arg_parser():
     return p
 
 
-def _subj_parralel(subj_metric, summary, name, skip, nb_columns):
+def _subj_parralel(subj_metric, summary, name, skip, nb_columns, bg=None):
     subjects_dict = {}
     curr_key = os.path.basename(subj_metric).split('.')[0]
-    screenshot_path = screenshot_mosaic_wrapper(subj_metric,
-                                                output_prefix=name,
-                                                directory="data", skip=skip,
-                                                nb_columns=nb_columns)
+
+    if bg is None:
+        screenshot_path = screenshot_mosaic_wrapper(subj_metric,
+                                                    output_prefix=name,
+                                                    directory="data", skip=skip,
+                                                    nb_columns=nb_columns)
+    else:
+        screenshot_path = screenshot_mosaic_blend(bg, subj_metric,
+                                                  output_prefix=name,
+                                                  directory="data",
+                                                  blend_val=0.3,
+                                                  skip=skip,
+                                                  nb_columns=nb_columns,
+                                                  is_mask=True)
 
     summary_html = dataframe_to_html(summary.loc[curr_key].to_frame())
     subjects_dict[curr_key] = {}
@@ -98,6 +112,13 @@ def main():
         all_images = np.concatenate([seeding_mask, map_include,
                                      map_exclude])
 
+    background = []
+    if args.background is not None and len(args.background) > 0:
+        background = list_files_from_paths(args.background)
+        if not len(seeding_mask) == len(background):
+            parser.error("Not the same number of images in input.")
+        all_images = np.concatenate([all_images, background])
+
     assert_inputs_exist(parser, all_images)
     assert_outputs_exist(parser, args, [args.output_report, "data", "libs"])
 
@@ -109,17 +130,17 @@ def main():
         shutil.rmtree("libs")
 
     if args.tracking_type == "local":
-        metrics_names = [[seeding_mask, 'Seeding mask'],
-                         [tracking_mask, 'Tracking mask']]
+        metrics_names = [[background, seeding_mask, 'Seeding mask'],
+                         [background, tracking_mask, 'Tracking mask']]
     else:
-        metrics_names = [[seeding_mask, 'Seeding mask'],
-                         [map_include, 'Map include'],
-                         [map_exclude, 'Maps exclude']]
+        metrics_names = [[background, seeding_mask, 'Seeding mask'],
+                         [background, map_include, 'Map include'],
+                         [background, map_exclude, 'Maps exclude']]
     metrics_dict = {}
     summary_dict = {}
     graphs = []
     warning_dict = {}
-    for metrics, name in metrics_names:
+    for bg, metrics, name in metrics_names:
         columns = ["{} volume".format(name)]
         summary, stats = stats_mask_volume(columns, metrics)
 
@@ -137,11 +158,13 @@ def main():
         subjects_dict = {}
         pool = Pool(args.nb_threads)
         subjects_dict_pool = pool.starmap(_subj_parralel,
-                                          zip(metrics,
+                                          itertools.zip_longest(
+                                              metrics,
                                               itertools.repeat(summary),
                                               itertools.repeat(name),
                                               itertools.repeat(args.skip),
-                                              itertools.repeat(args.nb_columns)))
+                                              itertools.repeat(args.nb_columns),
+                                              bg))
         pool.close()
         pool.join()
 
