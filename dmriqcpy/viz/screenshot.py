@@ -65,7 +65,7 @@ def screenshot_mosaic_wrapper(filename, output_prefix="", directory=".", skip=1,
     imgs_comb : array 2D
         mosaic in array 2D
     """
-    data = nib.load(filename).get_data()
+    data = nib.load(filename).get_fdata()
     data = np.nan_to_num(data)
     unique = np.unique(data)
 
@@ -284,8 +284,7 @@ def screenshot_3_axis(data, mosaic, cmap=None, is_4d=False):
               data.shape[2] // 2]
     slice_display = [data[middle[0], :, :], data[:, middle[1], :],
                      data[:, :, middle[2]]]
-
-    size = max(data.shape)
+    size = max(data.shape[0:3])
     image = np.array([])
     for j in range(len(slice_display)):
         img = slice_display[j]
@@ -358,8 +357,8 @@ def screenshot_fa_peaks(fa, peaks, directory='.'):
         Path of the mosaic
     """
     slice_name = ['sagittal', 'coronal', 'axial']
-    data = nib.load(fa).get_data()
-    evecs_data = nib.load(peaks).get_data()
+    data = nib.load(fa).get_fdata()
+    evecs_data = nib.load(peaks).get_fdata()
 
     evecs = np.zeros(data.shape + (1, 3))
     evecs[:, :, :, 0, :] = evecs_data[...]
@@ -441,7 +440,7 @@ def screenshot_tracking(tracking, t1, directory="."):
     sft = load_tractogram(tracking, 'same')
     sft.to_vox()
     t1 = nib.load(t1)
-    t1_data = t1.get_data()
+    t1_data = t1.get_fdata()
 
     slice_name = ['sagittal', 'coronal', 'axial']
     img_center = [(int(t1_data.shape[0] / 2) + 5, None, None),

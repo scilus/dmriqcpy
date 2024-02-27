@@ -47,8 +47,8 @@ MAJOR = _version_major
 MINOR = _version_minor
 MICRO = _version_micro
 VERSION = __version__
-REQUIRES = ['numpy (>=1.18)', 'jinja2 (>=2.10.1)', 'pandas (>=0.25.1)',
-            'nibabel (>=3.0)', 'plotly (>=3.0.0)', 'vtk (>=8.1.2)',
-            'pillow (>=6.2.0)', 'fury (>=0.2.0)', 'dipy (>= 1.1.0)',
-            'matplotlib (>=2.2.0)', 'scipy (>=1.4.1)']
+REQUIRES = ['numpy (>=1.23,<1.24)', 'jinja2 (>=2.10.1)', 'pandas (>=0.25.1)',
+            'nibabel (>=5.2,<5.3)', 'plotly (>=5.18,<5.19)', 'vtk (>=9.2,<9.3)',
+            'pillow (>=10.2,<10.3)', 'fury (>=0.9,<0.10)', 'dipy (>=1.8,<1.9)',
+            'matplotlib (>=3.6,<3.7)', 'scipy (>=1.9,<2.0)']
 SCRIPTS = glob.glob("scripts/*.py")
